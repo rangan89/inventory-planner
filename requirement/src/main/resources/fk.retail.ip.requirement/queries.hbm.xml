@@ -30,7 +30,7 @@
     <named-query name="fetchBandDataForFSNs">
         <query>
             <![CDATA[
-            SELECT r
+            SELECT fb
             FROM FsnBand fb
             WHERE
                 fb.fsn IN :fsns

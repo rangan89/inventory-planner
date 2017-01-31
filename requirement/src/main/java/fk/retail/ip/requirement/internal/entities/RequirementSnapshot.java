@@ -4,6 +4,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -42,7 +43,8 @@ public class RequirementSnapshot extends ReadOnlyEntity {
 
     private String policy;
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "group_id")
+    @OneToOne(fetch = FetchType.LAZY)
+    @PrimaryKeyJoinColumn
     private Group group;
 
 
