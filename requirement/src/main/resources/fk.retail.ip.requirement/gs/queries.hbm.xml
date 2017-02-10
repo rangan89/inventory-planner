@@ -15,6 +15,17 @@
         </query>
     </named-query>
 
+    <named-query name="findRequirementByIds.count">
+        <query>
+            <![CDATA[
+            SELECT count(r)
+            FROM Requirement r
+            WHERE
+                r.id in :ids
+                 ]]>
+        </query>
+    </named-query>
+
     <named-query name="findEnabledRequirementsByState">
         <query>
             <![CDATA[

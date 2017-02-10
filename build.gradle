@@ -29,8 +29,13 @@ subprojects {
         compile group: 'org.apache.poi', name: 'poi', version: '3.10-FINAL'
         compile group: 'org.apache.poi', name: 'poi-ooxml', version: '3.10-FINAL'
 
-
-        testCompile group: 'junit', name: 'junit', version: '4.11'
+        testCompile "junit:junit:4.11"
+        testCompile "org.jukito:jukito:1.3"
+        testCompile "io.dropwizard:dropwizard-testing:$dropwizardVersion"
+        testCompile "fk.sp.common:common-test-extensions:$commonExtentions"
+        testCompile group: 'org.mockito', name: 'mockito-core', version: '2.2.7'
+        testCompile 'org.skyscreamer:jsonassert:1.3.0'
+        testCompile group: 'org.hsqldb', name: 'hsqldb', version: '2.3.2'
     }
 
     configurations {

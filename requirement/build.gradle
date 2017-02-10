@@ -5,7 +5,7 @@ version = '1.0'
 
 
 dependencies {
-    compile 'io.dropwizard:dropwizard-forms:0.9.1'
+    compile "io.dropwizard:dropwizard-forms:$dropwizardVersion"
     compile 'org.apache.commons:commons-lang3:3.1'
     compile 'org.apache.commons:commons-collections4:4.1'
     compile project(':core')
