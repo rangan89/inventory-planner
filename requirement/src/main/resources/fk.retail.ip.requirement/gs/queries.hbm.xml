@@ -38,10 +38,35 @@
         </query>
     </named-query>
 
+
+    <named-query name="findEnabledRequirementsByState.count">
+        <query>
+            <![CDATA[
+            SELECT count(r)
+            FROM Requirement r
+            WHERE
+                r.enabled = 1 and
+                r.state = :state
+                ]]>
+        </query>
+    </named-query>
+
     <named-query name="fetchBandDataForFSNs">
         <query>
             <![CDATA[
             SELECT fb
+            FROM FsnBand fb
+            WHERE
+                fb.fsn IN :fsns
+                ]]>
+        </query>
+    </named-query>
+
+
+    <named-query name="fetchBandDataForFSNs.count">
+        <query>
+            <![CDATA[
+            SELECT count(fb)
             FROM FsnBand fb
             WHERE
                 fb.fsn IN :fsns
@@ -61,6 +86,17 @@
         </query>
     </named-query>
 
+
+    <named-query name="fetchWeeklySalesForFsns.count">
+        <query>
+            <![CDATA[
+            SELECT count(ws)
+            FROM WeeklySale ws
+            WHERE
+                ws.fsn IN :fsns
+                ]]>
+        </query>
+    </named-query>
 
 
 
