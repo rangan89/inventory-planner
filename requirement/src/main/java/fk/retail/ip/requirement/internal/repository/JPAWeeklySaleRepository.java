@@ -3,12 +3,11 @@ package fk.retail.ip.requirement.internal.repository;
 import com.google.inject.Inject;
 import fk.retail.ip.requirement.internal.entities.WeeklySale;
 import fk.sp.common.extensions.jpa.SimpleJpaGenericRepository;
-
+import java.util.List;
+import java.util.Set;
 import javax.inject.Provider;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Created by nidhigupta.m on 27/01/17.
@@ -27,7 +26,6 @@ public class JPAWeeklySaleRepository extends SimpleJpaGenericRepository<WeeklySa
         List<WeeklySale> weeklySales = query.getResultList();
         return weeklySales;
     }
-
 
 
 }

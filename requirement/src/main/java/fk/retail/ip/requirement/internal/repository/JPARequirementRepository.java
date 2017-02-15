@@ -3,11 +3,10 @@ package fk.retail.ip.requirement.internal.repository;
 import com.google.inject.Inject;
 import fk.retail.ip.requirement.internal.entities.Requirement;
 import fk.sp.common.extensions.jpa.SimpleJpaGenericRepository;
-
+import java.util.List;
 import javax.inject.Provider;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
-import java.util.List;
 
 /**
  * Created by nidhigupta.m on 26/01/17.

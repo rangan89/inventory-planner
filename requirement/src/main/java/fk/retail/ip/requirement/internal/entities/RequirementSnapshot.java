@@ -1,12 +1,15 @@
 package fk.retail.ip.requirement.internal.entities;
 
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
+import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlRootElement;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Immutable;
-
-import javax.persistence.*;
-import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Created by nidhigupta.m on 27/01/17.

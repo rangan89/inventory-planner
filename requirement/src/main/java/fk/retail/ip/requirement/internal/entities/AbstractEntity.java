@@ -8,6 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,6 +34,7 @@ public class AbstractEntity implements Serializable {
     protected Date updatedAt;
 
     @NotNull
+    @Version
     private long version;
 
 }

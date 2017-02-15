@@ -6,18 +6,9 @@ import fk.retail.ip.requirement.internal.entities.FsnBand;
 import fk.retail.ip.requirement.internal.entities.Requirement;
 import fk.retail.ip.requirement.internal.entities.RequirementSnapshot;
 import fk.retail.ip.requirement.internal.entities.WeeklySale;
-import fk.retail.ip.requirement.internal.repository.WeeklySaleRepository;
 import fk.retail.ip.requirement.internal.repository.JPAFsnBandRepository;
+import fk.retail.ip.requirement.internal.repository.WeeklySaleRepository;
 import fk.retail.ip.requirement.model.RequirementDownloadLineItem;
-
-import org.jukito.JukitoRunner;
-import org.jukito.UseModules;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.Assert;
-import org.junit.runner.RunWith;
-import org.mockito.*;
-
 import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -27,6 +18,18 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.IntStream;
+import org.jukito.JukitoRunner;
+import org.jukito.UseModules;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 /**
  * Created by nidhigupta.m on 15/02/17.
@@ -61,7 +64,7 @@ public class DownloadProposedCommandTest {
         List<Requirement> requirements = getRequirements();
         Mockito.when(fsnBandRepository.fetchBandDataForFSNs(Mockito.anySetOf(String.class))).thenReturn(Arrays.asList(getFsnBand()));
         Mockito.when(weeklySaleRepository.fetchWeeklySalesForFsns(Mockito.anySetOf(String.class))).thenReturn(getWeeklySale());
-        downloadProposedCommand.execute(requirements,false);
+        downloadProposedCommand.execute(requirements, false);
         Mockito.verify(generateExcelCommand).generateExcel(captor.capture(), Mockito.eq("/templates/proposed.xlsx"));
         Assert.assertEquals(2, captor.getValue().size());
 
@@ -83,7 +86,7 @@ public class DownloadProposedCommandTest {
         Assert.assertEquals(4, captor.getValue().get(0).getPendingPOQty());
         Assert.assertEquals(5, captor.getValue().get(0).getOpenReqQty());
         Assert.assertEquals(6, captor.getValue().get(0).getIwitIntransitQty());
-        Assert.assertEquals(21,captor.getValue().get(0).getQuantity());
+        Assert.assertEquals(21, captor.getValue().get(0).getQuantity());
         Assert.assertEquals("ABC", captor.getValue().get(0).getSupplier());
 
         Assert.assertEquals("fsn", captor.getValue().get(1).getFsn());
@@ -104,7 +107,7 @@ public class DownloadProposedCommandTest {
         Assert.assertEquals(9, captor.getValue().get(1).getPendingPOQty());
         Assert.assertEquals(10, captor.getValue().get(1).getOpenReqQty());
         Assert.assertEquals(11, captor.getValue().get(1).getIwitIntransitQty());
-        Assert.assertEquals(22,captor.getValue().get(1).getQuantity());
+        Assert.assertEquals(22, captor.getValue().get(1).getQuantity());
         Assert.assertEquals("DEF", captor.getValue().get(1).getSupplier());
 
 
@@ -173,7 +176,7 @@ public class DownloadProposedCommandTest {
     }
 
     private FsnBand getFsnBand() {
-        FsnBand fsnBand = new FsnBand("fsn",2, 3, "Last 30 Days");
+        FsnBand fsnBand = new FsnBand("fsn", 2, 3, "Last 30 Days");
         fsnBand.setCreatedAt(new Date());
         return fsnBand;
     }
@@ -185,12 +188,12 @@ public class DownloadProposedCommandTest {
         List<WeeklySale> weeklySales = Lists.newArrayList();
 
         IntStream.iterate(date.get(weekOfYear), currentWeek -> (currentWeek - 2 + 52) % 52 + 1).limit(8).forEach(currentWeek -> {
-            WeeklySale weeklySale= new WeeklySale("fsn", "dummy_warehouse1", currentWeek, 20);
+            WeeklySale weeklySale = new WeeklySale("fsn", "dummy_warehouse1", currentWeek, 20);
             weeklySale.setCreatedAt(new Date());
             weeklySales.add(weeklySale);
         });
         IntStream.iterate(date.get(weekOfYear), currentWeek -> (currentWeek - 2 + 52) % 52 + 1).limit(8).forEach(currentWeek -> {
-            WeeklySale weeklySale= new WeeklySale("fsn", "dummy_warehouse2", currentWeek, 30);
+            WeeklySale weeklySale = new WeeklySale("fsn", "dummy_warehouse2", currentWeek, 30);
             weeklySale.setCreatedAt(new Date());
             weeklySales.add(weeklySale);
         });

@@ -4,16 +4,15 @@ import com.google.inject.Inject;
 import fk.retail.ip.requirement.config.TestModule;
 import fk.retail.ip.requirement.internal.entities.FsnBand;
 import fk.sp.common.extensions.jpa.TransactionalJpaRepositoryTest;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
 import org.jukito.JukitoRunner;
 import org.jukito.UseModules;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
 
 /**
  * Created by nidhigupta.m on 15/02/17.
@@ -37,7 +36,7 @@ public class FsnBandRepositoryTest extends TransactionalJpaRepositoryTest {
 
     private FsnBand getFsnBand() {
 
-        FsnBand fsnBand = new FsnBand("fsn",2, 3, "Last 30 Days");
+        FsnBand fsnBand = new FsnBand("fsn", 2, 3, "Last 30 Days");
         fsnBand.setCreatedAt(new Date());
         return fsnBand;
     }

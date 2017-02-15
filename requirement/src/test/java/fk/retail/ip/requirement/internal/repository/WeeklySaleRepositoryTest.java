@@ -4,16 +4,15 @@ import com.google.inject.Inject;
 import fk.retail.ip.requirement.config.TestModule;
 import fk.retail.ip.requirement.internal.entities.WeeklySale;
 import fk.sp.common.extensions.jpa.TransactionalJpaRepositoryTest;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
 import org.jukito.JukitoRunner;
 import org.jukito.UseModules;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
 
 /**
  * Created by nidhigupta.m on 15/02/17.
@@ -36,7 +35,7 @@ public class WeeklySaleRepositoryTest extends TransactionalJpaRepositoryTest {
 
     private WeeklySale getWeeklySale() {
 
-        WeeklySale weeklySale = new WeeklySale("fsn","wh1", 3, 90);
+        WeeklySale weeklySale = new WeeklySale("fsn", "wh1", 3, 90);
         weeklySale.setCreatedAt(new Date());
         return weeklySale;
     }

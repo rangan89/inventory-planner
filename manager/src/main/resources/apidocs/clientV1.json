@@ -1,93 +1,122 @@
 {
-  "apiVersion" : "1",
-  "swaggerVersion" : "1.2",
-  "basePath" : "/",
-  "resourcePath" : "/clientV1",
-  "apis" : [ {
-    "path" : "/{v:v1}/client",
-    "operations" : [ {
-      "method" : "GET",
-      "nickname" : "getClients",
-      "type" : "array",
-      "items" : {
-        "$ref" : "Client"
-      },
-      "parameters" : [ {
-        "type" : "string",
-        "defaultValue" : "v1",
-        "paramType" : "path",
-        "name" : "v",
-        "required" : true
-      } ],
-      "summary" : "To fetch All Clients",
-      "notes" : "Returning All will not scale hence changed to pagination in next version",
-      "produces" : [ "application/json" ]
-    }, {
-      "method" : "PUT",
-      "nickname" : "createClient",
-      "type" : "Response",
-      "parameters" : [ {
-        "type" : "Client",
-        "paramType" : "body",
-        "name" : "client",
-        "required" : true
-      }, {
-        "type" : "string",
-        "defaultValue" : "v1",
-        "paramType" : "path",
-        "name" : "v",
-        "required" : true
-      } ],
-      "summary" : "Use to create a new Client",
-      "responseMessages" : [ {
-        "code" : 201,
-        "message" : "created"
-      } ],
-      "consumes" : [ "application/json" ],
-      "produces" : [ "application/json" ]
-    } ]
-  }, {
-    "path" : "/{v:v1}/client/{name}",
-    "operations" : [ {
-      "method" : "GET",
-      "nickname" : "getClient",
-      "type" : "Client",
-      "parameters" : [ {
-        "type" : "string",
-        "paramType" : "path",
-        "name" : "name",
-        "required" : true
-      }, {
-        "type" : "string",
-        "defaultValue" : "v1",
-        "paramType" : "path",
-        "name" : "v",
-        "required" : true
-      } ],
-      "summary" : "Used to fetch a client details",
-      "responseMessages" : [ {
-        "code" : 200,
-        "message" : "Client Exists",
-        "responseModel" : "Client"
-      }, {
-        "code" : 404,
-        "message" : "Client Not found"
-      } ],
-      "produces" : [ "application/json" ]
-    } ]
-  } ],
-  "models" : {
-    "Client" : {
-      "id" : "Client",
-      "properties" : {
-        "name" : {
-          "type" : "string"
+  "apiVersion": "1",
+  "swaggerVersion": "1.2",
+  "basePath": "/",
+  "resourcePath": "/clientV1",
+  "apis": [
+    {
+      "path": "/{v:v1}/client",
+      "operations": [
+        {
+          "method": "GET",
+          "nickname": "getClients",
+          "type": "array",
+          "items": {
+            "$ref": "Client"
+          },
+          "parameters": [
+            {
+              "type": "string",
+              "defaultValue": "v1",
+              "paramType": "path",
+              "name": "v",
+              "required": true
+            }
+          ],
+          "summary": "To fetch All Clients",
+          "notes": "Returning All will not scale hence changed to pagination in next version",
+          "produces": [
+            "application/json"
+          ]
         },
-        "description" : {
-          "type" : "string"
+        {
+          "method": "PUT",
+          "nickname": "createClient",
+          "type": "Response",
+          "parameters": [
+            {
+              "type": "Client",
+              "paramType": "body",
+              "name": "client",
+              "required": true
+            },
+            {
+              "type": "string",
+              "defaultValue": "v1",
+              "paramType": "path",
+              "name": "v",
+              "required": true
+            }
+          ],
+          "summary": "Use to create a new Client",
+          "responseMessages": [
+            {
+              "code": 201,
+              "message": "created"
+            }
+          ],
+          "consumes": [
+            "application/json"
+          ],
+          "produces": [
+            "application/json"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/{v:v1}/client/{name}",
+      "operations": [
+        {
+          "method": "GET",
+          "nickname": "getClient",
+          "type": "Client",
+          "parameters": [
+            {
+              "type": "string",
+              "paramType": "path",
+              "name": "name",
+              "required": true
+            },
+            {
+              "type": "string",
+              "defaultValue": "v1",
+              "paramType": "path",
+              "name": "v",
+              "required": true
+            }
+          ],
+          "summary": "Used to fetch a client details",
+          "responseMessages": [
+            {
+              "code": 200,
+              "message": "Client Exists",
+              "responseModel": "Client"
+            },
+            {
+              "code": 404,
+              "message": "Client Not found"
+            }
+          ],
+          "produces": [
+            "application/json"
+          ]
+        }
+      ]
+    }
+  ],
+  "models": {
+    "Client": {
+      "id": "Client",
+      "properties": {
+        "name": {
+          "type": "string"
         },
-        "email" : {
-          "type" : "string"
+        "description": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
         }
       }
     }

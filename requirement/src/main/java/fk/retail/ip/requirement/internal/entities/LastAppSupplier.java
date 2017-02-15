@@ -8,8 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Immutable;
 
-import java.util.Date;
-
 /**
  * Created by yogeshwari.k on 12/02/17.
  */
@@ -20,7 +18,7 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @Immutable
-public class LastAppSupplier extends ReadOnlyEntity{
+public class LastAppSupplier extends ReadOnlyEntity {
 
     private String fsn;
 

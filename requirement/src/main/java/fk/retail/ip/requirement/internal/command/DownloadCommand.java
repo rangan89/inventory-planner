@@ -1,6 +1,5 @@
 package fk.retail.ip.requirement.internal.command;
 
-import com.google.inject.Inject;
 import fk.retail.ip.requirement.internal.entities.FsnBand;
 import fk.retail.ip.requirement.internal.entities.LastAppSupplier;
 import fk.retail.ip.requirement.internal.entities.Requirement;
@@ -9,7 +8,6 @@ import fk.retail.ip.requirement.internal.repository.FsnBandRepository;
 import fk.retail.ip.requirement.internal.repository.LastAppSupplierRepository;
 import fk.retail.ip.requirement.internal.repository.WeeklySaleRepository;
 import fk.retail.ip.requirement.model.RequirementDownloadLineItem;
-
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalField;
@@ -106,15 +104,15 @@ public abstract class DownloadCommand {
     }
 
     private void populateLastAppSupplierData(List<LastAppSupplier> lastAppSuppliers, RequirementDownloadLineItem reqItem, Consumer<Integer> lastAppSetter, Consumer<String> lastSupplierSetter) {
-        MultiKeyMap<String,Integer> fsnWhLastAppMap = new MultiKeyMap();
-        MultiKeyMap<String,String> fsnWhLastSupplierMap = new MultiKeyMap();
+        MultiKeyMap<String, Integer> fsnWhLastAppMap = new MultiKeyMap();
+        MultiKeyMap<String, String> fsnWhLastSupplierMap = new MultiKeyMap();
         lastAppSuppliers.forEach(l -> {
-            fsnWhLastAppMap.put(l.getFsn(),l.getWarehouseId(),l.getLastApp());
-            fsnWhLastSupplierMap.put(l.getFsn(),l.getWarehouseId(),l.getLastSupplier());
+            fsnWhLastAppMap.put(l.getFsn(), l.getWarehouseId(), l.getLastApp());
+            fsnWhLastSupplierMap.put(l.getFsn(), l.getWarehouseId(), l.getLastSupplier());
         });
 
-        lastAppSetter.accept(fsnWhLastAppMap.get(reqItem.getFsn(),reqItem.getWarehouse()));
-        lastSupplierSetter.accept(fsnWhLastSupplierMap.get(reqItem.getFsn(),reqItem.getWarehouse()));
+        lastAppSetter.accept(fsnWhLastAppMap.get(reqItem.getFsn(), reqItem.getWarehouse()));
+        lastSupplierSetter.accept(fsnWhLastSupplierMap.get(reqItem.getFsn(), reqItem.getWarehouse()));
     }
 
 

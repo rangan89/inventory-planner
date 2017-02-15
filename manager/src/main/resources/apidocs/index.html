@@ -27,32 +27,32 @@
     <script type="text/javascript">
         $(function () {
             window.swaggerUi = new SwaggerUi({
-                                                 url: "service.json",
-                                                 dom_id: "swagger-ui-container",
-                                                 supportedSubmitMethods: ['get', 'post', 'put',
-                                                                          'delete'],
-                                                 onComplete: function (swaggerApi, swaggerUi) {
-                                                     log("Loaded SwaggerUI");
+                url: "service.json",
+                dom_id: "swagger-ui-container",
+                supportedSubmitMethods: ['get', 'post', 'put',
+                    'delete'],
+                onComplete: function (swaggerApi, swaggerUi) {
+                    log("Loaded SwaggerUI");
 
-                                                     if (typeof initOAuth == "function") {
-                                                         /*
-                                                          initOAuth({
-                                                          clientId: "your-client-id",
-                                                          realm: "your-realms",
-                                                          appName: "your-app-name"
-                                                          });
-                                                          */
-                                                     }
-                                                     $('pre code').each(function (i, e) {
-                                                         hljs.highlightBlock(e)
-                                                     });
-                                                 },
-                                                 onFailure: function (data) {
-                                                     log("Unable to Load SwaggerUI");
-                                                 },
-                                                 docExpansion: "none",
-                                                 sorter: "alpha"
-                                             });
+                    if (typeof initOAuth == "function") {
+                        /*
+                         initOAuth({
+                         clientId: "your-client-id",
+                         realm: "your-realms",
+                         appName: "your-app-name"
+                         });
+                         */
+                    }
+                    $('pre code').each(function (i, e) {
+                        hljs.highlightBlock(e)
+                    });
+                },
+                onFailure: function (data) {
+                    log("Unable to Load SwaggerUI");
+                },
+                docExpansion: "none",
+                sorter: "alpha"
+            });
 
             $('#input_apiKey').change(function () {
                 var key = $('#input_apiKey')[0].value;
@@ -60,7 +60,7 @@
                 if (key && key.trim() != "") {
                     log("added key " + key);
                     window.authorizations.add("key",
-                                              new ApiKeyAuthorization("api_key", key, "query"));
+                            new ApiKeyAuthorization("api_key", key, "query"));
                 }
             })
             window.swaggerUi.load();
@@ -93,7 +93,7 @@
             function createHtmlForHeader(name) {
                 var headerTemplate = '<label style="padding-left: 15px"><span>Last Name</span><input type="text" name="lastname"/></label>';
                 var headerField = $(headerTemplate);
-                headerField.find("span").html("  "+name +":");
+                headerField.find("span").html("  " + name + ":");
                 headerField.find("input")
                         .attr("id", name)
                         .attr("name", name);
@@ -127,7 +127,7 @@
             function setElementValue(elementName, value, headerName) {
                 $(elementName)[0].setAttribute("value", value);
                 window.authorizations.add(headerName,
-                                          new ApiKeyAuthorization(headerName, value, "header"));
+                        new ApiKeyAuthorization(headerName, value, "header"));
             }
 
             function bindHeadersToStorage() {
@@ -155,8 +155,10 @@
 <body class="swagger-section">
 <div id='header'>
     <div class="swagger-ui-wrap">
-        <div class="headerField" style="display:inline-block; font-weight: bold; font-size: 25px">Inventory-planner (fk.sp.inventory-planner)</div>
-        <div id= "customHeaders" style="display: inline-block; float: right;">
+        <div class="headerField" style="display:inline-block; font-weight: bold; font-size: 25px">Inventory-planner
+            (fk.sp.inventory-planner)
+        </div>
+        <div id="customHeaders" style="display: inline-block; float: right;">
 
         </div>
     </div>

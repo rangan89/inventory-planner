@@ -1,24 +1,18 @@
 package fk.retail.ip.requirement.internal.repository;
 
-import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import fk.retail.ip.requirement.config.TestModule;
 import fk.retail.ip.requirement.internal.entities.LastAppSupplier;
 import fk.sp.common.extensions.jpa.TransactionalJpaRepositoryTest;
-import org.apache.commons.lang.ArrayUtils;
-import org.bouncycastle.cert.ocsp.Req;
-import org.jukito.JukitoRunner;
-import org.jukito.UseModules;
-import org.junit.*;
-import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
-
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.IntStream;
-import java.util.stream.LongStream;
+import org.jukito.JukitoRunner;
+import org.jukito.UseModules;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 @RunWith(JukitoRunner.class)
 @UseModules(TestModule.class)
@@ -35,7 +29,7 @@ public class LastAppSupplierRepositoryTest extends TransactionalJpaRepositoryTes
         LastAppSupplier lastAppSupplier = getLastAppSupplier();
         lastAppSupplierRepository.persist(lastAppSupplier);
         List<LastAppSupplier> lastAppSupplierList = lastAppSupplierRepository.fetchLastAppSupplierForFsns(new HashSet<String>(Arrays.asList("fsn")));
-        Assert.assertEquals(lastAppSupplier,lastAppSupplierList.get(0));
+        Assert.assertEquals(lastAppSupplier, lastAppSupplierList.get(0));
     }
 
     private LastAppSupplier getLastAppSupplier() {

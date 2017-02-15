@@ -120,7 +120,27 @@
               ]]>
         </query>
     </named-query>
+    <named-query name="fetchIwtRequestIdsForStatuses">
+        <query>
+            <![CDATA[
+            SELECT ir.externalId
+            FROM IwtRequest ir
+            WHERE
+                ir.status IN :statuses
+                ]]>
+        </query>
+    </named-query>
 
-
+    <named-query name="fetchIwtRequestItemsInStatuses">
+        <query>
+            <![CDATA[
+            SELECT iri
+            FROM IwtRequestItem iri
+            WHERE
+                iri.fsn = :fsn AND
+                iri.status IN :statuses
+                ]]>
+        </query>
+    </named-query>
 
 </entity-mappings>

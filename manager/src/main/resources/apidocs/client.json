@@ -1,116 +1,147 @@
 {
-  "apiVersion" : "1",
-  "swaggerVersion" : "1.2",
-  "basePath" : "/",
-  "resourcePath" : "/client",
-  "apis" : [ {
-    "path" : "/{v:v([2-9]|\\d\\d+)}/client",
-    "operations" : [ {
-      "method" : "GET",
-      "nickname" : "getClients",
-      "type" : "ClientsResponse",
-      "parameters" : [ {
-        "type" : "string",
-        "defaultValue" : "v2",
-        "paramType" : "path",
-        "name" : "v",
-        "required" : true
-      }, {
-        "type" : "integer",
-        "format" : "int32",
-        "defaultValue" : "1",
-        "paramType" : "query",
-        "name" : "page_no"
-      }, {
-        "type" : "integer",
-        "format" : "int32",
-        "defaultValue" : "10",
-        "paramType" : "query",
-        "name" : "page_size"
-      } ],
-      "summary" : "To fetch All Clients",
-      "produces" : [ "application/json" ]
-    }, {
-      "method" : "PUT",
-      "nickname" : "createClient",
-      "type" : "Response",
-      "parameters" : [ {
-        "type" : "Client",
-        "paramType" : "body",
-        "name" : "client",
-        "required" : true
-      }, {
-        "type" : "string",
-        "defaultValue" : "v2",
-        "paramType" : "path",
-        "name" : "v",
-        "required" : true
-      } ],
-      "summary" : "Use to create a new Client",
-      "responseMessages" : [ {
-        "code" : 201,
-        "message" : "created"
-      } ],
-      "consumes" : [ "application/json" ],
-      "produces" : [ "application/json" ]
-    } ]
-  }, {
-    "path" : "/{v:v([2-9]|\\d\\d+)}/client/{name}",
-    "operations" : [ {
-      "method" : "GET",
-      "nickname" : "getClient",
-      "type" : "Client",
-      "parameters" : [ {
-        "type" : "string",
-        "paramType" : "path",
-        "name" : "name",
-        "required" : true
-      }, {
-        "type" : "string",
-        "defaultValue" : "v2",
-        "paramType" : "path",
-        "name" : "v",
-        "required" : true
-      } ],
-      "summary" : "Used to fetch a client details",
-      "responseMessages" : [ {
-        "code" : 200,
-        "message" : "Client Exists",
-        "responseModel" : "Client"
-      }, {
-        "code" : 404,
-        "message" : "Client Not found"
-      } ],
-      "produces" : [ "application/json" ]
-    } ]
-  } ],
-  "models" : {
-    "ClientsResponse" : {
-      "id" : "ClientsResponse",
-      "properties" : {
-        "total" : {
-          "type" : "integer",
-          "format" : "int64"
+  "apiVersion": "1",
+  "swaggerVersion": "1.2",
+  "basePath": "/",
+  "resourcePath": "/client",
+  "apis": [
+    {
+      "path": "/{v:v([2-9]|\\d\\d+)}/client",
+      "operations": [
+        {
+          "method": "GET",
+          "nickname": "getClients",
+          "type": "ClientsResponse",
+          "parameters": [
+            {
+              "type": "string",
+              "defaultValue": "v2",
+              "paramType": "path",
+              "name": "v",
+              "required": true
+            },
+            {
+              "type": "integer",
+              "format": "int32",
+              "defaultValue": "1",
+              "paramType": "query",
+              "name": "page_no"
+            },
+            {
+              "type": "integer",
+              "format": "int32",
+              "defaultValue": "10",
+              "paramType": "query",
+              "name": "page_size"
+            }
+          ],
+          "summary": "To fetch All Clients",
+          "produces": [
+            "application/json"
+          ]
         },
-        "clients" : {
-          "type" : "array",
-          "items" : {
-            "$ref" : "Client"
+        {
+          "method": "PUT",
+          "nickname": "createClient",
+          "type": "Response",
+          "parameters": [
+            {
+              "type": "Client",
+              "paramType": "body",
+              "name": "client",
+              "required": true
+            },
+            {
+              "type": "string",
+              "defaultValue": "v2",
+              "paramType": "path",
+              "name": "v",
+              "required": true
+            }
+          ],
+          "summary": "Use to create a new Client",
+          "responseMessages": [
+            {
+              "code": 201,
+              "message": "created"
+            }
+          ],
+          "consumes": [
+            "application/json"
+          ],
+          "produces": [
+            "application/json"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/{v:v([2-9]|\\d\\d+)}/client/{name}",
+      "operations": [
+        {
+          "method": "GET",
+          "nickname": "getClient",
+          "type": "Client",
+          "parameters": [
+            {
+              "type": "string",
+              "paramType": "path",
+              "name": "name",
+              "required": true
+            },
+            {
+              "type": "string",
+              "defaultValue": "v2",
+              "paramType": "path",
+              "name": "v",
+              "required": true
+            }
+          ],
+          "summary": "Used to fetch a client details",
+          "responseMessages": [
+            {
+              "code": 200,
+              "message": "Client Exists",
+              "responseModel": "Client"
+            },
+            {
+              "code": 404,
+              "message": "Client Not found"
+            }
+          ],
+          "produces": [
+            "application/json"
+          ]
+        }
+      ]
+    }
+  ],
+  "models": {
+    "ClientsResponse": {
+      "id": "ClientsResponse",
+      "properties": {
+        "total": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "clients": {
+          "type": "array",
+          "items": {
+            "$ref": "Client"
           }
         }
       }
     },
-    "Client" : {
-      "id" : "Client",
-      "properties" : {
-        "name" : {
-          "type" : "string"
+    "Client": {
+      "id": "Client",
+      "properties": {
+        "name": {
+          "type": "string"
         },
-        "description" : {
-          "type" : "string"
+        "description": {
+          "type": "string"
         },
-        "email" : {
-          "type" : "string"
+        "email": {
+          "type": "string"
         }
       }
     }

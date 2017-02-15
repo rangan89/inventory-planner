@@ -1,11 +1,14 @@
 #custom-row #custom-left-block {
     width: 20%;
     display: inline-block;
-}  ​
+}
+
+​
 #custom-row #custom-right-block {
     width: 75%;
     display: inline-block;
 }
+
 #custom-row {
     width: 100%;
     text-align: center;
