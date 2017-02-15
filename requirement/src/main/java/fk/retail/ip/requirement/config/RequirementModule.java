@@ -1,6 +1,7 @@
 package fk.retail.ip.requirement.config;
 
 import com.google.inject.AbstractModule;
+import fk.retail.ip.requirement.internal.repository.*;
 import fk.retail.ip.requirement.resource.RequirementResource;
 
 /**
@@ -12,5 +13,9 @@ public class RequirementModule extends AbstractModule {
     protected void configure() {
 
         bind(RequirementResource.class);
+
+        bind(FsnBandRepository.class).to(JPAFsnBandRepository.class);
+        bind(WeeklySaleRepository.class).to(JPAWeeklySaleRepository.class);
+        bind(RequirementRepository.class).to(JPARequirementRepository.class);
     }
 }
