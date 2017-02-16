@@ -3,15 +3,13 @@ package fk.retail.ip.requirement.internal.repository;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import fk.retail.ip.requirement.internal.entities.Requirement;
-import fk.retail.ip.requirement.internal.repository.config.TestModule;
+import fk.retail.ip.requirement.config.TestModule;
 import fk.sp.common.extensions.jpa.TransactionalJpaRepositoryTest;
 import org.apache.commons.lang.ArrayUtils;
-import org.bouncycastle.cert.ocsp.Req;
 import org.jukito.JukitoRunner;
 import org.jukito.UseModules;
 import org.junit.*;
 import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
 
 import java.util.Arrays;
 import java.util.Date;

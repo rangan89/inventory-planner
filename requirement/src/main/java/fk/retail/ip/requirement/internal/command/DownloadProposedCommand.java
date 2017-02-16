@@ -10,13 +10,13 @@ import fk.retail.ip.requirement.internal.repository.WeeklySaleRepository;
 public class DownloadProposedCommand extends DownloadCommand {
 
     @Inject
-    public DownloadProposedCommand(FsnBandRepository fsnBandRepository, WeeklySaleRepository weeklySaleRepository) {
-        super(fsnBandRepository, weeklySaleRepository);
+    public DownloadProposedCommand(FsnBandRepository fsnBandRepository, WeeklySaleRepository weeklySaleRepository, GenerateExcelCommand generateExcelCommand) {
+        super(fsnBandRepository, weeklySaleRepository, generateExcelCommand);
     }
 
     @Override
     protected String getTemplateName() {
-        return "proposed.xlsx";
+        return "/templates/proposed.xlsx";
     }
 
     @Override

@@ -10,13 +10,13 @@ import fk.retail.ip.requirement.internal.repository.WeeklySaleRepository;
 public class DownloadCDOReviewCommand extends DownloadCommand {
 
     @Inject
-    public DownloadCDOReviewCommand(FsnBandRepository fsnBandRepository, WeeklySaleRepository weeklySaleRepository) {
-        super(fsnBandRepository, weeklySaleRepository);
+    public DownloadCDOReviewCommand(FsnBandRepository fsnBandRepository, WeeklySaleRepository weeklySaleRepository, GenerateExcelCommand generateExcelCommand) {
+        super(fsnBandRepository, weeklySaleRepository, generateExcelCommand);
     }
 
     @Override
     protected String getTemplateName() {
-        return "CDOReview.xlsx";
+        return "/templates/CDOReview.xlsx";
     }
 
     @Override

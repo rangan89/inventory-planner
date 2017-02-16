@@ -13,7 +13,7 @@ import java.util.Set;
 /**
  * Created by nidhigupta.m on 27/01/17.
  */
-public class JPAWeeklySaleRepository extends SimpleJpaGenericRepository<WeeklySale, Long> implements  WeeklySaleRepository {
+public class JPAWeeklySaleRepository extends SimpleJpaGenericRepository<WeeklySale, Long> implements WeeklySaleRepository {
 
     @Inject
     public JPAWeeklySaleRepository(Provider<EntityManager> entityManagerProvider) {

@@ -26,6 +26,7 @@ public class JPAFsnBandRepository extends SimpleJpaGenericRepository<FsnBand, Lo
 
         TypedQuery<FsnBand> query = getEntityManager().createNamedQuery("fetchBandDataForFSNs", FsnBand.class);
         query.setParameter("fsns", fsns);
+        query.setParameter("timeFrame", "Last 30 Days");
         List<FsnBand> fsnBands = query.getResultList();
         return fsnBands;
     }

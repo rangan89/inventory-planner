@@ -57,7 +57,8 @@
             SELECT fb
             FROM FsnBand fb
             WHERE
-                fb.fsn IN :fsns
+                fb.fsn IN :fsns and
+                fb.timeFrame = :timeFrame
                 ]]>
         </query>
     </named-query>

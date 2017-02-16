@@ -19,33 +19,33 @@ public class RequirementDownloadLineItem {
     private int pvBand;
     private int salesBand;
     @JsonProperty("salesBucket-0")
-    private Integer week0Sale;
+    private int week0Sale;
     @JsonProperty("salesBucket-1")
-    private Integer week1Sale;
+    private int week1Sale;
     @JsonProperty("salesBucket-2")
-    private Integer week2Sale;
+    private int week2Sale;
     @JsonProperty("salesBucket-3")
-    private Integer week3Sale;
+    private int week3Sale;
     @JsonProperty("salesBucket-4")
-    private Integer week4Sale;
+    private int week4Sale;
     @JsonProperty("salesBucket-5")
-    private Integer week5Sale;
+    private int week5Sale;
     @JsonProperty("salesBucket-6")
-    private Integer week6Sale;
+    private int week6Sale;
     @JsonProperty("salesBucket-7")
-    private Integer week7Sale;
+    private int week7Sale;
     private int inventory;
     private int qoh;
-    private String forcast;
+    private String forecast;
     private int pendingPOQty;
     private int openReqQty;
     private int iwitIntransitQty;
     private int quantity;
     private String supplier;
-    private Integer mrp;
-    private Integer app;
+    private int mrp;
+    private int app;
     private String currency;
-    private Integer sla;
+    private int sla;
     private boolean international;
     private String procType;
     private String overrideComment;
@@ -58,7 +58,7 @@ public class RequirementDownloadLineItem {
         this.pendingPOQty = req.getRequirementSnapshot().getPendingPoQty();
         this.iwitIntransitQty = req.getRequirementSnapshot().getIwitIntransitQty();
         this.openReqQty = req.getRequirementSnapshot().getOpenReqQty();
-        this.forcast = req.getRequirementSnapshot().getForecast();
+        this.forecast = req.getRequirementSnapshot().getForecast();
         this.quantity = req.getQuantity();
         this.supplier = req.getSupplier();
         this.mrp = req.getMrp();

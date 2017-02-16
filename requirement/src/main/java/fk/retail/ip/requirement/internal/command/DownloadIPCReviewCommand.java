@@ -10,13 +10,13 @@ import fk.retail.ip.requirement.internal.repository.WeeklySaleRepository;
 public class DownloadIPCReviewCommand extends DownloadCommand {
 
     @Inject
-    public DownloadIPCReviewCommand(FsnBandRepository fsnBandRepository, WeeklySaleRepository weeklySaleRepository) {
-        super(fsnBandRepository, weeklySaleRepository);
+    public DownloadIPCReviewCommand(FsnBandRepository fsnBandRepository, WeeklySaleRepository weeklySaleRepository, GenerateExcelCommand generateExcelCommand) {
+        super(fsnBandRepository, weeklySaleRepository, generateExcelCommand);
     }
 
     @Override
     protected String getTemplateName() {
-        return "IPCReview.xlsx";
+        return "/templates/IPCReview.xlsx";
     }
 
     @Override

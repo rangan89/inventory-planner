@@ -10,13 +10,13 @@ import fk.retail.ip.requirement.internal.repository.WeeklySaleRepository;
 public class DownloadBizFinReviewCommand extends DownloadCommand {
 
     @Inject
-    public DownloadBizFinReviewCommand(FsnBandRepository fsnBandRepository, WeeklySaleRepository weeklySaleRepository) {
-        super(fsnBandRepository, weeklySaleRepository);
+    public DownloadBizFinReviewCommand(FsnBandRepository fsnBandRepository, WeeklySaleRepository weeklySaleRepository, GenerateExcelCommand generateExcelCommand) {
+        super(fsnBandRepository, weeklySaleRepository, generateExcelCommand);
     }
 
     @Override
     protected String getTemplateName() {
-        return "BizFinReview.xlsx";
+        return "/templates/BizFinReview.xlsx";
     }
 
     @Override

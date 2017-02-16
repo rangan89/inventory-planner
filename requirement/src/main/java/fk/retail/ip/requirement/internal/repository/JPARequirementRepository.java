@@ -1,19 +1,13 @@
 package fk.retail.ip.requirement.internal.repository;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import fk.retail.ip.requirement.internal.entities.Requirement;
-import fk.sp.common.extensions.jpa.Page;
-import fk.sp.common.extensions.jpa.PageRequest;
 import fk.sp.common.extensions.jpa.SimpleJpaGenericRepository;
 
 import javax.inject.Provider;
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by nidhigupta.m on 26/01/17.

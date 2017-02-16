@@ -5,23 +5,23 @@ import com.google.inject.Inject;
 import fk.retail.ip.requirement.model.DownloadRequirementRequest;
 import fk.retail.ip.requirement.service.RequirementService;
 import io.dropwizard.hibernate.UnitOfWork;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Map;
-import javax.ws.rs.GET;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
+
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
-import org.glassfish.jersey.media.multipart.FormDataParam;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Map;
 
 /**
  * Created by nidhigupta.m on 26/01/17.
  */
-@Path("/requirement")
+@Path("/v1/requirement")
 public class RequirementResource {
 
     private final RequirementService requirementService;
@@ -31,7 +31,7 @@ public class RequirementResource {
         this.requirementService = requirementService;
     }
 
-    @GET
+    @POST
     @Path("/download")
     @Timed
     @UnitOfWork

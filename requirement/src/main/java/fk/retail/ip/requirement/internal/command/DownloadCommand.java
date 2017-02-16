@@ -1,17 +1,13 @@
 package fk.retail.ip.requirement.internal.command;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
-import fk.retail.ip.core.poi.SpreadSheetWriter;
 import fk.retail.ip.requirement.internal.entities.FsnBand;
 import fk.retail.ip.requirement.internal.entities.Requirement;
 import fk.retail.ip.requirement.internal.entities.WeeklySale;
 import fk.retail.ip.requirement.internal.repository.FsnBandRepository;
 import fk.retail.ip.requirement.internal.repository.WeeklySaleRepository;
 import fk.retail.ip.requirement.model.RequirementDownloadLineItem;
-import java.io.InputStream;
-import java.io.OutputStream;
+
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalField;
@@ -22,10 +18,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.StreamingOutput;
 import org.apache.commons.collections4.map.MultiKeyMap;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 
 import static java.util.stream.Collectors.toList;
 
@@ -39,11 +33,13 @@ public abstract class DownloadCommand {
     private final WeeklySaleRepository weeklySaleRepository;
     private List<RequirementDownloadLineItem> requirementDownloadLineItems;
     private Map<String, List<RequirementDownloadLineItem>> fsnToRequirement;
+    private final GenerateExcelCommand generateExcelCommand;
 
     @Inject
-    public DownloadCommand(FsnBandRepository fsnBandRepository, WeeklySaleRepository weeklySaleRepository) {
+    public DownloadCommand(FsnBandRepository fsnBandRepository, WeeklySaleRepository weeklySaleRepository, GenerateExcelCommand generateExcelCommand) {
         this.fsnBandRepository = fsnBandRepository;
         this.weeklySaleRepository = weeklySaleRepository;
+        this.generateExcelCommand = generateExcelCommand;
     }
 
     public StreamingOutput execute(List<Requirement> requirements, boolean isLastAppSupplierRequired) {
@@ -58,7 +54,8 @@ public abstract class DownloadCommand {
         if (isLastAppSupplierRequired) {
             fetchLastAppSupplierDataFromProc();
         }
-        return generateExcel(requirementDownloadLineItems);
+        String templateName = getTemplateName();
+        return generateExcelCommand.generateExcel(requirementDownloadLineItems, templateName);
     }
 
     protected void fetchProductData() {
@@ -88,20 +85,7 @@ public abstract class DownloadCommand {
 
     }
 
-    protected StreamingOutput generateExcel(List<RequirementDownloadLineItem> requirementDownloadLineItems) {
-        SpreadSheetWriter spreadsheet = new SpreadSheetWriter();
-        ObjectMapper mapper = new ObjectMapper();
-        InputStream template = getClass().getResourceAsStream(getTemplateName());
-        StreamingOutput output = (OutputStream out) -> {
-            try {
-                spreadsheet.populateTemplate(template, out, mapper.convertValue(requirementDownloadLineItems, new TypeReference<List<Map>>() {
-                }));
-            } catch (InvalidFormatException e) {
-                throw new WebApplicationException(e);
-            }
-        };
-        return output;
-    }
+
 
     private void populateSalesData(List<WeeklySale> sales, RequirementDownloadLineItem reqItem, Consumer<Integer>... setters) {
         MultiKeyMap<String, Integer> fsnWhWeekSalesMap = new MultiKeyMap();

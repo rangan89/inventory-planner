@@ -32,7 +32,7 @@ public class ManagerApplication extends Application<ManagerConfiguration> {
                 .addModule(new RequirementModule())
                 .addModule(new JpaWithSpringModule(
                         Sets.newHashSet(
-                                "fk.retail.ip"
+                                "fk.retail.ip.requirement.internal.entities","fk.retail.ip.requirement.sql"
                         ), new Properties()))
                 .enableAutoConfig(
                         "fk.sp.common.extensions.exception",
