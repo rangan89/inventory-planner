@@ -17,5 +17,6 @@ public class RequirementModule extends AbstractModule {
         bind(FsnBandRepository.class).to(JPAFsnBandRepository.class);
         bind(WeeklySaleRepository.class).to(JPAWeeklySaleRepository.class);
         bind(RequirementRepository.class).to(JPARequirementRepository.class);
+        bind(LastAppSupplierRepository.class).to(JPALastAppSupplierRepository.class);
     }
 }

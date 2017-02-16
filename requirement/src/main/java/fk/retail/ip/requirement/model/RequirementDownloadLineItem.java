@@ -49,6 +49,8 @@ public class RequirementDownloadLineItem {
     private boolean international;
     private String procType;
     private String overrideComment;
+    private Integer lastApp;
+    private String lastSupplier;
 
     public RequirementDownloadLineItem(Requirement req) {
         this.fsn = req.getFsn();

@@ -99,6 +99,27 @@
         </query>
     </named-query>
 
+    <named-query name="fetchLastAppSupplierForFsns">
+        <query>
+            <![CDATA[
+            SELECT l
+            FROM LastAppSupplier l
+            WHERE
+                l.fsn IN :fsns
+            ]]>
+        </query>
+    </named-query>
+
+    <named-query name="fetchLastAppSupplierForFsns.count">
+        <query>
+            <![CDATA[
+              SELECT count(l)
+              FROM LastAppSupplier l
+              WHERE
+                  l.fsn IN :fsns
+              ]]>
+        </query>
+    </named-query>
 
 
 

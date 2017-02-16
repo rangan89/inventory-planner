@@ -2,9 +2,11 @@ package fk.retail.ip.requirement.internal.command;
 
 import com.google.inject.Inject;
 import fk.retail.ip.requirement.internal.entities.FsnBand;
+import fk.retail.ip.requirement.internal.entities.LastAppSupplier;
 import fk.retail.ip.requirement.internal.entities.Requirement;
 import fk.retail.ip.requirement.internal.entities.WeeklySale;
 import fk.retail.ip.requirement.internal.repository.FsnBandRepository;
+import fk.retail.ip.requirement.internal.repository.LastAppSupplierRepository;
 import fk.retail.ip.requirement.internal.repository.WeeklySaleRepository;
 import fk.retail.ip.requirement.model.RequirementDownloadLineItem;
 
@@ -28,18 +30,20 @@ import static java.util.stream.Collectors.toList;
  */
 public abstract class DownloadCommand {
 
-    private Set<String> requirementFsns;
+    protected Set<String> requirementFsns;
     private final FsnBandRepository fsnBandRepository;
     private final WeeklySaleRepository weeklySaleRepository;
-    private List<RequirementDownloadLineItem> requirementDownloadLineItems;
+    protected List<RequirementDownloadLineItem> requirementDownloadLineItems;
     private Map<String, List<RequirementDownloadLineItem>> fsnToRequirement;
+    private final LastAppSupplierRepository lastAppSupplierRepository;
     private final GenerateExcelCommand generateExcelCommand;
 
-    @Inject
-    public DownloadCommand(FsnBandRepository fsnBandRepository, WeeklySaleRepository weeklySaleRepository, GenerateExcelCommand generateExcelCommand) {
+
+    public DownloadCommand(FsnBandRepository fsnBandRepository, WeeklySaleRepository weeklySaleRepository, GenerateExcelCommand generateExcelCommand, LastAppSupplierRepository lastAppSupplierRepository) {
         this.fsnBandRepository = fsnBandRepository;
         this.weeklySaleRepository = weeklySaleRepository;
         this.generateExcelCommand = generateExcelCommand;
+        this.lastAppSupplierRepository = lastAppSupplierRepository;
     }
 
     public StreamingOutput execute(List<Requirement> requirements, boolean isLastAppSupplierRequired) {
@@ -50,12 +54,9 @@ public abstract class DownloadCommand {
         fetchProductData();
         fetchFsnBandData();
         fetchSalesBucketData();
-        fetchRequirementStateData();
-        if (isLastAppSupplierRequired) {
-            fetchLastAppSupplierDataFromProc();
-        }
-        String templateName = getTemplateName();
-        return generateExcelCommand.generateExcel(requirementDownloadLineItems, templateName);
+        fetchRequirementStateData(isLastAppSupplierRequired);
+
+        return generateExcelCommand.generateExcel(requirementDownloadLineItems, getTemplateName());
     }
 
     protected void fetchProductData() {
@@ -81,12 +82,6 @@ public abstract class DownloadCommand {
         );
     }
 
-    protected void fetchLastAppSupplierDataFromProc() {
-
-    }
-
-
-
     private void populateSalesData(List<WeeklySale> sales, RequirementDownloadLineItem reqItem, Consumer<Integer>... setters) {
         MultiKeyMap<String, Integer> fsnWhWeekSalesMap = new MultiKeyMap();
         sales.forEach(s -> fsnWhWeekSalesMap.put(s.getFsn(), s.getWarehouse(), String.valueOf(s.getWeek()), s.getSaleQty()));
@@ -100,7 +95,32 @@ public abstract class DownloadCommand {
         }
     }
 
+    protected void fetchLastAppSupplierDataFromProc() {
+        List<LastAppSupplier> l = lastAppSupplierRepository.fetchLastAppSupplierForFsns(requirementFsns);
+
+        requirementDownloadLineItems.forEach(reqItem
+                -> populateLastAppSupplierData(l, reqItem, reqItem::setLastApp, reqItem::setLastSupplier)
+        );
+
+
+    }
+
+    private void populateLastAppSupplierData(List<LastAppSupplier> lastAppSuppliers, RequirementDownloadLineItem reqItem, Consumer<Integer> lastAppSetter, Consumer<String> lastSupplierSetter) {
+        MultiKeyMap<String,Integer> fsnWhLastAppMap = new MultiKeyMap();
+        MultiKeyMap<String,String> fsnWhLastSupplierMap = new MultiKeyMap();
+        lastAppSuppliers.forEach(l -> {
+            fsnWhLastAppMap.put(l.getFsn(),l.getWarehouseId(),l.getLastApp());
+            fsnWhLastSupplierMap.put(l.getFsn(),l.getWarehouseId(),l.getLastSupplier());
+        });
+
+        lastAppSetter.accept(fsnWhLastAppMap.get(reqItem.getFsn(),reqItem.getWarehouse()));
+        lastSupplierSetter.accept(fsnWhLastSupplierMap.get(reqItem.getFsn(),reqItem.getWarehouse()));
+    }
+
+
     protected abstract String getTemplateName();
 
-    abstract void fetchRequirementStateData();
+    abstract void fetchRequirementStateData(boolean isLastAppSupplierRequired);
+
+
 }

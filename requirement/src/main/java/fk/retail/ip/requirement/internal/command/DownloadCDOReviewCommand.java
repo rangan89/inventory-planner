@@ -2,6 +2,7 @@ package fk.retail.ip.requirement.internal.command;
 
 import com.google.inject.Inject;
 import fk.retail.ip.requirement.internal.repository.FsnBandRepository;
+import fk.retail.ip.requirement.internal.repository.LastAppSupplierRepository;
 import fk.retail.ip.requirement.internal.repository.WeeklySaleRepository;
 
 /**
@@ -10,8 +11,8 @@ import fk.retail.ip.requirement.internal.repository.WeeklySaleRepository;
 public class DownloadCDOReviewCommand extends DownloadCommand {
 
     @Inject
-    public DownloadCDOReviewCommand(FsnBandRepository fsnBandRepository, WeeklySaleRepository weeklySaleRepository, GenerateExcelCommand generateExcelCommand) {
-        super(fsnBandRepository, weeklySaleRepository, generateExcelCommand);
+    public DownloadCDOReviewCommand(FsnBandRepository fsnBandRepository, WeeklySaleRepository weeklySaleRepository, GenerateExcelCommand generateExcelCommand, LastAppSupplierRepository lastAppSupplierRepository) {
+        super(fsnBandRepository, weeklySaleRepository, generateExcelCommand, lastAppSupplierRepository);
     }
 
     @Override
@@ -20,7 +21,8 @@ public class DownloadCDOReviewCommand extends DownloadCommand {
     }
 
     @Override
-    void fetchRequirementStateData() {
+    void fetchRequirementStateData(boolean isLastAppSupplierRequired) {
 
     }
+
 }
