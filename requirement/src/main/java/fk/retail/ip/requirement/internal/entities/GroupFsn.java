@@ -13,7 +13,7 @@ import lombok.Data;
 public class GroupFsn extends ReadOnlyEntity {
 
     String fsn;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "group_id")
     Group group;
 }

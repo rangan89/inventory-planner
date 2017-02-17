@@ -120,7 +120,7 @@
         </query>
     </named-query>
 
-    <named-query name="fetchIwtRequestItemsByFsnsInStatuses">
+    <named-query name="IwtRequestItem.fetchByFsnsInStatuses">
         <query>
             <![CDATA[
             SELECT iri

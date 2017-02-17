@@ -15,7 +15,7 @@ public class IwtRequestItem extends ReadOnlyEntity {
     String fsn;
     int availableQuantity;
     String status;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "external_id", referencedColumnName = "externalId")
     IwtRequest iwtRequest;
 
