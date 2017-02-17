@@ -36,7 +36,11 @@ public class FsnBandRepositoryTest extends TransactionalJpaRepositoryTest {
 
     private FsnBand getFsnBand() {
 
-        FsnBand fsnBand = new FsnBand("fsn", 2, 3, "Last 30 Days");
+        FsnBand fsnBand = new FsnBand();
+        fsnBand.setFsn("fsn");
+        fsnBand.setSalesBand(2);
+        fsnBand.setPvBand(3);
+        fsnBand.setTimeFrame("Last 30 Days");
         fsnBand.setCreatedAt(new Date());
         return fsnBand;
     }

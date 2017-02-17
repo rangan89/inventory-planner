@@ -19,11 +19,11 @@ public class JpaIwtRequestItemRepository extends SimpleJpaGenericRepository<IwtR
     }
 
     @Override
-    public List<IwtRequestItem> fetchIwtIntransitItems(String fsn) {
+    public List<IwtRequestItem> fetchByFsns(List<String> fsns, List<String> statuses) {
         TypedQuery<IwtRequestItem> iwtRequestItemQuery =
-                getEntityManager().createNamedQuery("fetchIwtRequestItemsInStatuses", IwtRequestItem.class);
-        iwtRequestItemQuery.setParameter("fsn", fsn);
-        iwtRequestItemQuery.setParameter("statuses", Lists.newArrayList("in-process", "dispatched", "requested"));
+                getEntityManager().createNamedQuery("IwtRequestItem.fetchByFsnsInStatuses", IwtRequestItem.class);
+        iwtRequestItemQuery.setParameter("fsns", fsns);
+        iwtRequestItemQuery.setParameter("statuses", statuses);
         return iwtRequestItemQuery.getResultList();
     }
 }

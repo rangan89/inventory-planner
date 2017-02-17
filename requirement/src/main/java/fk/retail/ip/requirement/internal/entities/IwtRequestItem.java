@@ -1,7 +1,7 @@
 package fk.retail.ip.requirement.internal.entities;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -15,8 +15,8 @@ public class IwtRequestItem extends ReadOnlyEntity {
     String fsn;
     int availableQuantity;
     String status;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "externalId", referencedColumnName = "externalId")
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "external_id", referencedColumnName = "externalId")
     IwtRequest iwtRequest;
 
     public String getWarehouse() {

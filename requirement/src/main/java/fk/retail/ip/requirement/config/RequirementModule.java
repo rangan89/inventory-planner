@@ -2,13 +2,19 @@ package fk.retail.ip.requirement.config;
 
 import com.google.inject.AbstractModule;
 import fk.retail.ip.requirement.internal.repository.FsnBandRepository;
+import fk.retail.ip.requirement.internal.repository.GroupFsnRepository;
 import fk.retail.ip.requirement.internal.repository.IwtRequestItemRepository;
 import fk.retail.ip.requirement.internal.repository.JPAFsnBandRepository;
+import fk.retail.ip.requirement.internal.repository.JPAGroupFsnRepository;
 import fk.retail.ip.requirement.internal.repository.JPALastAppSupplierRepository;
+import fk.retail.ip.requirement.internal.repository.JPAOpenRequirementAndPurchaseOrderRepository;
+import fk.retail.ip.requirement.internal.repository.JPAPolicyRepository;
 import fk.retail.ip.requirement.internal.repository.JPARequirementRepository;
 import fk.retail.ip.requirement.internal.repository.JPAWeeklySaleRepository;
 import fk.retail.ip.requirement.internal.repository.JpaIwtRequestItemRepository;
 import fk.retail.ip.requirement.internal.repository.LastAppSupplierRepository;
+import fk.retail.ip.requirement.internal.repository.OpenRequirementAndPurchaseOrderRepository;
+import fk.retail.ip.requirement.internal.repository.PolicyRepository;
 import fk.retail.ip.requirement.internal.repository.RequirementRepository;
 import fk.retail.ip.requirement.internal.repository.WeeklySaleRepository;
 import fk.retail.ip.requirement.resource.RequirementResource;
@@ -30,5 +36,8 @@ public class RequirementModule extends AbstractModule {
         bind(RequirementRepository.class).to(JPARequirementRepository.class);
         bind(LastAppSupplierRepository.class).to(JPALastAppSupplierRepository.class);
         bind(IwtRequestItemRepository.class).to(JpaIwtRequestItemRepository.class);
+        bind(OpenRequirementAndPurchaseOrderRepository.class).to(JPAOpenRequirementAndPurchaseOrderRepository.class);
+        bind(PolicyRepository.class).to(JPAPolicyRepository.class);
+        bind(GroupFsnRepository.class).to(JPAGroupFsnRepository.class);
     }
 }

@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface IwtRequestItemRepository extends JpaGenericRepository<IwtRequestItem, Long> {
 
-    List<IwtRequestItem> fetchIwtIntransitItems(String fsn);
+    List<IwtRequestItem> fetchByFsns(List<String> fsns, List<String> statuses);
 }

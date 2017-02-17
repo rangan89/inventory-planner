@@ -63,14 +63,14 @@
         </query>
     </named-query>
 
-
     <named-query name="fetchBandDataForFSNs.count">
         <query>
             <![CDATA[
             SELECT count(fb)
             FROM FsnBand fb
             WHERE
-                fb.fsn IN :fsns
+                fb.fsn IN :fsns and
+                fb.timeFrame = :timeFrame
                 ]]>
         </query>
     </named-query>
@@ -86,7 +86,6 @@
                 ]]>
         </query>
     </named-query>
-
 
     <named-query name="fetchWeeklySalesForFsns.count">
         <query>
@@ -120,25 +119,61 @@
               ]]>
         </query>
     </named-query>
-    <named-query name="fetchIwtRequestIdsForStatuses">
-        <query>
-            <![CDATA[
-            SELECT ir.externalId
-            FROM IwtRequest ir
-            WHERE
-                ir.status IN :statuses
-                ]]>
-        </query>
-    </named-query>
 
-    <named-query name="fetchIwtRequestItemsInStatuses">
+    <named-query name="fetchIwtRequestItemsByFsnsInStatuses">
         <query>
             <![CDATA[
             SELECT iri
             FROM IwtRequestItem iri
             WHERE
-                iri.fsn = :fsn AND
+                iri.fsn IN :fsns AND
                 iri.status IN :statuses
+                ]]>
+        </query>
+    </named-query>
+
+    <named-query name="OpenRequirementAndPurchaseOrder.fetchByFsns">
+        <query>
+            <![CDATA[
+            SELECT rpo
+            FROM OpenRequirementAndPurchaseOrder rpo
+            WHERE
+                rpo.fsn IN :fsns
+                ]]>
+        </query>
+    </named-query>
+
+    <named-query name="Policy.fetchByFsns">
+        <query>
+            <![CDATA[
+            SELECT p
+            FROM Policy p
+            WHERE
+                p.fsn IN :fsns
+                ]]>
+        </query>
+    </named-query>
+
+
+    <named-query name="Policy.fetchByGroupIds">
+        <query>
+            <![CDATA[
+            SELECT p
+            FROM Policy p
+            WHERE
+                p.group.id IN :ids AND
+                p.fsn IS NULL
+                ]]>
+        </query>
+    </named-query>
+
+    <named-query name="GroupFsn.fetchByFsns">
+        <query>
+            <![CDATA[
+            SELECT gf
+            FROM GroupFsn gf
+            WHERE
+                gf.fsn IN :fsns
                 ]]>
         </query>
     </named-query>
