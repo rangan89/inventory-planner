@@ -30,8 +30,8 @@ public class JPARequirementRepository extends SimpleJpaGenericRepository<Require
     }
 
     @Override
-    public List<Requirement> findAllEnabledRequirements(String state) {
-        TypedQuery<Requirement> query = getEntityManager().createNamedQuery("findEnabledRequirementsByState", Requirement.class);
+    public List<Requirement> findAllCurrentRequirements(String state) {
+        TypedQuery<Requirement> query = getEntityManager().createNamedQuery("findCurrentRequirementsByState", Requirement.class);
         query.setParameter("state", state);
         List<Requirement> requirements = query.getResultList();
         return requirements;

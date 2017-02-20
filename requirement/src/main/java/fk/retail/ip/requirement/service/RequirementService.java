@@ -6,6 +6,7 @@ import fk.retail.ip.requirement.internal.repository.RequirementRepository;
 import fk.retail.ip.requirement.model.DownloadRequirementRequest;
 import fk.retail.ip.requirement.model.RequirementManager;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.ws.rs.core.StreamingOutput;
 
 /**
@@ -31,9 +32,11 @@ public class RequirementService {
         if (!requirementIds.isEmpty()) {
             requirements = requirementRepository.findRequirementByIds(requirementIds);
         } else {
-            requirements = requirementRepository.findAllEnabledRequirements(requirementState);
+            requirements = requirementRepository.findAllCurrentRequirements(requirementState);
         }
 
+        //todo: cleanup remove if 'all' column value for warehouse is removed
+        requirements = requirements.stream().filter(requirement -> !requirement.getWarehouse().equals("all")).collect(Collectors.toList());
         StreamingOutput output = requirementManager.withRequirements(requirements).download(requirementState, isLastAppSupplierRequired);
         return output;
 

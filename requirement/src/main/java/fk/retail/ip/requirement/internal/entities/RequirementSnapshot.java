@@ -1,41 +1,38 @@
 package fk.retail.ip.requirement.internal.entities;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.hibernate.annotations.Immutable;
-
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
+import lombok.Data;
 
 /**
  * Created by nidhigupta.m on 27/01/17.
  */
 @Entity
 @XmlRootElement
-@Getter
-@NoArgsConstructor
-@Immutable
-@Setter
+@Data
 @Table(name = "REQUIREMENT_SNAPSHOT")
 public class RequirementSnapshot extends ReadOnlyEntity {
 
     private String forecast;
 
-    private int inventoryQty;
+    private Integer inventoryQty;
 
-    private int qoh;
+    private Integer qoh;
 
-    private int pendingPoQty;
+    private Integer pendingPoQty;
 
-    private int openReqQty;
+    private Integer openReqQty;
 
-    private int iwitIntransitQty;
+    private Integer iwitIntransitQty;
 
     private String policy;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @PrimaryKeyJoinColumn
+    @JoinColumn(name = "group_id")
     private Group group;
 
 }

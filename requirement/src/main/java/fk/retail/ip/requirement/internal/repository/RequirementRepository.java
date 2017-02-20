@@ -12,7 +12,7 @@ public interface RequirementRepository extends JpaGenericRepository<Requirement,
 
     List<Requirement> findRequirementByIds(List<Long> requirementIds);
 
-    List<Requirement> findAllEnabledRequirements(String state);
+    List<Requirement> findAllCurrentRequirements(String state);
 
     List<Requirement> findEnabledRequirementsByStateFsn(String state, Set<String> fsns);
 }

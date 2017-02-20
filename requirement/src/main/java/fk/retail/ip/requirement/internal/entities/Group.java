@@ -10,11 +10,17 @@ import lombok.Data;
  */
 @Data
 @Entity
+//todo:cleanup
 @Table(name = "ip_groups")
 public class Group extends ReadOnlyEntity {
 
+    //todo:cleanup
     @Column(name = "group_name")
     private String name;
+
     private String procurementType;
-    private boolean enabled;
+
+    //todo: add this field in old db
+    @Column(name = "is_enabled")
+    private Boolean enabled;
 }

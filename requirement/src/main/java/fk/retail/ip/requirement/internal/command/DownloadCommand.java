@@ -91,7 +91,8 @@ public abstract class DownloadCommand {
 
     private void populateSalesData(MultiKeyMap<String,Integer> fsnWhWeekSalesMap, int currentWeek, RequirementDownloadLineItem reqItem, Consumer<Integer>... setters) {
         for (Consumer<Integer> setter : setters) {
-            setter.accept(fsnWhWeekSalesMap.get(reqItem.getFsn(), reqItem.getWarehouse(), String.valueOf(currentWeek)));
+            Integer saleQty = fsnWhWeekSalesMap.get(reqItem.getFsn(), reqItem.getWarehouse(), String.valueOf(currentWeek));
+            setter.accept(saleQty == null ? 0 : saleQty);
             currentWeek = (currentWeek - 2 + 52) % 52 + 1;
         }
     }
@@ -133,12 +134,13 @@ public abstract class DownloadCommand {
         });
     }
 
+
     protected void populateIpcQuantity() {
         List<Requirement> requirements = requirementRepository.findEnabledRequirementsByStateFsn("proposed",requirementFsns);
         MultiKeyMap<String,Integer> fsnWhIpcProposedQuantity = new MultiKeyMap();
         requirements.forEach(r -> {
             fsnWhIpcProposedQuantity.put(r.getFsn(),r.getWarehouse(),r.getQuantity());
-        });
+});
 
         requirementDownloadLineItems.forEach(reqItem
                 -> {
@@ -168,6 +170,5 @@ public abstract class DownloadCommand {
     protected abstract String getTemplateName(boolean isLastAppSupplierRequired);
 
     abstract void fetchRequirementStateData(boolean isLastAppSupplierRequired);
-
 
 }

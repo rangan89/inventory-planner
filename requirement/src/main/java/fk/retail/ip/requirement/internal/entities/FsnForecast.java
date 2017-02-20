@@ -3,19 +3,17 @@ package fk.retail.ip.requirement.internal.entities;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Immutable;
+import lombok.Data;
 
 /**
  * @author Pragalathan M
  */
+@Data
 @Entity
-@Table(name = "FORECAST")
+//todo:cleanup
+//@Table(name = "FORECAST")
+@Table(name = "forecast_regional")
 @XmlRootElement
-@Getter
-@NoArgsConstructor
-@Immutable
 public class FsnForecast extends ReadOnlyEntity {
 
     private String fsn;

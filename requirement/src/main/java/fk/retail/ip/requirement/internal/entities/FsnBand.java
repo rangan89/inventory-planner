@@ -10,12 +10,14 @@ import lombok.Data;
  */
 @Data
 @Entity
-@Table(name = "FDP_FSN_BAND")
+//todo:cleanup
+//@Table(name = "FDP_FSN_BAND")
+@Table(name = "fsn_bands")
 @XmlRootElement
 public class FsnBand extends ReadOnlyEntity {
 
     private String fsn;
-    private int salesBand;
-    private int pvBand;
+    private Integer salesBand;
+    private Integer pvBand;
     private String timeFrame;
 }

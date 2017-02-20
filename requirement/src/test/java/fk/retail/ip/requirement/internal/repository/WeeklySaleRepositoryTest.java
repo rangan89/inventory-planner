@@ -5,7 +5,6 @@ import fk.retail.ip.requirement.config.TestModule;
 import fk.retail.ip.requirement.internal.entities.WeeklySale;
 import fk.sp.common.extensions.jpa.TransactionalJpaRepositoryTest;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import org.jukito.JukitoRunner;
@@ -27,16 +26,10 @@ public class WeeklySaleRepositoryTest extends TransactionalJpaRepositoryTest {
 
     @Test
     public void fetchWeeklySalesForFsnsTest() {
-        WeeklySale weeklySale = getWeeklySale();
+        WeeklySale weeklySale = TestHelper.getWeeklySale("fsn", "wh1", 3, 90);
         weeklySaleRepository.persist(weeklySale);
         List<WeeklySale> weeklySaleList = weeklySaleRepository.fetchWeeklySalesForFsns(new HashSet<String>(Arrays.asList("fsn")));
         Assert.assertEquals(weeklySale, weeklySaleList.get(0));
     }
 
-    private WeeklySale getWeeklySale() {
-
-        WeeklySale weeklySale = new WeeklySale("fsn", "wh1", 3, 90);
-        weeklySale.setCreatedAt(new Date());
-        return weeklySale;
-    }
 }

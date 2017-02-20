@@ -22,6 +22,7 @@ public enum RequirementState {
 
     private DownloadCommand downloadCommand;
 
+
     RequirementState(Class<? extends DownloadCommand> type) {
         Injector INJECTOR = Guice.createInjector(new RequirementModule());
         downloadCommand = INJECTOR.getInstance(type);

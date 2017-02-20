@@ -26,21 +26,13 @@ public class LastAppSupplierRepositoryTest extends TransactionalJpaRepositoryTes
 
     @Test
     public void fetchLastAppSupplierForFsnsTest() {
-        LastAppSupplier lastAppSupplier = getLastAppSupplier();
+        LastAppSupplier lastAppSupplier = TestHelper.getLastAppSupplier("fsn", "wh","supplier", 150);
         lastAppSupplierRepository.persist(lastAppSupplier);
         List<LastAppSupplier> lastAppSupplierList = lastAppSupplierRepository.fetchLastAppSupplierForFsns(new HashSet<String>(Arrays.asList("fsn")));
         Assert.assertEquals(lastAppSupplier, lastAppSupplierList.get(0));
     }
 
-    private LastAppSupplier getLastAppSupplier() {
-        LastAppSupplier lastAppSupplier = new LastAppSupplier();
-        lastAppSupplier.setFsn("fsn");
-        lastAppSupplier.setWarehouseId("wh");
-        lastAppSupplier.setLastSupplier("supplier");
-        lastAppSupplier.setLastApp(150);
-        lastAppSupplier.setCreatedAt(new Date());
-        return lastAppSupplier;
-    }
+
 
 
 }
