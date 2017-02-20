@@ -14,43 +14,67 @@ import lombok.Setter;
 @Setter
 public class RequirementDownloadLineItem {
 
+    @JsonProperty("FSN")
     private String fsn;
+    @JsonProperty("Warehouse")
     private String warehouse;
+    @JsonProperty("PV Band")
     private int pvBand;
+    @JsonProperty("Sales Band")
     private int salesBand;
-    @JsonProperty("salesBucket-0")
+    @JsonProperty("Sales_bucket_0")
     private int week0Sale;
-    @JsonProperty("salesBucket-1")
+    @JsonProperty("Sales_bucket_1")
     private int week1Sale;
-    @JsonProperty("salesBucket-2")
+    @JsonProperty("Sales_bucket_2")
     private int week2Sale;
-    @JsonProperty("salesBucket-3")
+    @JsonProperty("Sales_bucket_3")
     private int week3Sale;
-    @JsonProperty("salesBucket-4")
+    @JsonProperty("Sales_bucket_4")
     private int week4Sale;
-    @JsonProperty("salesBucket-5")
+    @JsonProperty("Sales_bucket_5")
     private int week5Sale;
-    @JsonProperty("salesBucket-6")
+    @JsonProperty("Sales_bucket_6")
     private int week6Sale;
-    @JsonProperty("salesBucket-7")
+    @JsonProperty("Sales_bucket_7")
     private int week7Sale;
+    @JsonProperty("Inventory")
     private int inventory;
     private int qoh;
+    @JsonProperty("Forecast")
     private String forecast;
     private int pendingPOQty;
     private int openReqQty;
+    @JsonProperty("Intransit")
     private int iwitIntransitQty;
+    @JsonProperty("Quantity")
     private int quantity;
+    @JsonProperty("Supplier")
     private String supplier;
+    @JsonProperty("MRP")
     private int mrp;
+    @JsonProperty("Purchase Price")
     private int app;
+    @JsonProperty("Currency")
     private String currency;
+    @JsonProperty("SLA")
     private int sla;
     private boolean international;
+    @JsonProperty("procurement_type")
     private String procType;
     private String overrideComment;
+    @JsonProperty("Last App")
     private Integer lastApp;
+    @JsonProperty("Last Supplier")
     private String lastSupplier;
+    @JsonProperty("BizFin Quantity Recommendation")
+    private int bizFinRecommendedQuantity;
+    @JsonProperty("BizFin Comments")
+    private String bizFinComment;
+    @JsonProperty("IPC Proposed Quantity")
+    private int ipcProposedQuantity;
+    @JsonProperty("CDO Override reason")
+    private String cdoOverrideReason;
 
     public RequirementDownloadLineItem(Requirement req) {
         this.fsn = req.getFsn();

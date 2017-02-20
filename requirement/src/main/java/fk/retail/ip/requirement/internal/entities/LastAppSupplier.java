@@ -3,6 +3,8 @@ package fk.retail.ip.requirement.internal.entities;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
+
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,6 +19,7 @@ import org.hibernate.annotations.Immutable;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Immutable
 public class LastAppSupplier extends ReadOnlyEntity {
 

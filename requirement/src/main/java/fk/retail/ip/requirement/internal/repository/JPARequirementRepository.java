@@ -7,6 +7,8 @@ import java.util.List;
 import javax.inject.Provider;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by nidhigupta.m on 26/01/17.
@@ -31,6 +33,15 @@ public class JPARequirementRepository extends SimpleJpaGenericRepository<Require
     public List<Requirement> findAllEnabledRequirements(String state) {
         TypedQuery<Requirement> query = getEntityManager().createNamedQuery("findEnabledRequirementsByState", Requirement.class);
         query.setParameter("state", state);
+        List<Requirement> requirements = query.getResultList();
+        return requirements;
+    }
+
+    @Override
+    public List<Requirement> findEnabledRequirementsByStateFsn(String state, Set<String> fsns) {
+        TypedQuery<Requirement> query = getEntityManager().createNamedQuery("findEnabledRequirementsByStateFsnWh", Requirement.class);
+        query.setParameter("state", state);
+        query.setParameter("fsns", fsns);
         List<Requirement> requirements = query.getResultList();
         return requirements;
     }

@@ -1,8 +1,12 @@
 package fk.retail.ip.requirement.internal.command;
 
 import com.google.inject.Inject;
+import fk.retail.ip.requirement.internal.entities.LastAppSupplier;
+import fk.retail.ip.requirement.internal.entities.Requirement;
+import fk.retail.ip.requirement.internal.enums.RequirementState;
 import fk.retail.ip.requirement.internal.repository.FsnBandRepository;
 import fk.retail.ip.requirement.internal.repository.LastAppSupplierRepository;
+import fk.retail.ip.requirement.internal.repository.RequirementRepository;
 import fk.retail.ip.requirement.internal.repository.WeeklySaleRepository;
 
 /**
@@ -10,16 +14,17 @@ import fk.retail.ip.requirement.internal.repository.WeeklySaleRepository;
  */
 public class DownloadBizFinReviewCommand extends DownloadCommand {
 
-    private LastAppSupplierRepository lastAppSupplierRepository;
-
     @Inject
-    public DownloadBizFinReviewCommand(FsnBandRepository fsnBandRepository, WeeklySaleRepository weeklySaleRepository, GenerateExcelCommand generateExcelCommand, LastAppSupplierRepository lastAppSupplierRepository) {
-        super(fsnBandRepository, weeklySaleRepository, generateExcelCommand, lastAppSupplierRepository);
+    public DownloadBizFinReviewCommand(FsnBandRepository fsnBandRepository, WeeklySaleRepository weeklySaleRepository, GenerateExcelCommand generateExcelCommand, LastAppSupplierRepository lastAppSupplierRepository, RequirementRepository requirementRepository) {
+        super(fsnBandRepository, weeklySaleRepository, generateExcelCommand, lastAppSupplierRepository, requirementRepository);
     }
 
     @Override
-    protected String getTemplateName() {
-        return "/templates/BizFinReview.xlsx";
+    protected String getTemplateName(boolean isLastAppSupplierRequired) {
+        if(isLastAppSupplierRequired)
+            return "/templates/BizFinReviewWithLastAppSupplier.xlsx";
+        else
+            return "/templates/BizFinReview.xlsx";
     }
 
     @Override
@@ -27,6 +32,9 @@ public class DownloadBizFinReviewCommand extends DownloadCommand {
         if (isLastAppSupplierRequired) {
             fetchLastAppSupplierDataFromProc();
         }
+        populateBizFinData();
+        populateCdoData();
+        populateIpcQuantity();
     }
 
 

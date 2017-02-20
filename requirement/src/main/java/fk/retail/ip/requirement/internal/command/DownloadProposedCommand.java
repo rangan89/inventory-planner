@@ -3,6 +3,7 @@ package fk.retail.ip.requirement.internal.command;
 import com.google.inject.Inject;
 import fk.retail.ip.requirement.internal.repository.FsnBandRepository;
 import fk.retail.ip.requirement.internal.repository.LastAppSupplierRepository;
+import fk.retail.ip.requirement.internal.repository.RequirementRepository;
 import fk.retail.ip.requirement.internal.repository.WeeklySaleRepository;
 
 /**
@@ -11,12 +12,12 @@ import fk.retail.ip.requirement.internal.repository.WeeklySaleRepository;
 public class DownloadProposedCommand extends DownloadCommand {
 
     @Inject
-    public DownloadProposedCommand(FsnBandRepository fsnBandRepository, WeeklySaleRepository weeklySaleRepository, GenerateExcelCommand generateExcelCommand, LastAppSupplierRepository lastAppSupplierRepository) {
-        super(fsnBandRepository, weeklySaleRepository, generateExcelCommand, lastAppSupplierRepository);
+    public DownloadProposedCommand(FsnBandRepository fsnBandRepository, WeeklySaleRepository weeklySaleRepository, GenerateExcelCommand generateExcelCommand, LastAppSupplierRepository lastAppSupplierRepository, RequirementRepository requirementRepository) {
+        super(fsnBandRepository, weeklySaleRepository, generateExcelCommand, lastAppSupplierRepository, requirementRepository);
     }
 
     @Override
-    protected String getTemplateName() {
+    protected String getTemplateName(boolean isLastAppSupplierRequired) {
         return "/templates/proposed.xlsx";
     }
 
