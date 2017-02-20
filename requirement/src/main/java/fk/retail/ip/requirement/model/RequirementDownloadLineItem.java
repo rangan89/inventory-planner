@@ -61,22 +61,19 @@ public class RequirementDownloadLineItem {
     @JsonProperty("Currency")
     private String currency;
     @JsonProperty("SLA")
-    private Integer sla;   
+    private Integer sla;
     @JsonProperty("procurement_type")
     private String procType;
-    @JsonProperty("Comment")
-    private String overrideComment;
-
     @JsonProperty("Last App")
     private Integer lastApp;
     @JsonProperty("Last Supplier")
     private String lastSupplier;
     @JsonProperty("BizFin Quantity Recommendation")
-    private int bizFinRecommendedQuantity;
+    private Integer bizFinRecommendedQuantity;
     @JsonProperty("BizFin Comments")
     private String bizFinComment;
     @JsonProperty("IPC Proposed Quantity")
-    private int ipcProposedQuantity;
+    private Integer ipcProposedQuantity;
     @JsonProperty("CDO Override reason")
     private String cdoOverrideReason;
 
@@ -104,7 +101,6 @@ public class RequirementDownloadLineItem {
         this.currency = req.getCurrency();
         this.sla = req.getSla();
         this.procType = req.getProcType();
-        this.overrideComment = req.getOverrideComment();
 
     }
 

@@ -102,8 +102,8 @@ public abstract class DownloadCommand {
         MultiKeyMap<String,Integer> fsnWhLastAppMap = new MultiKeyMap();
         MultiKeyMap<String,String> fsnWhLastSupplierMap = new MultiKeyMap();
         lastAppSuppliers.forEach(l -> {
-            fsnWhLastAppMap.put(l.getFsn(),l.getWarehouseId(),l.getLastApp());
-            fsnWhLastSupplierMap.put(l.getFsn(),l.getWarehouseId(),l.getLastSupplier());
+            fsnWhLastAppMap.put(l.getFsn(),l.getWarehouse(),l.getLastApp());
+            fsnWhLastSupplierMap.put(l.getFsn(),l.getWarehouse(),l.getLastSupplier());
         });
 
         requirementDownloadLineItems.forEach(reqItem

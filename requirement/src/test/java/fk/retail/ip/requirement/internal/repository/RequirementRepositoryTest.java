@@ -73,6 +73,7 @@ public class RequirementRepositoryTest extends TransactionalJpaRepositoryTest {
         String fsn = "fsn" + String.valueOf(i);
         Requirement requirement = TestHelper.getRequirement(fsn, "dummy_warehouse","proposed", true, null, 10, "supplier",
                 10, 11, "INR",2,"comment", "daily"  );
+        requirement.setCurrent(true);
 
         return requirement;
     }
