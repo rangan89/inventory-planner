@@ -1,17 +1,15 @@
 package fk.retail.ip.requirement.internal.repository;
 
-import fk.retail.ip.requirement.internal.entities.FsnBand;
-import fk.retail.ip.requirement.internal.entities.Group;
-import fk.retail.ip.requirement.internal.entities.GroupFsn;
-import fk.retail.ip.requirement.internal.entities.IwtRequest;
-import fk.retail.ip.requirement.internal.entities.IwtRequestItem;
-import fk.retail.ip.requirement.internal.entities.LastAppSupplier;
-import fk.retail.ip.requirement.internal.entities.OpenRequirementAndPurchaseOrder;
-import fk.retail.ip.requirement.internal.entities.Policy;
-import fk.retail.ip.requirement.internal.entities.Requirement;
-import fk.retail.ip.requirement.internal.entities.RequirementSnapshot;
-import fk.retail.ip.requirement.internal.entities.WeeklySale;
+import com.google.common.collect.Lists;
+import fk.retail.ip.requirement.internal.entities.*;
+
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import fk.retail.ip.zulu.internal.entities.EntityView;
+import fk.retail.ip.zulu.internal.entities.RetailProductAttributeResponse;
 import org.bouncycastle.cert.ocsp.Req;
 
 public class TestHelper {
@@ -118,6 +116,51 @@ public class TestHelper {
         snapshot.setOpenReqQty(req);
         snapshot.setIwitIntransitQty(intransit);
         return snapshot;
+    }
+
+     /*
+    * Initialise mocked zulu response
+    * */
+    public static RetailProductAttributeResponse getZuluData() {
+        RetailProductAttributeResponse retailProductAttributeResponse = new RetailProductAttributeResponse();
+        EntityView entityView = new EntityView();
+        List<EntityView> entityViews = Lists.newArrayList();
+        Map<Object, Object> view = new HashMap<>();
+        Map<String, String> analyticalInfo = new HashMap<>();
+        Map<Object, Object> supplyChainAttributes = new HashMap<>();
+        entityView.setEntityId("fsn");
+        supplyChainAttributes.put("procurement_title", "dummy_zulu_title");
+        Map<String, String> productAttributes = new HashMap<>();
+        analyticalInfo.put("vertical", "dummy_zulu_vertical");
+        analyticalInfo.put("category", "dummy_zulu_category");
+        analyticalInfo.put("super_category", "dummy_zulu_super_category");
+        productAttributes.put("brand", "dummy_zulu_brand");
+        productAttributes.put("flipkart_selling_price", String.valueOf(2));
+        supplyChainAttributes.put("product_attributes", productAttributes);
+        view.put("analytics_info", analyticalInfo);
+        view.put("supply_chain", supplyChainAttributes);
+        entityView.setView(view);
+        entityViews.add(entityView);
+        retailProductAttributeResponse.setEntityViews(entityViews);
+        return retailProductAttributeResponse;
+    }
+
+    /*
+    * Initialiase mocked db response for getting product info
+    * */
+    public static List<ProductInfo> getProductInfo() {
+        List<ProductInfo> productInfoList = Lists.newArrayList();
+        ProductInfo dbProductInfo = new ProductInfo();
+        dbProductInfo.setFsn("fsn");
+        dbProductInfo.setVertical("dummy_db_vertical");
+        dbProductInfo.setSuperCategory("dummy_db_super_category");
+        dbProductInfo.setCategory("dummy_db_category");
+        dbProductInfo.setBrand("dummy_db_brand");
+        dbProductInfo.setTitle("dummy_db_title");
+        dbProductInfo.setFsp(1);
+        productInfoList.add(dbProductInfo);
+
+        return productInfoList;
     }
 
 }

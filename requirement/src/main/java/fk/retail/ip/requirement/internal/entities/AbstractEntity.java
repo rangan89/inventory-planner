@@ -39,7 +39,7 @@ public class AbstractEntity implements Serializable {
 
     @NotNull
     @Version
-    private long version;
+    private Long version;
 
     @PreUpdate
     public void setUpdate() {  this.updatedAt = new Date(); }

@@ -6,7 +6,9 @@ import fk.retail.ip.requirement.internal.entities.FsnBand;
 import fk.retail.ip.requirement.internal.entities.Requirement;
 import fk.retail.ip.requirement.internal.entities.RequirementSnapshot;
 import fk.retail.ip.requirement.internal.entities.WeeklySale;
+import fk.retail.ip.requirement.internal.enums.RequirementApprovalStates;
 import fk.retail.ip.requirement.internal.repository.JPAFsnBandRepository;
+import fk.retail.ip.requirement.internal.repository.ProductInfoRepository;
 import fk.retail.ip.requirement.internal.repository.TestHelper;
 import fk.retail.ip.requirement.internal.repository.WeeklySaleRepository;
 import fk.retail.ip.requirement.model.RequirementDownloadLineItem;
@@ -18,6 +20,8 @@ import java.time.temporal.WeekFields;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
+
+import fk.retail.ip.zulu.client.ZuluClient;
 import org.jukito.JukitoRunner;
 import org.jukito.UseModules;
 import org.junit.Assert;
@@ -50,6 +54,12 @@ public class IPCFinalisedCommandTest {
     @Mock
     WeeklySaleRepository weeklySaleRepository;
 
+    @Mock
+    ProductInfoRepository productInfoRepository;
+
+    @Mock
+    ZuluClient zuluClient;
+
     @Captor
     private ArgumentCaptor<List<RequirementDownloadLineItem>> captor;
 
@@ -63,6 +73,8 @@ public class IPCFinalisedCommandTest {
         List<Requirement> requirements = getRequirements();
         Mockito.when(fsnBandRepository.fetchBandDataForFSNs(Mockito.anySetOf(String.class))).thenReturn(Arrays.asList(getFsnBand()));
         Mockito.when(weeklySaleRepository.fetchWeeklySalesForFsns(Mockito.anySetOf(String.class))).thenReturn(getWeeklySale());
+        Mockito.when(productInfoRepository.getProductInfo(Mockito.anyList())).thenReturn(TestHelper.getProductInfo());
+        Mockito.doReturn(TestHelper.getZuluData()).when(zuluClient).getRetailProductAttributes(Mockito.anyList());
         downloadIPCFinalisedCommand.execute(requirements,false);
         Mockito.verify(generateExcelCommand).generateExcel(captor.capture(), Mockito.eq("/templates/IPCFinalised.xlsx"));
         Assert.assertEquals(2, captor.getValue().size());
@@ -112,12 +124,12 @@ public class IPCFinalisedCommandTest {
         RequirementSnapshot snapshot1 = TestHelper.getRequirementSnapshot("[3,4]", 7,8,9,10,11);
 
         List<Requirement> requirements = Lists.newArrayList();
-        Requirement requirement = TestHelper.getRequirement("fsn", "dummy_warehouse1", "proposed", true, snapshot, 21,
+        Requirement requirement = TestHelper.getRequirement("fsn", "dummy_warehouse1", RequirementApprovalStates.PROPOSED.toString(), true, snapshot, 21,
                 "ABC",100,101,"INR", 3, "", "Daily planning" );
 
         requirements.add(requirement);
 
-        requirement = TestHelper.getRequirement("fsn", "dummy_warehouse2", "proposed", true, snapshot1, 22,
+        requirement = TestHelper.getRequirement("fsn", "dummy_warehouse2", RequirementApprovalStates.PROPOSED.toString(), true, snapshot1, 22,
                 "DEF",10,9,"USD", 4, "", "Daily planning" );
 
         requirements.add(requirement);

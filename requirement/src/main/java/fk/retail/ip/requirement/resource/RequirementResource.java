@@ -3,6 +3,7 @@ package fk.retail.ip.requirement.resource;
 import com.codahale.metrics.annotation.Timed;
 import com.google.inject.Inject;
 import com.google.inject.persist.Transactional;
+import fk.retail.ip.requirement.internal.exception.InvalidRequirementStateException;
 import fk.retail.ip.requirement.model.DownloadRequirementRequest;
 import fk.retail.ip.requirement.service.RequirementService;
 import io.dropwizard.hibernate.UnitOfWork;
@@ -37,18 +38,22 @@ public class RequirementResource {
     @Timed
     @UnitOfWork
     public Response download(DownloadRequirementRequest downloadRequirementRequest) {
-        StreamingOutput stream = requirementService.downloadRequirement(downloadRequirementRequest);
-        return Response.ok(stream)
-                .header(HttpHeaders.CONTENT_TYPE, "application/octet-stream")
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename = projection.xlsx")
-                .build();
+        try {
+            StreamingOutput stream = requirementService.downloadRequirement(downloadRequirementRequest);
+            return Response.ok(stream)
+                    .header(HttpHeaders.CONTENT_TYPE, "application/octet-stream")
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename = projection.xlsx")
+                    .build();
+        } catch (InvalidRequirementStateException ise) {
+            return Response.status(400).entity(ise.getMessage()).build();
+        }
     }
 
     @POST
     @Path("/upload")
     public Response uploadProjectionOverride(@FormDataParam("file") InputStream inputStream,
-                                             @FormDataParam("file") FormDataContentDisposition fileDetails,
-                                             Map<String, Object> params) throws IOException, InvalidFormatException {
+            @FormDataParam("file") FormDataContentDisposition fileDetails,
+            Map<String, Object> params) throws IOException, InvalidFormatException {
 
         return Response.ok().build();
 

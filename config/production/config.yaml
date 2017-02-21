@@ -64,3 +64,29 @@ server:
       archive: true
       archivedLogFilenamePattern: /var/log/flipkart/sp/fk-sp-inventory-planner/requests-%d.log.gz
       archivedFileCount: 30
+
+
+clientConfiguration:
+  timeout: 80000ms
+  connectionTimeout: 50000ms
+  connectionRequestTimeout: 50000ms
+  timeToLive: 1 hour
+  cookiesEnabled: false
+  maxConnections: 1024
+  maxConnectionsPerRoute: 1024
+  keepAlive: 0s
+  minThreads: 1
+  maxThreads: 128
+  gzipEnabled: false
+  gzipEnabledForRequests: false
+  chunkedEncodingEnabled: false
+
+
+zuluConfiguration:
+  url: http://10.47.1.8:31200
+  viewPath: "/views"
+  clientId: "retail.rp"
+  maxBatchSize: 30
+
+
+

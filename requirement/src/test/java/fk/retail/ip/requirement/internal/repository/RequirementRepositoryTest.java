@@ -16,6 +16,8 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import java.util.Set;
+import java.util.HashSet;
 
 @RunWith(JukitoRunner.class)
 @UseModules(TestModule.class)
@@ -67,6 +69,19 @@ public class RequirementRepositoryTest extends TransactionalJpaRepositoryTest {
         List<Requirement>
                 requirements = requirementRepository.findAllCurrentRequirements("proposed");
         Assert.assertEquals(24, requirements.size());
+    }
+
+    @Test
+    public void testFindEnabledRequirementsByStateFsn() {
+
+        Set<String> fsns = new HashSet<String>();
+        IntStream.rangeClosed(1,20).forEach(i -> {
+            requirementRepository.persist(getRequirement(i));
+            fsns.add("fsn"+String.valueOf(i));
+        });
+        List<Requirement>
+                requirements = requirementRepository.findEnabledRequirementsByStateFsn("proposed",fsns);
+        Assert.assertEquals(20,requirements.size());
     }
 
     private Requirement getRequirement(int i) {

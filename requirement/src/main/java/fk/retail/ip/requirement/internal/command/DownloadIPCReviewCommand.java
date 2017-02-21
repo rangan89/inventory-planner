@@ -1,24 +1,28 @@
 package fk.retail.ip.requirement.internal.command;
 
 import com.google.inject.Inject;
-import fk.retail.ip.requirement.internal.entities.Requirement;
-import fk.retail.ip.requirement.internal.enums.RequirementState;
 import fk.retail.ip.requirement.internal.repository.FsnBandRepository;
 import fk.retail.ip.requirement.internal.repository.LastAppSupplierRepository;
-import fk.retail.ip.requirement.internal.repository.RequirementRepository;
+import fk.retail.ip.requirement.internal.repository.ProductInfoRepository;
 import fk.retail.ip.requirement.internal.repository.WeeklySaleRepository;
-import org.apache.commons.collections4.map.MultiKeyMap;
+import fk.retail.ip.requirement.model.RequirementDownloadLineItem;
+import fk.retail.ip.zulu.client.ZuluClient;
+
+import fk.retail.ip.requirement.internal.repository.RequirementRepository;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by nidhigupta.m on 26/01/17.
  */
 public class DownloadIPCReviewCommand extends DownloadCommand {
 
-    @Inject
-    public DownloadIPCReviewCommand(FsnBandRepository fsnBandRepository, WeeklySaleRepository weeklySaleRepository, GenerateExcelCommand generateExcelCommand, LastAppSupplierRepository lastAppSupplierRepository, RequirementRepository requirementRepository) {
-        super(fsnBandRepository, weeklySaleRepository, generateExcelCommand, lastAppSupplierRepository, requirementRepository);
+   @Inject
+    public DownloadIPCReviewCommand(FsnBandRepository fsnBandRepository, WeeklySaleRepository weeklySaleRepository, GenerateExcelCommand generateExcelCommand, LastAppSupplierRepository lastAppSupplierRepository,
+                                      ProductInfoRepository productInfoRepository, ZuluClient zuluClient, RequirementRepository requirementRepository) {
+        super(fsnBandRepository, weeklySaleRepository, generateExcelCommand, lastAppSupplierRepository, productInfoRepository, zuluClient, requirementRepository);
+
     }
 
     @Override
@@ -27,11 +31,11 @@ public class DownloadIPCReviewCommand extends DownloadCommand {
     }
 
     @Override
-    void fetchRequirementStateData(boolean isLastAppSupplierRequired) {
+    void fetchRequirementStateData(boolean isLastAppSupplierRequired, Set<String> requirementFsns, List<RequirementDownloadLineItem> requirementDownloadLineItems) {
 
-        populateBizFinData();
-        populateCdoData();
-        populateIpcQuantity();
+        populateBizFinData(requirementFsns,requirementDownloadLineItems);
+        populateCdoData(requirementFsns,requirementDownloadLineItems);
+        populateIpcQuantity(requirementFsns,requirementDownloadLineItems);
     }
 
 

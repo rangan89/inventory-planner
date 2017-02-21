@@ -17,8 +17,11 @@ import fk.retail.ip.requirement.internal.repository.OpenRequirementAndPurchaseOr
 import fk.retail.ip.requirement.internal.repository.PolicyRepository;
 import fk.retail.ip.requirement.internal.repository.RequirementRepository;
 import fk.retail.ip.requirement.internal.repository.WeeklySaleRepository;
+import fk.retail.ip.requirement.internal.repository.*;
 import fk.retail.ip.requirement.resource.RequirementResource;
 import fk.retail.ip.requirement.resource.TestResource;
+import fk.retail.ip.zulu.client.HystrixZuluClient;
+import fk.retail.ip.zulu.client.ZuluClient;
 
 /**
  * Created by nidhigupta.m on 26/01/17.
@@ -31,6 +34,7 @@ public class RequirementModule extends AbstractModule {
         bind(RequirementResource.class);
         bind(TestResource.class);
 
+        bind(ZuluClient.class).to(HystrixZuluClient.class);
         bind(FsnBandRepository.class).to(JPAFsnBandRepository.class);
         bind(WeeklySaleRepository.class).to(JPAWeeklySaleRepository.class);
         bind(RequirementRepository.class).to(JPARequirementRepository.class);
@@ -39,5 +43,6 @@ public class RequirementModule extends AbstractModule {
         bind(OpenRequirementAndPurchaseOrderRepository.class).to(JPAOpenRequirementAndPurchaseOrderRepository.class);
         bind(PolicyRepository.class).to(JPAPolicyRepository.class);
         bind(GroupFsnRepository.class).to(JPAGroupFsnRepository.class);
+        bind(ProductInfoRepository.class).to(JPAProductInfoRepository.class);
     }
 }

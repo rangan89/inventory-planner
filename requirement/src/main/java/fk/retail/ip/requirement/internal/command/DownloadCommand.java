@@ -1,27 +1,37 @@
 package fk.retail.ip.requirement.internal.command;
 
-import com.google.inject.Inject;
+import com.google.common.collect.Sets;
 import fk.retail.ip.requirement.internal.entities.FsnBand;
 import fk.retail.ip.requirement.internal.entities.LastAppSupplier;
 import fk.retail.ip.requirement.internal.entities.Requirement;
 import fk.retail.ip.requirement.internal.entities.WeeklySale;
-import fk.retail.ip.requirement.internal.enums.RequirementState;
+
+import com.google.common.collect.Lists;
+
+
+import fk.retail.ip.requirement.internal.entities.*;
+import fk.retail.ip.requirement.internal.enums.RequirementApprovalStates;
 import fk.retail.ip.requirement.internal.repository.FsnBandRepository;
 import fk.retail.ip.requirement.internal.repository.LastAppSupplierRepository;
+import fk.retail.ip.requirement.internal.repository.ProductInfoRepository;
+
 import fk.retail.ip.requirement.internal.repository.RequirementRepository;
 import fk.retail.ip.requirement.internal.repository.WeeklySaleRepository;
 import fk.retail.ip.requirement.model.RequirementDownloadLineItem;
+
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+
 import javax.ws.rs.core.StreamingOutput;
+
+import fk.retail.ip.zulu.client.ZuluClient;
+import fk.retail.ip.zulu.internal.entities.RetailProductAttributeResponse;
+
 import org.apache.commons.collections4.map.MultiKeyMap;
 
 import static java.util.stream.Collectors.toList;
@@ -31,42 +41,50 @@ import static java.util.stream.Collectors.toList;
  */
 public abstract class DownloadCommand {
 
-    protected Set<String> requirementFsns;
     private final FsnBandRepository fsnBandRepository;
     private final WeeklySaleRepository weeklySaleRepository;
-    protected List<RequirementDownloadLineItem> requirementDownloadLineItems;
-    private Map<String, List<RequirementDownloadLineItem>> fsnToRequirement;
+    private final ProductInfoRepository productInfoRepository;
     private final LastAppSupplierRepository lastAppSupplierRepository;
     private final GenerateExcelCommand generateExcelCommand;
     private final RequirementRepository requirementRepository;
 
+    private final ZuluClient zuluClient;
 
-    public DownloadCommand(FsnBandRepository fsnBandRepository, WeeklySaleRepository weeklySaleRepository, GenerateExcelCommand generateExcelCommand, LastAppSupplierRepository lastAppSupplierRepository, RequirementRepository requirementRepository) {
+    public DownloadCommand(FsnBandRepository fsnBandRepository, WeeklySaleRepository weeklySaleRepository, GenerateExcelCommand generateExcelCommand, LastAppSupplierRepository lastAppSupplierRepository,
+                           ProductInfoRepository productInfoRepository, ZuluClient zuluClient, RequirementRepository requirementRepository) {
+
         this.fsnBandRepository = fsnBandRepository;
         this.weeklySaleRepository = weeklySaleRepository;
         this.generateExcelCommand = generateExcelCommand;
+        this.productInfoRepository = productInfoRepository;
+        this.zuluClient = zuluClient;
         this.lastAppSupplierRepository = lastAppSupplierRepository;
         this.requirementRepository = requirementRepository;
+
     }
 
     public StreamingOutput execute(List<Requirement> requirements, boolean isLastAppSupplierRequired) {
 
-        requirementDownloadLineItems = requirements.stream().map(RequirementDownloadLineItem::new).collect(toList());
-        fsnToRequirement = requirementDownloadLineItems.stream().collect(Collectors.groupingBy(RequirementDownloadLineItem::getFsn));
-        requirementFsns = Collections.unmodifiableSet(fsnToRequirement.keySet());
-        fetchProductData();
-        fetchFsnBandData();
-        fetchSalesBucketData();
-        fetchRequirementStateData(isLastAppSupplierRequired);
-
+        List<RequirementDownloadLineItem> requirementDownloadLineItems = requirements.stream().map(RequirementDownloadLineItem::new).collect(toList());
+        Map<String, List<RequirementDownloadLineItem>> fsnToRequirement = requirementDownloadLineItems.stream().collect(Collectors.groupingBy(RequirementDownloadLineItem::getFsn));
+        Set<String> requirementFsns = fsnToRequirement.keySet();
+        fetchProductData(requirementFsns,fsnToRequirement );
+        fetchFsnBandData(requirementFsns,fsnToRequirement);
+        fetchSalesBucketData(requirementFsns,requirementDownloadLineItems);
+        fetchRequirementStateData(isLastAppSupplierRequired, requirementFsns,requirementDownloadLineItems);
         return generateExcelCommand.generateExcel(requirementDownloadLineItems, getTemplateName(isLastAppSupplierRequired));
     }
 
-    protected void fetchProductData() {
-
+    /*
+    Fetch product data for list of fsns from db. If not found from db fetch the data from zulu.
+    *
+    * */
+    protected void fetchProductData(Set<String> requirementFsns, Map<String, List<RequirementDownloadLineItem>> fsnToRequirement) {
+        Set<String> zuluFsns = fetchDataFromProductInfo(requirementFsns, fsnToRequirement);
+        fetchDataFromZulu(zuluFsns,fsnToRequirement);
     }
 
-    protected void fetchFsnBandData() {
+    protected void fetchFsnBandData(Set<String> requirementFsns, Map<String, List<RequirementDownloadLineItem>> fsnToRequirement) {
         List<FsnBand> bands = fsnBandRepository.fetchBandDataForFSNs(requirementFsns);
         bands.stream().forEach(b -> {
             List<RequirementDownloadLineItem> items = fsnToRequirement.get(b.getFsn());
@@ -77,7 +95,7 @@ public abstract class DownloadCommand {
         });
     }
 
-    protected void fetchSalesBucketData() {
+    protected void fetchSalesBucketData(Set<String> requirementFsns, List<RequirementDownloadLineItem> requirementDownloadLineItems) {
         List<WeeklySale> sales = weeklySaleRepository.fetchWeeklySalesForFsns(requirementFsns);
         MultiKeyMap<String, Integer> fsnWhWeekSalesMap = new MultiKeyMap();
         sales.forEach(s -> fsnWhWeekSalesMap.put(s.getFsn(), s.getWarehouse(), String.valueOf(s.getWeek()), s.getSaleQty()));
@@ -97,7 +115,7 @@ public abstract class DownloadCommand {
         }
     }
 
-    protected void fetchLastAppSupplierDataFromProc() {
+    protected void fetchLastAppSupplierDataFromProc(Set<String> requirementFsns, List<RequirementDownloadLineItem> requirementDownloadLineItems) {
         List<LastAppSupplier> lastAppSuppliers = lastAppSupplierRepository.fetchLastAppSupplierForFsns(requirementFsns);
         MultiKeyMap<String,Integer> fsnWhLastAppMap = new MultiKeyMap();
         MultiKeyMap<String,String> fsnWhLastSupplierMap = new MultiKeyMap();
@@ -116,8 +134,9 @@ public abstract class DownloadCommand {
         );
     }
 
-    protected void populateBizFinData() {
-        List<Requirement> requirements = requirementRepository.findEnabledRequirementsByStateFsn("bizfin_review",requirementFsns);
+
+    protected void populateBizFinData(Set<String> requirementFsns, List<RequirementDownloadLineItem> requirementDownloadLineItems) {
+        List<Requirement> requirements = requirementRepository.findEnabledRequirementsByStateFsn(RequirementApprovalStates.BIZFIN_REVIEW.toString(),requirementFsns);
         MultiKeyMap<String,Integer> fsnWhBizFinRecommended = new MultiKeyMap();
         MultiKeyMap<String,String> fsnWhBizFinComment = new MultiKeyMap();
         requirements.forEach(r -> {
@@ -135,8 +154,8 @@ public abstract class DownloadCommand {
     }
 
 
-    protected void populateIpcQuantity() {
-        List<Requirement> requirements = requirementRepository.findEnabledRequirementsByStateFsn("proposed",requirementFsns);
+    protected void populateIpcQuantity(Set<String> requirementFsns, List<RequirementDownloadLineItem> requirementDownloadLineItems) {
+        List<Requirement> requirements = requirementRepository.findEnabledRequirementsByStateFsn(RequirementApprovalStates.PROPOSED.toString(),requirementFsns);
         MultiKeyMap<String,Integer> fsnWhIpcProposedQuantity = new MultiKeyMap();
         requirements.forEach(r -> {
             fsnWhIpcProposedQuantity.put(r.getFsn(),r.getWarehouse(),r.getQuantity());
@@ -149,8 +168,56 @@ public abstract class DownloadCommand {
         });
     }
 
-    protected void populateCdoData() {
-        List<Requirement> requirements = requirementRepository.findEnabledRequirementsByStateFsn("cdo_review",requirementFsns);
+    private void fetchDataFromZulu(Set<String> zuluFsns, Map<String, List<RequirementDownloadLineItem>> fsnToRequirement ) {
+        List<String> zuluFsnList = Lists.newArrayList(zuluFsns);
+        RetailProductAttributeResponse retailProductAttributeResponse = zuluClient.getRetailProductAttributes(zuluFsnList);
+        retailProductAttributeResponse.getEntityViews().forEach(entityView -> {
+            String fsn = entityView.getEntityId();
+            List<RequirementDownloadLineItem> items = fsnToRequirement.get(fsn);
+            Map<String, String> analyticalInfo = (Map<String, String>)entityView.getView().get("analytics_info");
+            HashMap<Object, Object> supplyChain = (HashMap<Object, Object>)entityView.getView().get("supply_chain");
+            String vertical = analyticalInfo.get("vertical");
+            String category = analyticalInfo.get("category");
+            String superCategory = analyticalInfo.get("super_category");
+            Map<String, String> productAttributes = (Map<String, String>)(supplyChain.get("product_attributes"));
+            String brand = productAttributes.get("brand");
+            int fsp = Integer.parseInt(productAttributes.get("flipkart_selling_price"));
+            String title = supplyChain.get("procurement_title").toString();
+                items.forEach(i -> {
+                    i.setVertical(vertical);
+                    i.setCategory(category);
+                    i.setSuperCategory(superCategory);
+                    i.setBrand(brand);
+                    i.setFsp(fsp);
+                    i.setTitle(title);
+                });
+        });
+    }
+
+    private Set<String> fetchDataFromProductInfo(Set<String> requirementFsns, Map<String, List<RequirementDownloadLineItem>> fsnToRequirement ) {
+        List<ProductInfo> productInfo = productInfoRepository.getProductInfo(Lists.newArrayList(requirementFsns));
+        List<String> cachedFsns = Lists.newArrayList();
+        productInfo.stream().forEach(pi -> {
+        cachedFsns.add(pi.getFsn());
+        List<RequirementDownloadLineItem> items = fsnToRequirement.get(pi.getFsn());
+        items.forEach(i -> {
+            i.setVertical(pi.getVertical());
+            i.setCategory(pi.getCategory());
+            i.setSuperCategory(pi.getSuperCategory());
+            i.setTitle(pi.getTitle());
+            i.setFsp(pi.getFsp());
+            i.setBrand(pi.getBrand());
+            });
+        });
+        Set<String> cachedFsnSet = new HashSet<String>(cachedFsns);
+        Set<String> requirementFsnsCopy = Sets.newHashSet(requirementFsns);
+        requirementFsnsCopy.removeAll(cachedFsnSet);
+        return requirementFsnsCopy;
+    }
+
+
+    protected void populateCdoData(Set<String> requirementFsns, List<RequirementDownloadLineItem> requirementDownloadLineItems) {
+        List<Requirement> requirements = requirementRepository.findEnabledRequirementsByStateFsn(RequirementApprovalStates.CDO_REVIEW.toString(),requirementFsns);
         MultiKeyMap<String,String> fsnWhCdoComment = new MultiKeyMap();
         MultiKeyMap<String,Integer> fsnWhQuantity = new MultiKeyMap();
         requirements.forEach(r -> {
@@ -169,6 +236,6 @@ public abstract class DownloadCommand {
 
     protected abstract String getTemplateName(boolean isLastAppSupplierRequired);
 
-    abstract void fetchRequirementStateData(boolean isLastAppSupplierRequired);
+    abstract void fetchRequirementStateData(boolean isLastAppSupplierRequired, Set<String> requirementFsns, List<RequirementDownloadLineItem> requirementDownloadLineItems);
 
 }
