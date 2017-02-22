@@ -1,6 +1,7 @@
 package fk.retail.ip.requirement.internal.states;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import fk.retail.ip.requirement.internal.command.DownloadProposedCommand;
 import fk.retail.ip.requirement.internal.entities.Requirement;
 import java.util.List;
@@ -11,15 +12,15 @@ import javax.ws.rs.core.StreamingOutput;
  */
 public class ProposedRequirementState implements RequirementState {
 
-    private final DownloadProposedCommand downloadProposedCommand;
+    private final Provider<DownloadProposedCommand> downloadProposedCommandProvider;
 
     @Inject
-    public ProposedRequirementState(DownloadProposedCommand downloadProposedCommand) {
-        this.downloadProposedCommand = downloadProposedCommand;
+    public ProposedRequirementState(Provider<DownloadProposedCommand> downloadProposedCommandProvider) {
+        this.downloadProposedCommandProvider = downloadProposedCommandProvider;
     }
 
     @Override
     public StreamingOutput download(List<Requirement> requirements, boolean isLastAppSupplierRequired) {
-        return downloadProposedCommand.execute(requirements, isLastAppSupplierRequired);
+        return downloadProposedCommandProvider.get().execute(requirements, isLastAppSupplierRequired);
     }
 }

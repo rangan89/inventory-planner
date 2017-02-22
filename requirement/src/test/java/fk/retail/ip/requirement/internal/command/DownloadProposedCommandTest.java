@@ -4,11 +4,13 @@ import com.google.common.collect.Lists;
 import fk.retail.ip.requirement.config.TestModule;
 import fk.retail.ip.requirement.internal.entities.Requirement;
 import fk.retail.ip.requirement.internal.entities.RequirementSnapshot;
+import fk.retail.ip.requirement.internal.entities.Warehouse;
 import fk.retail.ip.requirement.internal.entities.WeeklySale;
 import fk.retail.ip.requirement.internal.enums.RequirementApprovalStates;
 import fk.retail.ip.requirement.internal.repository.JPAFsnBandRepository;
 import fk.retail.ip.requirement.internal.repository.ProductInfoRepository;
 import fk.retail.ip.requirement.internal.repository.TestHelper;
+import fk.retail.ip.requirement.internal.repository.WarehouseRepository;
 import fk.retail.ip.requirement.internal.repository.WeeklySaleRepository;
 import fk.retail.ip.requirement.model.RequirementDownloadLineItem;
 import fk.retail.ip.zulu.client.ZuluClient;
@@ -60,6 +62,9 @@ public class DownloadProposedCommandTest {
     @Mock
     WeeklySaleRepository weeklySaleRepository;
 
+    @Mock
+    WarehouseRepository warehouseRepository;
+
     @Captor
     private ArgumentCaptor<List<RequirementDownloadLineItem>> captor;
 
@@ -73,6 +78,7 @@ public class DownloadProposedCommandTest {
         List<Requirement> requirements = getRequirements();
         Mockito.when(fsnBandRepository.fetchBandDataForFSNs(Mockito.anySetOf(String.class))).thenReturn(Arrays.asList(TestHelper.getFsnBand("fsn", "Last 30 Days")));
         Mockito.when(weeklySaleRepository.fetchWeeklySalesForFsns(Mockito.anySetOf(String.class))).thenReturn(getWeeklySale());
+        Mockito.when(warehouseRepository.fetchWarehouseNameByCode(Mockito.anySetOf(String.class))).thenReturn(getWarehouse());
         Mockito.when(productInfoRepository.getProductInfo(Mockito.anyList())).thenReturn(TestHelper.getProductInfo());
         Mockito.doReturn(TestHelper.getZuluData()).when(zuluClient).getRetailProductAttributes(Mockito.anyList());
 
@@ -99,6 +105,8 @@ public class DownloadProposedCommandTest {
         Assert.assertEquals(15, (int)captor.getValue().get(0).getIntransitQty());
         Assert.assertEquals(21, (int)captor.getValue().get(0).getQuantity());
         Assert.assertEquals("ABC", captor.getValue().get(0).getSupplier());
+        Assert.assertEquals("dummy_warehouse_name1", captor.getValue().get(0).getWarehouseName());
+
         Assert.assertEquals("fsn", captor.getValue().get(1).getFsn());
         Assert.assertEquals("dummy_warehouse2", captor.getValue().get(1).getWarehouse());
         Assert.assertEquals(2, (int)captor.getValue().get(1).getSalesBand());
@@ -118,26 +126,27 @@ public class DownloadProposedCommandTest {
         Assert.assertEquals(30, (int)captor.getValue().get(1).getIntransitQty());
         Assert.assertEquals(22, (int)captor.getValue().get(1).getQuantity());
         Assert.assertEquals("DEF", captor.getValue().get(1).getSupplier());
+        Assert.assertEquals("dummy_warehouse_name2", captor.getValue().get(1).getWarehouseName());
 
         /*
         * Check if db product data is fetched
         * */
-//        Assert.assertEquals("dummy_db_title", captor.getValue().get(0).getTitle());
-//        Assert.assertEquals("dummy_db_brand",captor.getValue().get(0).getBrand());
-//        Assert.assertEquals("dummy_db_vertical", captor.getValue().get(0).getVertical());
-//        Assert.assertEquals("dummy_db_category", captor.getValue().get(0).getCategory());
-//        Assert.assertEquals("dummy_db_super_category", captor.getValue().get(0).getSuperCategory());
-//        Assert.assertEquals(1, (int)captor.getValue().get(0).getFsp());
+        Assert.assertEquals("dummy_db_title", captor.getValue().get(0).getTitle());
+        Assert.assertEquals("dummy_db_brand",captor.getValue().get(0).getBrand());
+        Assert.assertEquals("dummy_db_vertical", captor.getValue().get(0).getVertical());
+        Assert.assertEquals("dummy_db_category", captor.getValue().get(0).getCategory());
+        Assert.assertEquals("dummy_db_super_category", captor.getValue().get(0).getSuperCategory());
+        Assert.assertEquals(1, (int)captor.getValue().get(0).getFsp());
 
         /*
         * Check if zulu product data is fetched
         * */
-//        Assert.assertEquals("dummy_zulu_title", captor.getValue().get(1).getTitle());
-//        Assert.assertEquals("dummy_zulu_brand",captor.getValue().get(1).getBrand());
-//        Assert.assertEquals("dummy_zulu_vertical", captor.getValue().get(1).getVertical());
-//        Assert.assertEquals("dummy_zulu_category", captor.getValue().get(1).getCategory());
-//        Assert.assertEquals("dummy_zulu_super_category", captor.getValue().get(1).getSuperCategory());
-//        Assert.assertEquals(2, (int)captor.getValue().get(1).getFsp());
+//        Assert.assertEquals("dummy_zulu_title", captor.getValue().get(2).getTitle());
+//        Assert.assertEquals("dummy_zulu_brand",captor.getValue().get(2).getBrand());
+//        Assert.assertEquals("dummy_zulu_vertical", captor.getValue().get(2).getVertical());
+//        Assert.assertEquals("dummy_zulu_category", captor.getValue().get(2).getCategory());
+//        Assert.assertEquals("dummy_zulu_super_category", captor.getValue().get(2).getSuperCategory());
+//        Assert.assertEquals(2, (int)captor.getValue().get(2).getFsp());
 
     }
 
@@ -155,13 +164,20 @@ public class DownloadProposedCommandTest {
 
         requirement = TestHelper.getRequirement("fsn", "dummy_warehouse2",RequirementApprovalStates.PROPOSED.toString(), true, snapshot1 , 22, "DEF",
                 10, 9, "USD", 4, "", "Daily planning");
+
         requirements.add(requirement);
+
+//        requirement = TestHelper.getRequirement("zulufsn", "dummy_warehouse2",RequirementApprovalStates.PROPOSED.toString(), true, snapshot1 , 22, "DEF",
+//                10, 9, "USD", 4, "", "Daily planning");
+//
+//        requirements.add(requirement);
+
         return requirements;
     }
 
     private List<WeeklySale> getWeeklySale() {
         LocalDate date = LocalDate.now();
-        TemporalField weekOfYear = WeekFields.of(DayOfWeek.MONDAY, 1).weekOfWeekBasedYear();
+        TemporalField weekOfYear = WeekFields.of(DayOfWeek.MONDAY, 2).weekOfWeekBasedYear();
 
         List<WeeklySale> weeklySales = Lists.newArrayList();
 
@@ -176,6 +192,15 @@ public class DownloadProposedCommandTest {
         });
 
         return weeklySales;
+    }
+
+    private List<Warehouse> getWarehouse() {
+        List<Warehouse> warehouses = Lists.newArrayList();
+        Warehouse warehouse = TestHelper.getWarehouse("dummy_warehouse1","dummy_warehouse_name1");
+        warehouses.add(warehouse);
+        warehouse = TestHelper.getWarehouse("dummy_warehouse2","dummy_warehouse_name2");
+        warehouses.add(warehouse);
+        return warehouses;
     }
 
 }

@@ -44,5 +44,6 @@ public class RequirementModule extends AbstractModule {
         bind(PolicyRepository.class).to(JPAPolicyRepository.class);
         bind(GroupFsnRepository.class).to(JPAGroupFsnRepository.class);
         bind(ProductInfoRepository.class).to(JPAProductInfoRepository.class);
+        bind(WarehouseRepository.class).to(JPAWarehouseRepository.class);
     }
 }

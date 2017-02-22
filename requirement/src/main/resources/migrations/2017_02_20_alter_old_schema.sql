@@ -26,12 +26,18 @@ CREATE TABLE `LAST_APP_SUPPLIER` (
 
 
 alter table projection_states add column fsn varchar(20);
+update projection_states as ps set fsn = (select fsn from projections where id = ps.projection_id )
 
 alter table projection_states add column is_current Boolean;
+update projection_states as ps set is_current = 1 where state = (select current_state from projections where id = ps.projection_id);
 
 alter table projection_states add column requirement_snapshot_id BigInt(11);
 
+
 alter table projection_states add column proc_type varchar(20);
+update  projection_states as ps set proc_type= (select proc_type from projections where id = ps.projection_id );
 
-alter table ip_groups add column is_enabled bool;
+alter table ip_groups add column is_enabled bool DEFAULT 0;
+update ip_groups set is_enabled= 1 where tag = "rp_planning";
 
+alter table `INTRANSIT` add column `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP;

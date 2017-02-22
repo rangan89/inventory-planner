@@ -1,38 +1,38 @@
 package fk.retail.ip.requirement.internal.command;
 
+
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import fk.retail.ip.requirement.internal.entities.FsnBand;
 import fk.retail.ip.requirement.internal.entities.LastAppSupplier;
+import fk.retail.ip.requirement.internal.entities.ProductInfo;
 import fk.retail.ip.requirement.internal.entities.Requirement;
+import fk.retail.ip.requirement.internal.entities.Warehouse;
 import fk.retail.ip.requirement.internal.entities.WeeklySale;
-
-import com.google.common.collect.Lists;
-
-
-import fk.retail.ip.requirement.internal.entities.*;
 import fk.retail.ip.requirement.internal.enums.RequirementApprovalStates;
 import fk.retail.ip.requirement.internal.repository.FsnBandRepository;
 import fk.retail.ip.requirement.internal.repository.LastAppSupplierRepository;
 import fk.retail.ip.requirement.internal.repository.ProductInfoRepository;
-
 import fk.retail.ip.requirement.internal.repository.RequirementRepository;
+import fk.retail.ip.requirement.internal.repository.WarehouseRepository;
 import fk.retail.ip.requirement.internal.repository.WeeklySaleRepository;
 import fk.retail.ip.requirement.model.RequirementDownloadLineItem;
-
+import fk.retail.ip.zulu.client.ZuluClient;
+import fk.retail.ip.zulu.internal.entities.RetailProductAttributeResponse;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-
 import javax.ws.rs.core.StreamingOutput;
-
-import fk.retail.ip.zulu.client.ZuluClient;
-import fk.retail.ip.zulu.internal.entities.RetailProductAttributeResponse;
-
 import org.apache.commons.collections4.map.MultiKeyMap;
+import org.json.JSONObject;
 
 import static java.util.stream.Collectors.toList;
 
@@ -47,11 +47,12 @@ public abstract class DownloadCommand {
     private final LastAppSupplierRepository lastAppSupplierRepository;
     private final GenerateExcelCommand generateExcelCommand;
     private final RequirementRepository requirementRepository;
+    private final WarehouseRepository warehouseRepository;
 
     private final ZuluClient zuluClient;
 
     public DownloadCommand(FsnBandRepository fsnBandRepository, WeeklySaleRepository weeklySaleRepository, GenerateExcelCommand generateExcelCommand, LastAppSupplierRepository lastAppSupplierRepository,
-                           ProductInfoRepository productInfoRepository, ZuluClient zuluClient, RequirementRepository requirementRepository) {
+                           ProductInfoRepository productInfoRepository, ZuluClient zuluClient, RequirementRepository requirementRepository, WarehouseRepository warehouseRepository) {
 
         this.fsnBandRepository = fsnBandRepository;
         this.weeklySaleRepository = weeklySaleRepository;
@@ -60,6 +61,7 @@ public abstract class DownloadCommand {
         this.zuluClient = zuluClient;
         this.lastAppSupplierRepository = lastAppSupplierRepository;
         this.requirementRepository = requirementRepository;
+        this.warehouseRepository = warehouseRepository;
 
     }
 
@@ -68,10 +70,14 @@ public abstract class DownloadCommand {
         List<RequirementDownloadLineItem> requirementDownloadLineItems = requirements.stream().map(RequirementDownloadLineItem::new).collect(toList());
         Map<String, List<RequirementDownloadLineItem>> fsnToRequirement = requirementDownloadLineItems.stream().collect(Collectors.groupingBy(RequirementDownloadLineItem::getFsn));
         Set<String> requirementFsns = fsnToRequirement.keySet();
+        Map<String, List<RequirementDownloadLineItem>> WhToRequirement = requirementDownloadLineItems.stream().collect(Collectors.groupingBy(RequirementDownloadLineItem::getWarehouse));
+        Set<String> requirementWhs =  WhToRequirement.keySet();
         fetchProductData(requirementFsns,fsnToRequirement );
         fetchFsnBandData(requirementFsns,fsnToRequirement);
         fetchSalesBucketData(requirementFsns,requirementDownloadLineItems);
+        fetchWarehouseName(requirementWhs,requirementDownloadLineItems);
         fetchRequirementStateData(isLastAppSupplierRequired, requirementFsns,requirementDownloadLineItems);
+
         return generateExcelCommand.generateExcel(requirementDownloadLineItems, getTemplateName(isLastAppSupplierRequired));
     }
 
@@ -81,7 +87,9 @@ public abstract class DownloadCommand {
     * */
     protected void fetchProductData(Set<String> requirementFsns, Map<String, List<RequirementDownloadLineItem>> fsnToRequirement) {
         Set<String> zuluFsns = fetchDataFromProductInfo(requirementFsns, fsnToRequirement);
-        fetchDataFromZulu(zuluFsns,fsnToRequirement);
+        if (zuluFsns.size() > 0) {
+            fetchDataFromZulu(zuluFsns, fsnToRequirement);
+        }
     }
 
     protected void fetchFsnBandData(Set<String> requirementFsns, Map<String, List<RequirementDownloadLineItem>> fsnToRequirement) {
@@ -100,7 +108,7 @@ public abstract class DownloadCommand {
         MultiKeyMap<String, Integer> fsnWhWeekSalesMap = new MultiKeyMap();
         sales.forEach(s -> fsnWhWeekSalesMap.put(s.getFsn(), s.getWarehouse(), String.valueOf(s.getWeek()), s.getSaleQty()));
         LocalDate date = LocalDate.now();
-        TemporalField weekOfYear = WeekFields.of(DayOfWeek.MONDAY, 1).weekOfWeekBasedYear();
+        TemporalField weekOfYear = WeekFields.of(DayOfWeek.MONDAY, 2).weekOfWeekBasedYear();
         int currentWeek = date.get(weekOfYear);
         requirementDownloadLineItems.forEach(reqItem
                 -> populateSalesData(fsnWhWeekSalesMap, currentWeek, reqItem, reqItem::setWeek0Sale, reqItem::setWeek1Sale, reqItem::setWeek2Sale, reqItem::setWeek3Sale, reqItem::setWeek4Sale, reqItem::setWeek5Sale, reqItem::setWeek6Sale, reqItem::setWeek7Sale)
@@ -114,6 +122,22 @@ public abstract class DownloadCommand {
             currentWeek = (currentWeek - 2 + 52) % 52 + 1;
         }
     }
+
+    protected void fetchWarehouseName(Set<String> requirementWhs, List<RequirementDownloadLineItem> requirementDownloadLineItems) {
+        List<Warehouse> warehouses = warehouseRepository.fetchWarehouseNameByCode(requirementWhs);
+        HashMap<String,String> whCodeNameMap= new HashMap();
+        warehouses.forEach(w -> {
+         whCodeNameMap.put(w.getWarehouseCode(),w.getWarehouseName());
+        });
+
+        requirementDownloadLineItems.forEach(reqItem -> {
+            if (whCodeNameMap.get(reqItem.getWarehouse())!=null)
+                reqItem.setWarehouseName(whCodeNameMap.get(reqItem.getWarehouse()));
+            else
+                reqItem.setWarehouseName(reqItem.getWarehouse());
+        });
+    }
+
 
     protected void fetchLastAppSupplierDataFromProc(Set<String> requirementFsns, List<RequirementDownloadLineItem> requirementDownloadLineItems) {
         List<LastAppSupplier> lastAppSuppliers = lastAppSupplierRepository.fetchLastAppSupplierForFsns(requirementFsns);
@@ -136,6 +160,7 @@ public abstract class DownloadCommand {
 
 
     protected void populateBizFinData(Set<String> requirementFsns, List<RequirementDownloadLineItem> requirementDownloadLineItems) {
+
         List<Requirement> requirements = requirementRepository.findEnabledRequirementsByStateFsn(RequirementApprovalStates.BIZFIN_REVIEW.toString(),requirementFsns);
         MultiKeyMap<String,Integer> fsnWhBizFinRecommended = new MultiKeyMap();
         MultiKeyMap<String,String> fsnWhBizFinComment = new MultiKeyMap();
@@ -155,6 +180,7 @@ public abstract class DownloadCommand {
 
 
     protected void populateIpcQuantity(Set<String> requirementFsns, List<RequirementDownloadLineItem> requirementDownloadLineItems) {
+
         List<Requirement> requirements = requirementRepository.findEnabledRequirementsByStateFsn(RequirementApprovalStates.PROPOSED.toString(),requirementFsns);
         MultiKeyMap<String,Integer> fsnWhIpcProposedQuantity = new MultiKeyMap();
         requirements.forEach(r -> {
@@ -175,22 +201,23 @@ public abstract class DownloadCommand {
             String fsn = entityView.getEntityId();
             List<RequirementDownloadLineItem> items = fsnToRequirement.get(fsn);
             Map<String, String> analyticalInfo = (Map<String, String>)entityView.getView().get("analytics_info");
-            HashMap<Object, Object> supplyChain = (HashMap<Object, Object>)entityView.getView().get("supply_chain");
+            JSONObject supplyChainJson = new JSONObject(entityView.getView().get("supply_chain").toString());
             String vertical = analyticalInfo.get("vertical");
             String category = analyticalInfo.get("category");
             String superCategory = analyticalInfo.get("super_category");
-            Map<String, String> productAttributes = (Map<String, String>)(supplyChain.get("product_attributes"));
-            String brand = productAttributes.get("brand");
-            int fsp = Integer.parseInt(productAttributes.get("flipkart_selling_price"));
-            String title = supplyChain.get("procurement_title").toString();
-                items.forEach(i -> {
-                    i.setVertical(vertical);
-                    i.setCategory(category);
-                    i.setSuperCategory(superCategory);
-                    i.setBrand(brand);
-                    i.setFsp(fsp);
-                    i.setTitle(title);
-                });
+            JSONObject productAttributesJson = new JSONObject(supplyChainJson.get("product_attributes").toString());
+            String brand = productAttributesJson.get("brand").toString();
+            int fsp = Integer.parseInt(productAttributesJson.get("flipkart_selling_price").toString());
+            String title = supplyChainJson.get("procurement_title").toString();
+            items.forEach(i -> {
+                i.setVertical(vertical);
+                i.setCategory(category);
+                i.setSuperCategory(superCategory);
+                i.setBrand(brand);
+                i.setFsp(fsp);
+                i.setTitle(title);
+            });
+
         });
     }
 
@@ -214,6 +241,7 @@ public abstract class DownloadCommand {
         requirementFsnsCopy.removeAll(cachedFsnSet);
         return requirementFsnsCopy;
     }
+
 
 
     protected void populateCdoData(Set<String> requirementFsns, List<RequirementDownloadLineItem> requirementDownloadLineItems) {

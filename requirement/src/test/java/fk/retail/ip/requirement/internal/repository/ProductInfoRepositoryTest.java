@@ -17,7 +17,7 @@ import org.junit.runner.RunWith;
  */
 @RunWith(JukitoRunner.class)
 @UseModules(TestModule.class)
-public class ProductInfoRepositoryTest extends TransactionalJpaRepositoryTest{
+public class ProductInfoRepositoryTest extends TransactionalJpaRepositoryTest {
 
     @Inject
     ProductInfoRepository productInfoRepository;

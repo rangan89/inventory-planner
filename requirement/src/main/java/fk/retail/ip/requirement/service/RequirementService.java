@@ -35,7 +35,6 @@ public class RequirementService {
         } else {
             requirements = requirementRepository.findAllCurrentRequirements(requirementState);
         }
-
         //todo: cleanup remove if 'all' column value for warehouse is removed
         requirements = requirements.stream().filter(requirement -> !requirement.getWarehouse().equals("all")).collect(Collectors.toList());
         RequirementState state = requirementStateFactory.getRequirementState(requirementState);

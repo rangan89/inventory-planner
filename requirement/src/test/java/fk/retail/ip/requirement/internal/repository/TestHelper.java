@@ -118,6 +118,13 @@ public class TestHelper {
         return snapshot;
     }
 
+    public static Warehouse getWarehouse(String whCode, String whName) {
+        Warehouse warehouse = new Warehouse();
+        warehouse.setWarehouseCode(whCode);
+        warehouse.setWarehouseName(whName);
+        return warehouse;
+    }
+
      /*
     * Initialise mocked zulu response
     * */

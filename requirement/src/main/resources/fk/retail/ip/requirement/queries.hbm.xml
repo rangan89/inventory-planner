@@ -146,6 +146,28 @@
         </query>
     </named-query>
 
+    <named-query name="fetchWarehouseNameByCode">
+        <query>
+            <![CDATA[
+            SELECT w
+            FROM Warehouse w
+            WHERE
+                w.warehouseCode IN :whCodes
+            ]]>
+        </query>
+    </named-query>
+
+    <named-query name="fetchWarehouseNameByCode.count">
+        <query>
+            <![CDATA[
+            SELECT w
+            FROM Warehouse w
+            WHERE
+                w.warehouseCode IN :whCodes
+            ]]>
+        </query>
+    </named-query>
+
     <named-query name="IwtRequestItem.fetchByFsnsInStatuses">
         <query>
             <![CDATA[
