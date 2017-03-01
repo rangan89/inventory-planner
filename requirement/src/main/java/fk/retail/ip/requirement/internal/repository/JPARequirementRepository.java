@@ -23,6 +23,7 @@ public class JPARequirementRepository extends SimpleJpaGenericRepository<Require
 
     @Override
     public List<Requirement> findRequirementByIds(List<Long> requirementIds) {
+        //todo: now we find requirements by projecion_id(at fsn level. need to think abt it)
         TypedQuery<Requirement> query = getEntityManager().createNamedQuery("findRequirementByIds", Requirement.class);
         query.setParameter("ids", requirementIds);
         List<Requirement> requirements = query.getResultList();
