@@ -30,9 +30,9 @@ public class DownloadIPCReviewCommand extends DownloadCommand {
     @Override
     void fetchRequirementStateData(boolean isLastAppSupplierRequired, Set<String> requirementFsns, List<RequirementDownloadLineItem> requirementDownloadLineItems) {
 
-        populateBizFinData(requirementFsns,requirementDownloadLineItems);
         populateCdoData(requirementFsns,requirementDownloadLineItems);
         populateIpcQuantity(requirementFsns,requirementDownloadLineItems);
+        populateBizFinData(requirementFsns,requirementDownloadLineItems);
     }
 
 

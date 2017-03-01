@@ -34,9 +34,9 @@ public class DownloadBizFinReviewCommand extends DownloadCommand {
         if (isLastAppSupplierRequired) {
             fetchLastAppSupplierDataFromProc(requirementFsns,requirementDownloadLineItems );
         }
-        populateBizFinData(requirementFsns,requirementDownloadLineItems );
         populateCdoData(requirementFsns,requirementDownloadLineItems );
         populateIpcQuantity(requirementFsns,requirementDownloadLineItems);
+        populateBizFinData(requirementFsns,requirementDownloadLineItems );
     }
 
 }

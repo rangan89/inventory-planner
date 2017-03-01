@@ -5,11 +5,14 @@ package fk.retail.ip.requirement.internal.enums;
  */
 public enum RequirementApprovalStates {
 
-    PROPOSED("proposed"),
-    CDO_REVIEW("CDOReview"),
-    BIZFIN_REVIEW("BizFinReview"),
-    IPC_REVIEW("IPCReview"),
-    IPC_FINALISED("IPCFinalised");
+    //todo: 23/02/17 change enum names to new states
+
+    PRE_PROPOSED("proposed"),
+    PROPOSED("verified"),
+    CDO_REVIEW("approved"),
+    BIZFIN_REVIEW("bd_approved"),
+    IPC_REVIEW("bizfin_approved"),
+    IPC_FINALISED("ipc_finalized");
 
     private String state;
 

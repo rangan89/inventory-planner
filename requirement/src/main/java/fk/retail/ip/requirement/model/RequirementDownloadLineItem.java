@@ -87,9 +87,12 @@ public class RequirementDownloadLineItem {
     private String cdoOverrideReason;
     @JsonProperty("Warehouse")
     private String warehouseName;
+    @JsonProperty("Requirement Id")
+    private Long requirementId;
 
     public RequirementDownloadLineItem(Requirement req) {
 
+        this.requirementId = req.getId();
         this.fsn = req.getFsn();
 
         //todo: display warehouse as full name

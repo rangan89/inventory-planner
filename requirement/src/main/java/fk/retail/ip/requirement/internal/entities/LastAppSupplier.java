@@ -24,5 +24,4 @@ public class LastAppSupplier extends ReadOnlyEntity {
 
     private Integer lastApp;
 
-
 }

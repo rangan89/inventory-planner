@@ -160,7 +160,7 @@
     <named-query name="fetchWarehouseNameByCode.count">
         <query>
             <![CDATA[
-            SELECT w
+            SELECT count(w)
             FROM Warehouse w
             WHERE
                 w.warehouseCode IN :whCodes

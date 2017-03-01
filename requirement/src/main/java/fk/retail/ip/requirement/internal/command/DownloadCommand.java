@@ -171,7 +171,7 @@ public abstract class DownloadCommand {
 
         requirementDownloadLineItems.forEach(reqItem
                 -> {
-            if (fsnWhBizFinRecommended.get(reqItem.getFsn(),reqItem.getWarehouse())!=null)
+            if (fsnWhBizFinRecommended.get(reqItem.getFsn(),reqItem.getWarehouse())!=null && fsnWhBizFinRecommended.get(reqItem.getFsn(),reqItem.getWarehouse()) != reqItem.getQuantity())
                 reqItem.setBizFinRecommendedQuantity(fsnWhBizFinRecommended.get(reqItem.getFsn(), reqItem.getWarehouse()));
             if (fsnWhBizFinComment.get(reqItem.getFsn(),reqItem.getWarehouse())!=null)
                 reqItem.setBizFinComment(fsnWhBizFinComment.get(reqItem.getFsn(), reqItem.getWarehouse()));
@@ -207,7 +207,13 @@ public abstract class DownloadCommand {
             String superCategory = analyticalInfo.get("super_category");
             JSONObject productAttributesJson = new JSONObject(supplyChainJson.get("product_attributes").toString());
             String brand = productAttributesJson.get("brand").toString();
-            int fsp = Integer.parseInt(productAttributesJson.get("flipkart_selling_price").toString());
+            int fsp;
+            if (productAttributesJson.has("flipkart_selling_price")) {
+                fsp = Integer.parseInt(productAttributesJson.get("flipkart_selling_price").toString());
+            } else {
+                fsp = -1;
+            }
+
             String title = supplyChainJson.get("procurement_title").toString();
             items.forEach(i -> {
                 i.setVertical(vertical);
@@ -217,6 +223,15 @@ public abstract class DownloadCommand {
                 i.setFsp(fsp);
                 i.setTitle(title);
             });
+            ProductInfo productInfo = new ProductInfo();
+            productInfo.setFsn(fsn);
+            productInfo.setBrand(brand);
+            productInfo.setCategory(category);
+            productInfo.setFsp(fsp);
+            productInfo.setSuperCategory(superCategory);
+            productInfo.setTitle(title);
+            productInfo.setVertical(vertical);
+            productInfoRepository.persist(productInfo);
 
         });
     }

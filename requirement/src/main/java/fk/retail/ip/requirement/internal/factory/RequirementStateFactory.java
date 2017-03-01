@@ -3,18 +3,14 @@ package fk.retail.ip.requirement.internal.factory;
 import com.google.inject.Inject;
 import fk.retail.ip.requirement.internal.exception.InvalidRequirementStateException;
 import fk.retail.ip.requirement.internal.enums.RequirementApprovalStates;
-import fk.retail.ip.requirement.internal.states.BizFinRequirementState;
-import fk.retail.ip.requirement.internal.states.CDOReviewRequirementState;
-import fk.retail.ip.requirement.internal.states.IPCFinalisedRequirementState;
-import fk.retail.ip.requirement.internal.states.IPCReviewRequirementState;
-import fk.retail.ip.requirement.internal.states.ProposedRequirementState;
-import fk.retail.ip.requirement.internal.states.RequirementState;
+import fk.retail.ip.requirement.internal.states.*;
 
 /**
  * Created by nidhigupta.m on 21/02/17.
  */
 public class RequirementStateFactory {
 
+    private final PreProposedRequirementState preProposedRequirementState;
     private final ProposedRequirementState proposedRequirementState;
     private final BizFinRequirementState bizFinRequirementState;
     private final CDOReviewRequirementState cdoReviewRequirementState;
@@ -22,9 +18,10 @@ public class RequirementStateFactory {
     private final IPCFinalisedRequirementState ipcFinalisedRequirementState;
 
     @Inject
-    public RequirementStateFactory(ProposedRequirementState proposedRequirementState, BizFinRequirementState bizFinRequirementState,
+    public RequirementStateFactory(PreProposedRequirementState preProposedRequirementState, ProposedRequirementState proposedRequirementState, BizFinRequirementState bizFinRequirementState,
                                    CDOReviewRequirementState cdoReviewRequirementState, IPCReviewRequirementState ipcReviewRequirementState,
                                    IPCFinalisedRequirementState ipcFinalisedRequirementState) {
+        this.preProposedRequirementState = preProposedRequirementState;
         this.proposedRequirementState = proposedRequirementState;
         this.cdoReviewRequirementState = cdoReviewRequirementState;
         this.bizFinRequirementState = bizFinRequirementState;
@@ -40,6 +37,8 @@ public class RequirementStateFactory {
 
         }
         switch (requirementApprovalState) {
+            case PRE_PROPOSED:
+                return preProposedRequirementState;
             case PROPOSED:
                 return proposedRequirementState;
             case CDO_REVIEW:

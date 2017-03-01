@@ -1,0 +1,84 @@
+dataSource:
+  # the name of your JDBC driver
+  driverClass: com.mysql.jdbc.Driver
+  # the username
+  user: ip_sys_rw
+  # the password
+  password: caiP5yaa
+
+  # the JDBC URL
+  url: jdbc:mysql://10.32.225.159/erp_inv_db_test
+  # any properties specific to your JDBC driver:
+  properties:
+    charSet: UTF-8
+  # the maximum amount of time to wait on an empty pool before throwing an exception
+  maxWaitForConnection: 1s
+  # the SQL query to run when validating a connection's liveness
+  validationQuery: "/* MyService Health Check */ SELECT 1"
+  # the minimum number of connections to keep open
+  minSize: 8
+  # the maximum number of connections to keep open
+  maxSize: 32
+  # whether or not idle connections should be validated
+  checkConnectionWhileIdle: true
+  # how long a connection must be held before it can be validated
+  validationInterval: 10s
+  # the maximum lifetime of an idle connection
+  minIdleTime: 1 minute
+  # the maximum lifetime of an idle connection
+  maxConnectionAge: 1 minute
+  # the amount of time to sleep between runs of the idle connection validation, abandoned cleaner and idle pool resizing
+  evictionInterval: 10s
+
+rotationManagementConfig:
+  persistantFilePath: "./persistant_state.txt"
+
+logging:
+  level: INFO
+  appenders:
+  - type: console
+    threshold: INFO
+
+server:
+  applicationConnectors:
+  - type: http
+    port: 32000
+    acceptQueueSize: 0
+  adminConnectors:
+  - type: http
+    port: 32001
+  minThreads: 150
+  maxThreads: 150
+  gzip:
+    enabled: true
+    minimumEntitySize: 256 bytes
+    bufferSize: 8KiB
+    excludedUserAgents: []
+    compressedMimeTypes: []
+  requestLog:
+    timeZone: IST
+    appenders:
+    - type: console
+      threshold: INFO
+
+
+zuluConfiguration:
+  url: http://10.47.1.8:31200
+  viewPath: "/views"
+  clientId: "retail.rp"
+  maxBatchSize: 30
+
+clientConfiguration:
+  timeout: 80000ms
+  connectionTimeout: 50000ms
+  connectionRequestTimeout: 50000ms
+  timeToLive: 1 hour
+  cookiesEnabled: false
+  maxConnections: 1024
+  maxConnectionsPerRoute: 1024
+  keepAlive: 0s
+  minThreads: 1
+  maxThreads: 128
+  gzipEnabled: false
+  gzipEnabledForRequests: false
+  chunkedEncodingEnabled: false
