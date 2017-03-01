@@ -180,6 +180,17 @@
         </query>
     </named-query>
 
+    <named-query name="WarehouseInventory.fetchByFsns">
+        <query>
+            <![CDATA[
+            SELECT whinv
+            FROM WarehouseInventory whinv
+            WHERE
+                whinv.fsn IN :fsns
+                ]]>
+        </query>
+    </named-query>
+
     <named-query name="OpenRequirementAndPurchaseOrder.fetchByFsns">
         <query>
             <![CDATA[
@@ -202,7 +213,6 @@
         </query>
     </named-query>
 
-
     <named-query name="Policy.fetchByGroupIds">
         <query>
             <![CDATA[
@@ -222,6 +232,17 @@
             FROM GroupFsn gf
             WHERE
                 gf.fsn IN :fsns
+                ]]>
+        </query>
+    </named-query>
+
+    <named-query name="Forecast.fetchByFsns">
+        <query>
+            <![CDATA[
+            SELECT f
+            FROM Forecast f
+            WHERE
+                f.fsn IN :fsns
                 ]]>
         </query>
     </named-query>

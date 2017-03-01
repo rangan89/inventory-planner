@@ -1,6 +1,7 @@
 package fk.retail.ip.requirement.internal.entities;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -15,4 +16,6 @@ public class Policy extends AbstractEntity {
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "group_id")
     Group group;
+    @Column(name = "policy_values")
+    String value;
 }

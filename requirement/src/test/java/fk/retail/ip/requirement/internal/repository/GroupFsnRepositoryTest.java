@@ -1,6 +1,6 @@
 package fk.retail.ip.requirement.internal.repository;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import fk.retail.ip.requirement.config.TestModule;
 import fk.retail.ip.requirement.internal.entities.Group;
@@ -25,7 +25,7 @@ public class GroupFsnRepositoryTest extends TransactionalJpaRepositoryTest {
         Group group = TestHelper.getGroup("Test Group");
         GroupFsn groupFsn = TestHelper.getGroupFsn("fsn1", group);
         groupFsnRepository.persist(groupFsn);
-        List<GroupFsn> groupFsns = groupFsnRepository.findByFsns(Lists.newArrayList("fsn1"));
+        List<GroupFsn> groupFsns = groupFsnRepository.findByFsns(Sets.newHashSet("fsn1"));
         Assert.assertEquals(1, groupFsns.size());
         Assert.assertEquals(groupFsn, groupFsns.get(0));
         Assert.assertEquals(group, groupFsns.get(0).getGroup());

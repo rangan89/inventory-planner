@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import fk.retail.ip.requirement.internal.entities.Policy;
 import fk.sp.common.extensions.jpa.SimpleJpaGenericRepository;
 import java.util.List;
+import java.util.Set;
 import javax.inject.Provider;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -16,14 +17,14 @@ public class JPAPolicyRepository extends SimpleJpaGenericRepository<Policy, Long
     }
 
     @Override
-    public List<Policy> fetchByFsns(List<String> fsns) {
+    public List<Policy> fetchByFsns(Set<String> fsns) {
         TypedQuery<Policy> query = getEntityManager().createNamedQuery("Policy.fetchByFsns", Policy.class);
         query.setParameter("fsns", fsns);
         return query.getResultList();
     }
 
     @Override
-    public List<Policy> fetchByGroup(List<Long> ids) {
+    public List<Policy> fetchByGroup(Set<Long> ids) {
         TypedQuery<Policy> query = getEntityManager().createNamedQuery("Policy.fetchByGroupIds", Policy.class);
         query.setParameter("ids", ids);
         return query.getResultList();

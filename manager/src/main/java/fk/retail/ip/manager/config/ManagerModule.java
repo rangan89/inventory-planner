@@ -1,5 +1,6 @@
 package fk.retail.ip.manager.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
@@ -15,6 +16,8 @@ import org.glassfish.jersey.filter.LoggingFilter;
 import static com.google.inject.multibindings.Multibinder.newSetBinder;
 
 public class ManagerModule extends AbstractModule {
+
+    private static ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     protected void configure() {
@@ -45,4 +48,8 @@ public class ManagerModule extends AbstractModule {
         return managerConfiguration.getClientConfiguration();
     }
 
+    @Provides
+    public ObjectMapper getObjectMapper() {
+        return objectMapper;
+    }
 }

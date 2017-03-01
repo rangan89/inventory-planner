@@ -4,12 +4,14 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.inject.Inject;
 import com.google.inject.persist.Transactional;
 import fk.retail.ip.requirement.internal.exception.InvalidRequirementStateException;
+import fk.retail.ip.requirement.model.CalculateRequirementRequest;
 import fk.retail.ip.requirement.model.DownloadRequirementRequest;
 import fk.retail.ip.requirement.service.RequirementService;
 import io.dropwizard.hibernate.UnitOfWork;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
+import javax.validation.Valid;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.HttpHeaders;
@@ -31,6 +33,11 @@ public class RequirementResource {
     @Inject
     public RequirementResource(RequirementService requirementService) {
         this.requirementService = requirementService;
+    }
+
+    @POST
+    public void calculateRequirement(@Valid CalculateRequirementRequest calculateRequirementRequest) {
+        requirementService.calculateRequirement(calculateRequirementRequest);
     }
 
     @POST

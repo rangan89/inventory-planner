@@ -1,10 +1,13 @@
 package fk.retail.ip.requirement.service;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
+import fk.retail.ip.requirement.internal.command.CalculateRequirementCommand;
 import fk.retail.ip.requirement.internal.entities.Requirement;
 import fk.retail.ip.requirement.internal.factory.RequirementStateFactory;
 import fk.retail.ip.requirement.internal.repository.RequirementRepository;
 import fk.retail.ip.requirement.internal.states.RequirementState;
+import fk.retail.ip.requirement.model.CalculateRequirementRequest;
 import fk.retail.ip.requirement.model.DownloadRequirementRequest;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,12 +20,14 @@ public class RequirementService {
 
     private final RequirementRepository requirementRepository;
     private final RequirementStateFactory requirementStateFactory;
+    private final Provider<CalculateRequirementCommand> calculateRequirementCommandProvider;
 
     @Inject
-    public RequirementService(RequirementRepository requirementRepository, RequirementStateFactory requirementStateFactory) {
+    public RequirementService(RequirementRepository requirementRepository, RequirementStateFactory requirementStateFactory,
+                              Provider<CalculateRequirementCommand> calculateRequirementCommandProvider) {
         this.requirementRepository = requirementRepository;
         this.requirementStateFactory = requirementStateFactory;
-
+        this.calculateRequirementCommandProvider = calculateRequirementCommandProvider;
     }
 
     public StreamingOutput downloadRequirement(DownloadRequirementRequest downloadRequirementRequest) {
@@ -42,4 +47,7 @@ public class RequirementService {
 
     }
 
+    public void calculateRequirement(CalculateRequirementRequest calculateRequirementRequest) {
+        calculateRequirementCommandProvider.get().withFsns(calculateRequirementRequest.getFsns()).execute();
+    }
 }

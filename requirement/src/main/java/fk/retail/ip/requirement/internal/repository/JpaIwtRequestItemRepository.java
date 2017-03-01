@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import fk.retail.ip.requirement.internal.entities.IwtRequestItem;
 import fk.sp.common.extensions.jpa.SimpleJpaGenericRepository;
 import java.util.List;
+import java.util.Set;
 import javax.inject.Provider;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -19,7 +20,7 @@ public class JpaIwtRequestItemRepository extends SimpleJpaGenericRepository<IwtR
     }
 
     @Override
-    public List<IwtRequestItem> fetchByFsns(List<String> fsns, List<String> statuses) {
+    public List<IwtRequestItem> fetchByFsns(Set<String> fsns, Set<String> statuses) {
         TypedQuery<IwtRequestItem> iwtRequestItemQuery =
                 getEntityManager().createNamedQuery("IwtRequestItem.fetchByFsnsInStatuses", IwtRequestItem.class);
         iwtRequestItemQuery.setParameter("fsns", fsns);

@@ -1,8 +1,12 @@
 package fk.retail.ip.requirement.internal.enums;
 
+import fk.retail.ip.requirement.internal.Constants;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public enum PolicyType {
 
-    PLANNING_CYCLE("PlanningCycle"), ROP("Rop"), ROC("Roc"), MAX_COVERAGE("MaxCoverage"), MIN_INVENTORY("MinInventory"), CASE_SIZE("CaseSize");
+    PLANNING_CYCLE("PlanningCycle"), ROP("Rop"), ROC("Roc"), MAX_COVERAGE("MaxCoverage"), CASE_SIZE("CaseSize");
     String value;
 
     private PolicyType(String value) {
@@ -12,5 +16,15 @@ public enum PolicyType {
     @Override
     public String toString() {
         return value;
+    }
+
+    public static PolicyType fromString(String value) {
+        for (PolicyType type : values()) {
+            if (type.value.equals(value)) {
+                return type;
+            }
+        }
+        log.error(Constants.INVALID_POLICY_TYPE, value);
+        return null;
     }
 }

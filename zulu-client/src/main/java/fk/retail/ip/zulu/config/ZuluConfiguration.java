@@ -1,12 +1,12 @@
 package fk.retail.ip.zulu.config;
 
-import lombok.Getter;
+import lombok.Data;
 
 /**
  * Created by nidhigupta.m on 03/02/17.
  */
 
-@Getter
+@Data
 public class ZuluConfiguration {
     String url;
     String viewPath;
