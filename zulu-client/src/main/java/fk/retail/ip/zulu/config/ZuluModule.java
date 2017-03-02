@@ -11,6 +11,5 @@ public class ZuluModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(ZuluClient.class).to(HystrixZuluClient.class);
-
     }
 }

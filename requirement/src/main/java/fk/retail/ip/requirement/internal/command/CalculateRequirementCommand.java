@@ -35,7 +35,6 @@ import java.util.stream.Collectors;
 
 public class CalculateRequirementCommand {
 
-    private Set<String> fsns = Sets.newHashSet();
     private final GroupFsnRepository groupFsnRepository;
     private final PolicyRepository policyRepository;
     private final ForecastRepository forecastRepository;
@@ -44,10 +43,12 @@ public class CalculateRequirementCommand {
     private final OpenRequirementAndPurchaseOrderRepository openRequirementAndPurchaseOrderRepository;
     private final RequirementRepository requirementRepository;
     private final ObjectMapper objectMapper;
-    private final Map<String, Group> fsnToGroupMap;
-    private final PolicyContext policyContext;
-    private final ForecastContext forecastContext;
-    private final OnHandQuantityContext onHandQuantityContext;
+
+    private Set<String> fsns = Sets.newHashSet();
+    private Map<String, Group> fsnToGroupMap;
+    private PolicyContext policyContext;
+    private ForecastContext forecastContext;
+    private OnHandQuantityContext onHandQuantityContext;
 
     @Inject
     public CalculateRequirementCommand(GroupFsnRepository groupFsnRepository, PolicyRepository policyRepository, ForecastRepository forecastRepository, WarehouseInventoryRepository warehouseInventoryRepository, IwtRequestItemRepository iwtRequestItemRepository, OpenRequirementAndPurchaseOrderRepository openRequirementAndPurchaseOrderRepository, RequirementRepository requirementRepository, ObjectMapper objectMapper) {
@@ -59,18 +60,22 @@ public class CalculateRequirementCommand {
         this.openRequirementAndPurchaseOrderRepository = openRequirementAndPurchaseOrderRepository;
         this.requirementRepository = requirementRepository;
         this.objectMapper = objectMapper;
-        this.fsnToGroupMap = getFsnToGroupMap();
-        this.forecastContext = getForecastContext();
-        this.policyContext = getPolicyContext(forecastContext.getFsns());
-        this.onHandQuantityContext = getOnHandQuantityContext(forecastContext.getFsns());
     }
 
     public CalculateRequirementCommand withFsns(Set<String> fsns) {
         this.fsns = fsns;
-        return null;
+        return this;
     }
 
+    private void initContexts() {
+        this.forecastContext = getForecastContext();
+        this.policyContext = getPolicyContext(forecastContext.getFsns());
+        this.onHandQuantityContext = getOnHandQuantityContext(forecastContext.getFsns());
+        this.fsnToGroupMap = getFsnToGroupMap();
+    }
     public void execute() {
+        initContexts();
+
         Set<String> fsnsWithForecast = forecastContext.getFsns();
 
         //create requirement entities
