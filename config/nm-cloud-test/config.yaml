@@ -30,7 +30,7 @@ dataSource:
   evictionInterval: 10s
 
 rotationManagementConfig:
-  persistantFilePath: "./persistant_state.txt"
+  persistantFilePath: "/var/run/fk-ip-inventory-planner/persistant_state.txt"
 
 logging:
   level: INFO

@@ -10,8 +10,7 @@
             SELECT r
             FROM Requirement r
             WHERE
-                r.projectionId in :ids and
-                r.current = 1
+                r.id in :ids
                  ]]>
         </query>
     </named-query>
