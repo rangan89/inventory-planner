@@ -1,5 +1,6 @@
 package fk.retail.ip.requirement.internal.context;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Lists;
@@ -8,7 +9,9 @@ import fk.retail.ip.requirement.internal.entities.Requirement;
 import fk.retail.ip.requirement.internal.enums.PolicyType;
 import java.util.List;
 import java.util.Set;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class PolicyContext {
 
     private final ObjectMapper objectMapper;
@@ -33,7 +36,13 @@ public class PolicyContext {
         orderedPolicyApplicators.forEach(policyApplicator -> policyApplicator.applyPolicies(fsn, requirements, fsnPolicyTypeDataTable.row(fsn), forecastContext, onHandQuantityContext));
     }
 
-    public String getPolicyAsString(String fsn, String warehouse) {
-        return null;
+    public String getPolicyAsString(String fsn) {
+        String policyString = null;
+        try {
+            policyString = objectMapper.writeValueAsString(fsnPolicyTypeDataTable.row(fsn));
+        } catch (JsonProcessingException e) {
+            log.error(e.getMessage(), e);
+        }
+        return policyString;
     }
 }

@@ -86,7 +86,7 @@ public class TestResource {
         requirement.setEnabled(true);
         requirement.setCurrent(true);
         requirement.setQuantity(0.123);
-        requirement.setProjectionId(32749L);
+//        requirement.setProjection(32749L);
         //TODO: do we need procType here?
         requirement.setProcType("DAILY_PLANNING");
         RequirementSnapshot requirementSnapshot = new RequirementSnapshot();

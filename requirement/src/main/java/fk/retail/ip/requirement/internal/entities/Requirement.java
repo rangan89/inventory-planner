@@ -5,6 +5,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
@@ -79,11 +80,12 @@ public class Requirement extends AbstractEntity {
 
 
     //todo: cleanup (fields for backward compatibilty)
-    private Long projectionId;
+    @ManyToOne(fetch= FetchType.LAZY, cascade= CascadeType.ALL)
+    @JoinColumn(name = "projection_id")
+    private Projection projection;
     private Integer panIndia;
     private String mrpCurrency;
     private String sslId;
     private Long prevStateId;
     private Integer international;
-
 }

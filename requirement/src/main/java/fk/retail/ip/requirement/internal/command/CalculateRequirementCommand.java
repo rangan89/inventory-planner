@@ -6,25 +6,26 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import fk.retail.ip.requirement.internal.Constants;
-import fk.retail.ip.requirement.internal.PolicyManager;
+import fk.retail.ip.requirement.internal.context.ForecastContext;
+import fk.retail.ip.requirement.internal.context.OnHandQuantityContext;
+import fk.retail.ip.requirement.internal.context.PolicyContext;
 import fk.retail.ip.requirement.internal.entities.Forecast;
 import fk.retail.ip.requirement.internal.entities.Group;
 import fk.retail.ip.requirement.internal.entities.GroupFsn;
 import fk.retail.ip.requirement.internal.entities.IwtRequestItem;
 import fk.retail.ip.requirement.internal.entities.OpenRequirementAndPurchaseOrder;
 import fk.retail.ip.requirement.internal.entities.Policy;
+import fk.retail.ip.requirement.internal.entities.Projection;
 import fk.retail.ip.requirement.internal.entities.Requirement;
 import fk.retail.ip.requirement.internal.entities.RequirementSnapshot;
 import fk.retail.ip.requirement.internal.entities.WarehouseInventory;
 import fk.retail.ip.requirement.internal.enums.RequirementApprovalStates;
-import fk.retail.ip.requirement.internal.context.ForecastContext;
-import fk.retail.ip.requirement.internal.context.OnHandQuantityContext;
-import fk.retail.ip.requirement.internal.context.PolicyContext;
 import fk.retail.ip.requirement.internal.repository.ForecastRepository;
 import fk.retail.ip.requirement.internal.repository.GroupFsnRepository;
 import fk.retail.ip.requirement.internal.repository.IwtRequestItemRepository;
 import fk.retail.ip.requirement.internal.repository.OpenRequirementAndPurchaseOrderRepository;
 import fk.retail.ip.requirement.internal.repository.PolicyRepository;
+import fk.retail.ip.requirement.internal.repository.RequirementRepository;
 import fk.retail.ip.requirement.internal.repository.WarehouseInventoryRepository;
 import java.util.HashSet;
 import java.util.List;
@@ -41,7 +42,7 @@ public class CalculateRequirementCommand {
     private final WarehouseInventoryRepository warehouseInventoryRepository;
     private final IwtRequestItemRepository iwtRequestItemRepository;
     private final OpenRequirementAndPurchaseOrderRepository openRequirementAndPurchaseOrderRepository;
-    private final PolicyManager policyManager;
+    private final RequirementRepository requirementRepository;
     private final ObjectMapper objectMapper;
     private final Map<String, Group> fsnToGroupMap;
     private final PolicyContext policyContext;
@@ -49,14 +50,14 @@ public class CalculateRequirementCommand {
     private final OnHandQuantityContext onHandQuantityContext;
 
     @Inject
-    public CalculateRequirementCommand(GroupFsnRepository groupFsnRepository, PolicyRepository policyRepository, ForecastRepository forecastRepository, WarehouseInventoryRepository warehouseInventoryRepository, IwtRequestItemRepository iwtRequestItemRepository, OpenRequirementAndPurchaseOrderRepository openRequirementAndPurchaseOrderRepository, PolicyManager policyManager, ObjectMapper objectMapper) {
+    public CalculateRequirementCommand(GroupFsnRepository groupFsnRepository, PolicyRepository policyRepository, ForecastRepository forecastRepository, WarehouseInventoryRepository warehouseInventoryRepository, IwtRequestItemRepository iwtRequestItemRepository, OpenRequirementAndPurchaseOrderRepository openRequirementAndPurchaseOrderRepository, RequirementRepository requirementRepository, ObjectMapper objectMapper) {
         this.groupFsnRepository = groupFsnRepository;
         this.policyRepository = policyRepository;
         this.forecastRepository = forecastRepository;
         this.warehouseInventoryRepository = warehouseInventoryRepository;
         this.iwtRequestItemRepository = iwtRequestItemRepository;
         this.openRequirementAndPurchaseOrderRepository = openRequirementAndPurchaseOrderRepository;
-        this.policyManager = policyManager;
+        this.requirementRepository = requirementRepository;
         this.objectMapper = objectMapper;
         this.fsnToGroupMap = getFsnToGroupMap();
         this.forecastContext = getForecastContext();
@@ -70,22 +71,9 @@ public class CalculateRequirementCommand {
     }
 
     public void execute() {
-        //create forecast context
         Set<String> fsnsWithForecast = forecastContext.getFsns();
-        Set<String> fsnsWithoutForecast = new HashSet<>(fsns);
-        fsnsWithoutForecast.removeAll(fsnsWithForecast);
 
-        Set<Requirement> erredRequirements = fsnsWithoutForecast.stream().map(fsn -> {
-            Requirement requirement = new Requirement();
-            requirement.setFsn(fsn);
-            requirement.setState(Constants.ERROR_STATE);
-            requirement.setWarehouse(Constants.NOT_APPLICABLE);
-            requirement.setOverrideComment(Constants.FORECAST_NOT_FOUND);
-            requirement.setEnabled(false);
-            return requirement;
-        }).collect(Collectors.toSet());
-
-        //create the valid requirements
+        //create requirement entities
         Map<String, List<Requirement>> fsnToRequirementMap = Maps.newHashMap();
         for (String fsn : fsnsWithForecast) {
             Set<String> warehouses = forecastContext.getWarehouses(fsn);
@@ -99,11 +87,58 @@ public class CalculateRequirementCommand {
             }
         }
 
-        //apply policies
+        //apply policies, mark error if critical policy is missing
         fsnsWithForecast.forEach(fsn -> {
             List<Requirement> requirements = fsnToRequirementMap.get(fsn);
             policyContext.applyPolicies(fsn, requirements, forecastContext, onHandQuantityContext);
         });
+
+        //find supplier for non error fsns
+        List<Requirement> allRequirements = Lists.newArrayList();
+        fsnToRequirementMap.values().forEach(requirements -> allRequirements.addAll(allRequirements));
+        List<Requirement> validRequirements = allRequirements.stream().filter(requirement -> !Constants.ERROR_STATE.equals(requirement.getState())).collect(Collectors.toList());
+        populateSupplier(validRequirements);
+
+        //create dummy error entry for fsns without forecast
+        Set<String> fsnsWithoutForecast = new HashSet<>(fsns);
+        fsnsWithoutForecast.removeAll(fsnsWithForecast);
+        Set<Requirement> erredRequirements = fsnsWithoutForecast.stream().map(fsn -> {
+            Requirement requirement = new Requirement();
+            requirement.setFsn(fsn);
+            requirement.setState(Constants.ERROR_STATE);
+            requirement.setWarehouse(Constants.NOT_APPLICABLE);
+            requirement.setOverrideComment(Constants.FORECAST_NOT_FOUND);
+            requirement.setEnabled(false);
+            return requirement;
+        }).collect(Collectors.toSet());
+        allRequirements.addAll(erredRequirements);
+
+        //TODO: remove backward compatibility changes to add entry in projections table
+        for (String fsn : fsnToRequirementMap.keySet()) {
+            List<Requirement> requirements = fsnToRequirementMap.get(fsn);
+            Projection projection = new Projection();
+            Requirement requirement = requirements.get(0);
+            projection.setFsn(requirement.getFsn());
+            projection.setCurrentState(requirement.getState());
+            projection.setEnabled(requirement.getEnabled()?1:0);
+            projection.setError(requirement.getOverrideComment());
+            projection.setProcType(requirement.getProcType());
+            projection.setForecastId(0);
+            projection.setIntransit(0);
+            projection.setInventory(0);
+            projection.setPolicyId(requirement.getRequirementSnapshot().getPolicy());
+            projection.setGroupId(requirement.getRequirementSnapshot().getGroup().getId());
+            requirements.forEach(requirement1 -> {
+                requirement1.setProjection(projection);
+            });
+        }
+
+        //save
+        requirementRepository.persist(allRequirements);
+    }
+
+    private void populateSupplier(List<Requirement> validRequirements) {
+
     }
 
     private Map<String, Group> getFsnToGroupMap() {
@@ -123,7 +158,7 @@ public class CalculateRequirementCommand {
         requirement.setProcType(group.getProcurementType());
         RequirementSnapshot requirementSnapshot = new RequirementSnapshot();
         requirementSnapshot.setGroup(group);
-        requirementSnapshot.setPolicy(policyContext.getPolicyAsString(fsn, warehouse));
+        requirementSnapshot.setPolicy(policyContext.getPolicyAsString(fsn));
         requirementSnapshot.setForecast(forecastContext.getForecastAsString(fsn, warehouse));
         requirementSnapshot.setOpenReqQty((int) onHandQuantityContext.getOpenRequirementQuantity(fsn, warehouse));
         requirementSnapshot.setPendingPoQty((int) onHandQuantityContext.getPendingPurchaseOrderQuantity(fsn, warehouse));
@@ -156,6 +191,7 @@ public class CalculateRequirementCommand {
         policies.forEach(policy -> policyContext.addPolicy(policy.getFsn(), policy.getPolicyType(), policy.getValue()));
         return policyContext;
     }
+
     private OnHandQuantityContext getOnHandQuantityContext(Set<String> fsns) {
         OnHandQuantityContext onHandQuantityContext = new OnHandQuantityContext();
         //add wh inventory
