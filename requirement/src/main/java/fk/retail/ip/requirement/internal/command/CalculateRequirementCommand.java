@@ -25,6 +25,7 @@ import fk.retail.ip.requirement.internal.repository.GroupFsnRepository;
 import fk.retail.ip.requirement.internal.repository.IwtRequestItemRepository;
 import fk.retail.ip.requirement.internal.repository.OpenRequirementAndPurchaseOrderRepository;
 import fk.retail.ip.requirement.internal.repository.PolicyRepository;
+import fk.retail.ip.requirement.internal.repository.ProjectionRepository;
 import fk.retail.ip.requirement.internal.repository.RequirementRepository;
 import fk.retail.ip.requirement.internal.repository.WarehouseInventoryRepository;
 import java.util.HashSet;
@@ -42,6 +43,8 @@ public class CalculateRequirementCommand {
     private final IwtRequestItemRepository iwtRequestItemRepository;
     private final OpenRequirementAndPurchaseOrderRepository openRequirementAndPurchaseOrderRepository;
     private final RequirementRepository requirementRepository;
+    //TODO: remove
+    private final ProjectionRepository projectionRepository;
     private final ObjectMapper objectMapper;
 
     private Set<String> fsns = Sets.newHashSet();
@@ -51,7 +54,7 @@ public class CalculateRequirementCommand {
     private OnHandQuantityContext onHandQuantityContext;
 
     @Inject
-    public CalculateRequirementCommand(GroupFsnRepository groupFsnRepository, PolicyRepository policyRepository, ForecastRepository forecastRepository, WarehouseInventoryRepository warehouseInventoryRepository, IwtRequestItemRepository iwtRequestItemRepository, OpenRequirementAndPurchaseOrderRepository openRequirementAndPurchaseOrderRepository, RequirementRepository requirementRepository, ObjectMapper objectMapper) {
+    public CalculateRequirementCommand(GroupFsnRepository groupFsnRepository, PolicyRepository policyRepository, ForecastRepository forecastRepository, WarehouseInventoryRepository warehouseInventoryRepository, IwtRequestItemRepository iwtRequestItemRepository, OpenRequirementAndPurchaseOrderRepository openRequirementAndPurchaseOrderRepository, RequirementRepository requirementRepository, ProjectionRepository projectionRepository, ObjectMapper objectMapper) {
         this.groupFsnRepository = groupFsnRepository;
         this.policyRepository = policyRepository;
         this.forecastRepository = forecastRepository;
@@ -59,6 +62,7 @@ public class CalculateRequirementCommand {
         this.iwtRequestItemRepository = iwtRequestItemRepository;
         this.openRequirementAndPurchaseOrderRepository = openRequirementAndPurchaseOrderRepository;
         this.requirementRepository = requirementRepository;
+        this.projectionRepository = projectionRepository;
         this.objectMapper = objectMapper;
     }
 
@@ -125,7 +129,7 @@ public class CalculateRequirementCommand {
             Requirement requirement = requirements.get(0);
             projection.setFsn(requirement.getFsn());
             projection.setCurrentState(requirement.getState());
-            projection.setEnabled(requirement.getEnabled()?1:0);
+            projection.setEnabled(requirement.isEnabled()?1:0);
             projection.setError(requirement.getOverrideComment());
             projection.setProcType(requirement.getProcType());
             projection.setForecastId(0);
@@ -133,11 +137,11 @@ public class CalculateRequirementCommand {
             projection.setInventory(0);
             projection.setPolicyId(requirement.getRequirementSnapshot().getPolicy());
             projection.setGroupId(requirement.getRequirementSnapshot().getGroup().getId());
+            projectionRepository.persist(projection);
             requirements.forEach(requirement1 -> {
-                requirement1.setProjection(projection);
+                requirement1.setProjectionId(projection.getId());
             });
         }
-
         //save
         requirementRepository.persist(allRequirements);
     }

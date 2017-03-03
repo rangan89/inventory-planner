@@ -6,7 +6,9 @@ import fk.retail.ip.requirement.config.TestModule;
 import fk.retail.ip.requirement.internal.entities.Requirement;
 import fk.sp.common.extensions.jpa.TransactionalJpaRepositoryTest;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import org.apache.commons.lang.ArrayUtils;
@@ -16,8 +18,6 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import java.util.Set;
-import java.util.HashSet;
 
 @RunWith(JukitoRunner.class)
 @UseModules(TestModule.class)
@@ -37,8 +37,7 @@ public class RequirementRepositoryTest extends TransactionalJpaRepositoryTest {
     public void testFindRequirementById() {
         Requirement requirement = getRequirement(1);
         requirementRepository.persist(requirement);
-        List<Requirement>
-                requirements = requirementRepository.findRequirementByIds(Lists.newArrayList(new Long(1)));
+        List<Requirement> requirements = requirementRepository.findRequirementByIds(Lists.newArrayList(new Long(1)));
         Assert.assertEquals(1, requirements.size());
         Assert.assertEquals(requirement, requirements.get(0));
     }
@@ -55,8 +54,7 @@ public class RequirementRepositoryTest extends TransactionalJpaRepositoryTest {
         Long[] idList = ArrayUtils.toObject(ids);
         List<Long> idsAsList = Arrays.asList(idList);
 
-        List<Requirement>
-                requirements = requirementRepository.findRequirementByIds(idsAsList);
+        List<Requirement> requirements = requirementRepository.findRequirementByIds(idsAsList);
         Assert.assertEquals(30, requirements.size());
     }
 
@@ -66,8 +64,7 @@ public class RequirementRepositoryTest extends TransactionalJpaRepositoryTest {
         IntStream.rangeClosed(1, 24).forEach(i -> {
             requirementRepository.persist(getRequirement(i));
         });
-        List<Requirement>
-                requirements = requirementRepository.findAllCurrentRequirements("proposed");
+        List<Requirement> requirements = requirementRepository.findAllCurrentRequirements("proposed");
         Assert.assertEquals(24, requirements.size());
     }
 
@@ -75,23 +72,21 @@ public class RequirementRepositoryTest extends TransactionalJpaRepositoryTest {
     public void testFindEnabledRequirementsByStateFsn() {
 
         Set<String> fsns = new HashSet<String>();
-        IntStream.rangeClosed(1,20).forEach(i -> {
+        IntStream.rangeClosed(1, 20).forEach(i -> {
             requirementRepository.persist(getRequirement(i));
-            fsns.add("fsn"+String.valueOf(i));
+            fsns.add("fsn" + String.valueOf(i));
         });
-        List<Requirement>
-                requirements = requirementRepository.findEnabledRequirementsByStateFsn("proposed",fsns);
-        Assert.assertEquals(20,requirements.size());
+        List<Requirement> requirements = requirementRepository.findEnabledRequirementsByStateFsn("proposed", fsns);
+        Assert.assertEquals(20, requirements.size());
     }
 
     private Requirement getRequirement(int i) {
         String fsn = "fsn" + String.valueOf(i);
-        Requirement requirement = TestHelper.getRequirement(fsn, "dummy_warehouse","proposed", true, null, 10, "supplier",
-                10, 11, "INR",2,"comment", "daily"  );
+        Requirement requirement = TestHelper.getRequirement(fsn, "dummy_warehouse", "proposed", true, null, 10, "supplier",
+                10, 11, "INR", 2, "comment", "daily");
         requirement.setCurrent(true);
 
         return requirement;
     }
-
 
 }

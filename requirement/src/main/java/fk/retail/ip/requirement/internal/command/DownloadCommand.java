@@ -265,7 +265,7 @@ public abstract class DownloadCommand {
         MultiKeyMap<String,Integer> fsnWhQuantity = new MultiKeyMap();
         requirements.forEach(r -> {
             fsnWhCdoComment.put(r.getFsn(),r.getWarehouse(),r.getOverrideComment());
-            fsnWhQuantity.put(r.getFsn(),r.getWarehouse(),r.getQuantity().intValue());
+            fsnWhQuantity.put(r.getFsn(),r.getWarehouse(), (int) r.getQuantity());
         });
 
         requirementDownloadLineItems.forEach(reqItem

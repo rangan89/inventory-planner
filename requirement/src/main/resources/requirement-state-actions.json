@@ -1,0 +1,52 @@
+{
+    "verify": {
+        "currentState": "proposed",
+        "nextState": "verified",
+        "isForward": true
+    },
+    "cancel_verify": {
+        "currentState": "verified",
+        "nextState": "proposed",
+        "isForward": false
+    },
+    "approve": {
+        "currentState": "verified",
+        "nextState": "approved",
+        "isForward": true
+    },
+    "cancel_approve": {
+        "currentState": "approved",
+        "nextState": "verified",
+        "isForward": false
+    },
+    "bd_approve": {
+        "currentState": "approved",
+        "nextState": "bd_approved",
+        "isForward": true
+    },
+    "cancel_bd_approve": {
+        "currentState": "bd_approved",
+        "nextState": "approved",
+        "isForward": false
+    },
+    "bizfin_approve": {
+        "currentState": "bd_approved",
+        "nextState": "bizfin_approved",
+        "isForward": true
+    },
+    "cancel_bizfin_approve": {
+        "currentState": "bizfin_approved",
+        "nextState": "bd_approved",
+        "isForward": false
+    },
+    "ipc_finalize": {
+        "currentState": "bizfin_approved",
+        "nextState": "ipc_finalized",
+        "isForward": true
+    },
+    "cancel_ipc_finalize": {
+        "currentState": "ipc_finalized",
+        "nextState": "bizfin_approved",
+        "isForward": false
+    }
+}

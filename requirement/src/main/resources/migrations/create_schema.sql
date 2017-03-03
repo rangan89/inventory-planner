@@ -145,7 +145,7 @@ CREATE TABLE `REQUIREMENT` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-CREATE TABLE `REQUIREMENT_SNAPSHOT` (
+CREATE TABLE `requirement_snapshot` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `forecast` varchar(200) DEFAULT NULL,
   `inventory_qty` int(11) DEFAULT NULL,
@@ -158,7 +158,7 @@ CREATE TABLE `REQUIREMENT_SNAPSHOT` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `group_id` (`group_id`),
-  CONSTRAINT `requirement_snapshot_ibfk_2` FOREIGN KEY (`group_id`) REFERENCES `GROUP` (`id`)
+  CONSTRAINT `requirement_snapshot_ibfk_2` FOREIGN KEY (`group_id`) REFERENCES `ip_groups` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -186,6 +186,27 @@ CREATE TABLE `WAREHOUSE` (
   UNIQUE KEY `wh_code` (`code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+
+CREATE TABLE `group_approval` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `group_id` bigint(20) NOT NULL,
+  `state` varchar(32) NOT NULL,
+  `is_auto_approved` tinyint(1) NOT NULL DEFAULT '0',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime NOT NULL,
+  `version` bigint(20) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `unique_idx_group_state` (`group_id`,`state`)
+);
+
+ALTER TABLE `projection_states` 
+    ADD COLUMN `is_current` TINYINT(1) NOT NULL DEFAULT 0 AFTER `currency`;
+
+ALTER TABLE `projection_states` 
+    ADD COLUMN `fsn` VARCHAR(45) NOT NULL AFTER `is_current`;
+
+ALTER TABLE `projection_states` 
+    ADD COLUMN `proc_type` VARCHAR(45) NULL AFTER `fsn`;
 
 
 
