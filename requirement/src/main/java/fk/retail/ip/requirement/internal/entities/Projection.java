@@ -12,14 +12,14 @@ public class Projection extends AbstractEntity{
 
     String fsn;
     String currentState;
-    int dirty = 0;
-    int enabled;
-    int intransit;
-    int inventory;
+    Integer dirty = 0;
+    Integer enabled;
+    Integer intransit;
+    Integer inventory;
     String sku = "N/A";
     String procType;
-    long forecastId;
+    Long forecastId;
     String policyId;
-    long groupId;
+    Long groupId;
     String error;
 }

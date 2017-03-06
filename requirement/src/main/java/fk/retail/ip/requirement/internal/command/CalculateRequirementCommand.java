@@ -139,7 +139,7 @@ public class CalculateRequirementCommand {
             projection.setEnabled(requirement.isEnabled() ? 1 : 0);
             projection.setError(requirement.getOverrideComment());
             projection.setProcType(requirement.getProcType());
-            projection.setForecastId(0);
+            projection.setForecastId(0L);
             projection.setIntransit(0);
             projection.setInventory(0);
             projection.setPolicyId(requirement.getRequirementSnapshot().getPolicy());

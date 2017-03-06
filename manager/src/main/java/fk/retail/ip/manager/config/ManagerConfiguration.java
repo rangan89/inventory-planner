@@ -1,5 +1,6 @@
 package fk.retail.ip.manager.config;
 
+import fk.retail.ip.ssl.config.SslClientConfiguration;
 import fk.retail.ip.zulu.config.ZuluConfiguration;
 import fk.sp.common.extensions.dropwizard.db.HasDataSourceFactory;
 import flipkart.retail.server.admin.config.RotationManagementConfig;
@@ -23,6 +24,9 @@ public class ManagerConfiguration extends Configuration implements HasDataSource
 
     @NotNull
     private ZuluConfiguration zuluConfiguration;
+
+    @NotNull
+    private SslClientConfiguration sslClientConfiguration;
 
     @Valid
     @NotNull

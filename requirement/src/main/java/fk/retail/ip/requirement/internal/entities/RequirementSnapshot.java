@@ -13,7 +13,7 @@ import lombok.Data;
 @Entity
 @XmlRootElement
 @Data
-@Table(name = "REQUIREMENT_SNAPSHOT")
+@Table(name = "requirement_snapshot")
 public class RequirementSnapshot extends ReadOnlyEntity {
 
     private String forecast;

@@ -1,6 +1,7 @@
 package fk.retail.ip.requirement.config;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.name.Names;
 import fk.retail.ip.requirement.internal.repository.ForecastRepository;
 import fk.retail.ip.requirement.internal.repository.FsnBandRepository;
 import fk.retail.ip.requirement.internal.repository.GroupFsnRepository;
@@ -54,5 +55,7 @@ public class RequirementModule extends AbstractModule {
         bind(ForecastRepository.class).to(JPAForecastRepository.class);
         //TODO:remove
         bind(ProjectionRepository.class).to(ProjectionRepositoryImpl.class);
+
+        bind(String.class).annotatedWith(Names.named("actionConfiguration")).toInstance("/requirement-state-actions.json");
     }
 }

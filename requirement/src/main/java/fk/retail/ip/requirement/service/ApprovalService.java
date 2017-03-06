@@ -2,6 +2,7 @@ package fk.retail.ip.requirement.service;
 
 import com.google.common.io.CharStreams;
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import fk.retail.ip.requirement.internal.entities.AbstractEntity;
 import fk.retail.ip.requirement.internal.entities.Requirement;
 import fk.retail.ip.requirement.internal.repository.RequirementRepository;
@@ -22,8 +23,7 @@ public class ApprovalService<E extends AbstractEntity> {
     private JSONObject actions;
 
     @Inject
-    public ApprovalService(String actionConfiguration) {
-        actionConfiguration = "/requirement-state-actions.json";
+    public ApprovalService(@Named("actionConfiguration") String actionConfiguration) {
         try (InputStreamReader reader = new InputStreamReader(getClass().getResourceAsStream(actionConfiguration))) {
             actions = new JSONObject(CharStreams.toString(reader));
         } catch (Exception ex) {

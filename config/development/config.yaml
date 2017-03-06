@@ -67,6 +67,10 @@ zuluConfiguration:
   clientId: "retail.rp"
   maxBatchSize: 30
 
+sslClientConfiguration:
+  url: http://10.85.52.106
+  viewPath: "/supplier_selection"
+
 clientConfiguration:
   timeout: 80000ms
   connectionTimeout: 50000ms

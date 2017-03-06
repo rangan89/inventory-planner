@@ -27,7 +27,6 @@ import static fk.retail.ip.requirement.internal.repository.RequirementRepository
 @Slf4j
 public class JPARequirementRepository extends SimpleJpaGenericRepository<Requirement, Long> implements RequirementRepository {
 
-
     @Inject
     public JPARequirementRepository(Provider<EntityManager> entityManagerProvider) {
         super(entityManagerProvider);
@@ -59,6 +58,7 @@ public class JPARequirementRepository extends SimpleJpaGenericRepository<Require
         return requirements;
     }
 
+    @Override
     public List<Requirement> findRequirements(List<Long> projectionIds, String requirementState, Map<String, Object> filters, int pageNumber) {
         EntityManager entityManager = getEntityManager();
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
@@ -74,8 +74,9 @@ public class JPARequirementRepository extends SimpleJpaGenericRepository<Require
             predicate = criteriaBuilder.isTrue(requirementRoot.get("projectionId").in(projectionIds));
             predicates.add(predicate);
         }
-        if (filters.containsKey("fsns") && !filters.get("fsns").toString().isEmpty()) {
-            predicate = criteriaBuilder.equal(requirementRoot.get("fsn"), filters.get("fsns"));
+        List<String> fsns = (List<String>) filters.get("fsns");
+        if (filters.containsKey("fsns") && fsns != null && !fsns.isEmpty()) {
+            predicate = criteriaBuilder.isTrue(requirementRoot.get("fsn").in(fsns));
             predicates.add(predicate);
         }
         if (filters.containsKey("international") && !filters.get("international").toString().isEmpty()) {
@@ -90,21 +91,17 @@ public class JPARequirementRepository extends SimpleJpaGenericRepository<Require
             predicate = criteriaBuilder.lessThanOrEqualTo(requirementRoot.get("app"), Integer.parseInt(filters.get("price_to").toString()));
             predicates.add(predicate);
         }
-//        if (filters.get("group")!=null) {
-//            predicate = criteriaBuilder.greaterThanOrEqualTo(requirementRoot.get("requirementSnapshot").get("group").get("name"), filters.get("group"));
-//            predicates.add(predicate);
-//        }
+
+        if (filters.get("group") != null) {
+            predicate = criteriaBuilder.equal(requirementRoot.get("requirementSnapshot").get("group").get("name"), ((List<String>) filters.get("group")).get(0));
+            predicates.add(predicate);
+        }
 
         select.where(criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()])));
+//        select.orderBy(criteriaBuilder.asc(requirementRoot.get("id")));
         TypedQuery<Requirement> query = entityManager.createQuery(select);
-        query.setFirstResult((pageNumber - 1) * PAGE_SIZE).setMaxResults(PAGE_SIZE);
+//        query.setFirstResult((pageNumber - 1) * PAGE_SIZE).setMaxResults(PAGE_SIZE);
         return query.getResultList();
-    }
-
-    public List<Requirement> find(List<Long> ids) {
-        Map<String, Object> params = Maps.newHashMap();
-        params.put("ids", ids);
-        return fetchRequirements("findRequirementByIds", params);
     }
 
     //TODO: legacy code
@@ -123,7 +120,6 @@ public class JPARequirementRepository extends SimpleJpaGenericRepository<Require
                 .setParameter("state", toState)
                 .executeUpdate();
     }
-
 
     private List<Requirement> fetchRequirements(String query, Map<String, Object> params) {
         List<Requirement> requirements = Lists.newArrayList();

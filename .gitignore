@@ -133,3 +133,5 @@ local.properties
 /core/target/
 /requirement/target/
 /manager/target/
+/zulu-client/target/
+/manager/target/
