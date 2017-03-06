@@ -8,6 +8,7 @@ import com.google.common.collect.Table;
 import fk.retail.ip.requirement.internal.entities.Requirement;
 import fk.retail.ip.requirement.internal.enums.PolicyType;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 
@@ -15,11 +16,13 @@ import lombok.extern.slf4j.Slf4j;
 public class PolicyContext {
 
     private final ObjectMapper objectMapper;
+    private final Map<String, String> warehouseCodeMap;
     private final List<PolicyApplicator> orderedPolicyApplicators;
     private Table<String, PolicyType, String> fsnPolicyTypeDataTable = HashBasedTable.create();
 
-    public PolicyContext(ObjectMapper objectMapper) {
+    public PolicyContext(ObjectMapper objectMapper, Map<String, String> warehouseCodeMap) {
         this.objectMapper = objectMapper;
+        this.warehouseCodeMap = warehouseCodeMap;
         //DO NOT CHANGE THE ORDERING UNLESS YOU KNOW WHAT YOU ARE DOING
         orderedPolicyApplicators = Lists.newArrayList(new RopRocApplicator(objectMapper), new MaxCoverageCaseSizeApplicator(objectMapper));
     }
@@ -29,6 +32,10 @@ public class PolicyContext {
     }
 
     public String addPolicy(String fsn, String policyType, String value) {
+        //to replace wh name by wh code in policy values (case insensitive)
+        for (String name : warehouseCodeMap.keySet()) {
+            value = value.replaceAll("(?i)".concat(name), warehouseCodeMap.get(name));
+        }
         return fsnPolicyTypeDataTable.put(fsn, PolicyType.fromString(policyType), value);
     }
 
@@ -41,7 +48,7 @@ public class PolicyContext {
         try {
             policyString = objectMapper.writeValueAsString(fsnPolicyTypeDataTable.row(fsn));
         } catch (JsonProcessingException e) {
-            log.error(e.getMessage(), e);
+            log.warn(e.getMessage(), e);
         }
         return policyString;
     }

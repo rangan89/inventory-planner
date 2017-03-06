@@ -20,12 +20,14 @@ public class MaxCoverageCaseSizeApplicator extends PolicyApplicator {
     @Override
     public void applyPolicies(String fsn, List<Requirement> requirements, Map<PolicyType, String> policyTypeMap, ForecastContext forecastContext, OnHandQuantityContext onHandQuantityContext) {
         if (policyTypeMap.containsKey(PolicyType.MAX_COVERAGE) && policyTypeMap.get(PolicyType.MAX_COVERAGE) != null) {
-            double maxCoverageQuantity = convertDaysToQuantity(parsePolicy(policyTypeMap.get(PolicyType.MAX_COVERAGE), PolicyType.MAX_COVERAGE), forecastContext.geAllIndiaForecast(fsn));
+            double maxCoverageDays = parsePolicy(policyTypeMap.get(PolicyType.MAX_COVERAGE), PolicyType.MAX_COVERAGE);
+            double maxCoverageQuantity = convertDaysToQuantity(maxCoverageDays, forecastContext.geAllIndiaForecast(fsn));
             double totalOnHandQuantity = onHandQuantityContext.getTotalQuantity(fsn);
             double totalProjectedQuantity = requirements.stream().mapToDouble(Requirement::getQuantity).sum();
             if (maxCoverageQuantity > totalProjectedQuantity) {
                 double reductionRatio = (maxCoverageQuantity - totalOnHandQuantity) / totalProjectedQuantity;
                 requirements.forEach(requirement -> {
+                    addToSnapshot(requirement, PolicyType.MAX_COVERAGE, maxCoverageDays);
                     double reducedQuantity = requirement.getQuantity() * reductionRatio;
                     requirement.setQuantity(reducedQuantity);
                 });
@@ -33,16 +35,18 @@ public class MaxCoverageCaseSizeApplicator extends PolicyApplicator {
         }
         if (policyTypeMap.containsKey(PolicyType.CASE_SIZE) && policyTypeMap.get(PolicyType.CASE_SIZE) != null) {
             int caseSize = (int) parsePolicy(policyTypeMap.get(PolicyType.CASE_SIZE), PolicyType.CASE_SIZE);
-            if (caseSize != 0) {
+            if (caseSize > 0) {
                 if (policyTypeMap.containsKey(PolicyType.MAX_COVERAGE) && policyTypeMap.get(PolicyType.MAX_COVERAGE) != null) {
                     //max coverage is present, round everything down
                     requirements.forEach(requirement -> {
+                        addToSnapshot(requirement, PolicyType.CASE_SIZE, caseSize);
                         double roundedQuantity = Math.floor(requirement.getQuantity()/caseSize) * caseSize;
                         requirement.setQuantity(roundedQuantity);
                     });
                 } else {
                     //round to nearest multiple of case size
                     requirements.forEach(requirement -> {
+                        addToSnapshot(requirement, PolicyType.CASE_SIZE, caseSize);
                         double roundedQuantity = Math.round(requirement.getQuantity()/caseSize) * caseSize;
                         requirement.setQuantity(roundedQuantity);
                     });
@@ -65,7 +69,7 @@ public class MaxCoverageCaseSizeApplicator extends PolicyApplicator {
             Map<String, Double> policyMap = objectMapper.readValue(value, typeReference);
             return policyMap.get(key);
         } catch (IOException e) {
-            log.error(Constants.UNABLE_TO_PARSE, value);
+            log.warn(Constants.UNABLE_TO_PARSE, value);
         }
         return 0.0;
     }

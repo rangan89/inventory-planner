@@ -30,9 +30,11 @@ public class RopRocApplicator extends PolicyApplicator {
                 //rop policy not found
                 requirement.setState(Constants.ERROR_STATE);
                 requirement.setEnabled(false);
+                requirement.setCurrent(false);
                 requirement.setOverrideComment(String.format(Constants.POLICY_NOT_FOUND, PolicyType.ROP));
                 return;
             }
+            addToSnapshot(requirement, PolicyType.ROP, ropDays);
             double ropQuantity = convertDaysToQuantity(ropDays, forecast);
             double onHandQuantity = onHandQuantityContext.getTotalQuantity(fsn, warehouse);
             if (onHandQuantity <= ropQuantity) {
@@ -42,9 +44,11 @@ public class RopRocApplicator extends PolicyApplicator {
                     //roc policy not found
                     requirement.setState(Constants.ERROR_STATE);
                     requirement.setEnabled(false);
+                    requirement.setCurrent(false);
                     requirement.setOverrideComment(String.format(Constants.POLICY_NOT_FOUND, PolicyType.ROC));
                     return;
                 }
+                addToSnapshot(requirement, PolicyType.ROC, rocDays);
                 double demand = convertDaysToQuantity(rocDays, forecast);
                 requirement.setQuantity(demand - onHandQuantity);
             }
@@ -53,12 +57,15 @@ public class RopRocApplicator extends PolicyApplicator {
 
     private Map<String, Double> parseRopRoc(String value) {
         Map<String, Double> policyMap = Maps.newHashMap();
-        TypeReference<Map<String, Map<String, Integer>>> typeReference = new TypeReference<Map<String, Map<String, Integer>>>() {};
-        try {
-            Map<String, Map<String, Double>> rawMap = objectMapper.readValue(value, typeReference);
-            rawMap.entrySet().stream().forEach(entry -> policyMap.put(entry.getKey(), entry.getValue().get("days")));
-        } catch (IOException e) {
-            log.error(Constants.UNABLE_TO_PARSE, value);
+        if (value != null) {
+            TypeReference<Map<String, Map<String, Double>>> typeReference = new TypeReference<Map<String, Map<String, Double>>>() {
+            };
+            try {
+                Map<String, Map<String, Double>> rawMap = objectMapper.readValue(value, typeReference);
+                rawMap.entrySet().stream().forEach(entry -> policyMap.put(entry.getKey(), entry.getValue().get("days")));
+            } catch (IOException e) {
+                log.warn(Constants.UNABLE_TO_PARSE, value);
+            }
         }
         return policyMap;
     }

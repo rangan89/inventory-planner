@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public enum PolicyType {
 
-    PLANNING_CYCLE("PlanningCycle"), ROP("Rop"), ROC("Roc"), MAX_COVERAGE("MaxCoverage"), CASE_SIZE("CaseSize");
+    PLANNING_CYCLE("PlanningCycle"), ROP("Rop"), ROC("Roc"), MAX_COVERAGE("MaxCoverage"), CASE_SIZE("CaseSize"), UNKNOWN("Unknown");
     String value;
 
     private PolicyType(String value) {
@@ -24,7 +24,7 @@ public enum PolicyType {
                 return type;
             }
         }
-        log.error(Constants.INVALID_POLICY_TYPE, value);
-        return null;
+        log.warn(Constants.INVALID_POLICY_TYPE, value);
+        return UNKNOWN;
     }
 }

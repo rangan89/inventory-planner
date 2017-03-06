@@ -1,9 +1,8 @@
 package fk.retail.ip.requirement.internal.entities;
 
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 import lombok.Data;
@@ -31,7 +30,7 @@ public class RequirementSnapshot extends ReadOnlyEntity {
 
     private String policy;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "group_id")
     private Group group;
 

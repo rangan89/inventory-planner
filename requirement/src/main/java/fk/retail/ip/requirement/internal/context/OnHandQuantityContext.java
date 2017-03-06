@@ -9,12 +9,13 @@ public class OnHandQuantityContext {
     private Table<String, String, Quantity> fsnWarehouseQuantityTable = HashBasedTable.create();
 
 
-    public Quantity addInventoryQuantity(String fsn, String warehouse, int inventory) {
+    public Quantity addInventoryQuantity(String fsn, String warehouse, int inventory, int qoh) {
         Quantity quantity = fsnWarehouseQuantityTable.get(fsn, warehouse);
         if (quantity == null) {
             quantity = new Quantity();
         }
         quantity.setInventoryAvailableToPromise(inventory);
+        quantity.setQoh(qoh);
         return fsnWarehouseQuantityTable.put(fsn, warehouse, quantity);
     }
 
@@ -41,6 +42,15 @@ public class OnHandQuantityContext {
         Quantity quantity = fsnWarehouseQuantityTable.get(fsn, warehouse);
         if (quantity != null) {
             return quantity.getInventoryAvailableToPromise();
+        } else {
+            return 0;
+        }
+    }
+
+    public double getOnHandInventoryQuantity(String fsn, String warehouse) {
+        Quantity quantity = fsnWarehouseQuantityTable.get(fsn, warehouse);
+        if (quantity != null) {
+            return quantity.getQoh();
         } else {
             return 0;
         }
@@ -94,6 +104,7 @@ public class OnHandQuantityContext {
         double iwtIntransit;
         double openRequirement;
         double pendingPurchaseOrder;
+        double qoh;
         
         public double getTotal() {
             return inventoryAvailableToPromise + iwtIntransit + openRequirement + pendingPurchaseOrder;

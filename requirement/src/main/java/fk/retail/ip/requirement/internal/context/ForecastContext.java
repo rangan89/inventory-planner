@@ -31,7 +31,7 @@ public class ForecastContext {
         try {
             forecastValues = objectMapper.readValue(forecastString, typeReference);
         } catch (IOException e) {
-            log.error(e.getMessage(), e);
+            log.warn(e.getMessage(), e);
         }
         return fsnWarehouseForecastTable.put(fsn, warehouse, forecastValues);
     }
@@ -71,7 +71,7 @@ public class ForecastContext {
         try {
             return objectMapper.writeValueAsString(fsnWarehouseForecastTable.get(fsn, warehouse));
         } catch (JsonProcessingException e) {
-            log.error(e.getMessage(), e);
+            log.warn(e.getMessage(), e);
         }
         return null;
     }

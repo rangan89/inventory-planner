@@ -107,7 +107,7 @@ public class RequirementDownloadLineItem {
             this.intransitQty += (openReqQty != null ? openReqQty : 0);
             this.forecast = req.getRequirementSnapshot().getForecast();
         }
-        this.quantity = req.getQuantity();
+        this.quantity = (int) req.getQuantity();
         this.supplier = req.getSupplier();
         this.mrp = req.getMrp();
         this.app = req.getApp() != null ? req.getApp() : 0;

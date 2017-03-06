@@ -165,7 +165,7 @@ public abstract class DownloadCommand {
         MultiKeyMap<String,Integer> fsnWhBizFinRecommended = new MultiKeyMap();
         MultiKeyMap<String,String> fsnWhBizFinComment = new MultiKeyMap();
         requirements.forEach(r -> {
-            fsnWhBizFinRecommended.put(r.getFsn(),r.getWarehouse(),r.getQuantity().intValue());
+            fsnWhBizFinRecommended.put(r.getFsn(),r.getWarehouse(), (int) r.getQuantity());
             fsnWhBizFinComment.put(r.getFsn(),r.getWarehouse(),r.getOverrideComment());
         });
 
@@ -184,7 +184,7 @@ public abstract class DownloadCommand {
         List<Requirement> requirements = requirementRepository.findEnabledRequirementsByStateFsn(RequirementApprovalStates.PROPOSED.toString(),requirementFsns);
         MultiKeyMap<String,Integer> fsnWhIpcProposedQuantity = new MultiKeyMap();
         requirements.forEach(r -> {
-            fsnWhIpcProposedQuantity.put(r.getFsn(),r.getWarehouse(),r.getQuantity().intValue());
+            fsnWhIpcProposedQuantity.put(r.getFsn(),r.getWarehouse(), (int) r.getQuantity());
 });
 
         requirementDownloadLineItems.forEach(reqItem

@@ -9,6 +9,7 @@ import java.util.Set;
 import javax.inject.Provider;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
+import org.apache.commons.collections4.CollectionUtils;
 
 public class JpaIwtRequestItemRepository extends SimpleJpaGenericRepository<IwtRequestItem, Long>
         implements IwtRequestItemRepository {
@@ -21,6 +22,9 @@ public class JpaIwtRequestItemRepository extends SimpleJpaGenericRepository<IwtR
 
     @Override
     public List<IwtRequestItem> fetchByFsns(Set<String> fsns, Set<String> statuses) {
+        if (CollectionUtils.isEmpty(fsns)) {
+            return Lists.newArrayList();
+        }
         TypedQuery<IwtRequestItem> iwtRequestItemQuery =
                 getEntityManager().createNamedQuery("IwtRequestItem.fetchByFsnsInStatuses", IwtRequestItem.class);
         iwtRequestItemQuery.setParameter("fsns", fsns);

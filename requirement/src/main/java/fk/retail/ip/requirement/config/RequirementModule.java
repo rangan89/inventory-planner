@@ -21,6 +21,8 @@ import fk.retail.ip.requirement.internal.repository.LastAppSupplierRepository;
 import fk.retail.ip.requirement.internal.repository.OpenRequirementAndPurchaseOrderRepository;
 import fk.retail.ip.requirement.internal.repository.PolicyRepository;
 import fk.retail.ip.requirement.internal.repository.ProductInfoRepository;
+import fk.retail.ip.requirement.internal.repository.ProjectionRepository;
+import fk.retail.ip.requirement.internal.repository.ProjectionRepositoryImpl;
 import fk.retail.ip.requirement.internal.repository.RequirementRepository;
 import fk.retail.ip.requirement.internal.repository.WarehouseInventoryRepository;
 import fk.retail.ip.requirement.internal.repository.WarehouseRepository;
@@ -50,5 +52,7 @@ public class RequirementModule extends AbstractModule {
         bind(WarehouseRepository.class).to(JPAWarehouseRepository.class);
         bind(WarehouseInventoryRepository.class).to(JPAWarehouseInventoryRepository.class);
         bind(ForecastRepository.class).to(JPAForecastRepository.class);
+        //TODO:remove
+        bind(ProjectionRepository.class).to(ProjectionRepositoryImpl.class);
     }
 }
