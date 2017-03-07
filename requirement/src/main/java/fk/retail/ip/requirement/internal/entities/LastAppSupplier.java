@@ -10,7 +10,7 @@ import lombok.Data;
  * Created by yogeshwari.k on 12/02/17.
  */
 @Entity
-@Table(name = "LAST_APP_SUPPLIER")
+@Table(name = "last_app_supplier")
 @XmlRootElement
 @Data
 
