@@ -24,7 +24,7 @@ public abstract class PolicyApplicator {
             if (remainingDays >= Constants.DAYS_IN_WEEK) {
                 quantity += forecast.get(i);
             } else {
-                quantity *= forecast.get(i)*remainingDays/Constants.DAYS_IN_WEEK;
+                quantity += forecast.get(i)*remainingDays/Constants.DAYS_IN_WEEK;
             }
         }
         return quantity;
@@ -40,5 +40,13 @@ public abstract class PolicyApplicator {
         }
         appliedPolicies.add(String.format(Constants.POLICY_DISPLAY_FORMAT, type, value));
         requirement.getRequirementSnapshot().setPolicy(String.join(",", appliedPolicies));
+    }
+
+
+    public void markAsError(Requirement requirement, String errorMessage) {
+        requirement.setState(Constants.ERROR_STATE);
+        requirement.setEnabled(false);
+        requirement.setCurrent(false);
+        requirement.setOverrideComment(errorMessage);
     }
 }

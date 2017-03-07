@@ -26,30 +26,26 @@ public class RopRocApplicator extends PolicyApplicator {
             String warehouse = requirement.getWarehouse();
             List<Double> forecast = forecastContext.getForecast(fsn, warehouse);
             Double ropDays = warehouseToRopMap.get(warehouse);
-            if (ropDays == null) {
+            if (!isValidRopRoc(ropDays)) {
                 //rop policy not found
-                requirement.setState(Constants.ERROR_STATE);
-                requirement.setEnabled(false);
-                requirement.setCurrent(false);
-                requirement.setOverrideComment(String.format(Constants.POLICY_NOT_FOUND, PolicyType.ROP));
+                markAsError(requirement, String.format(Constants.VALID_POLICY_NOT_FOUND, PolicyType.ROP));
                 return;
             }
             addToSnapshot(requirement, PolicyType.ROP, ropDays);
-            double ropQuantity = convertDaysToQuantity(ropDays, forecast);
+            double ropQuantity = 0;
+            ropQuantity = convertDaysToQuantity(ropDays, forecast);
             double onHandQuantity = onHandQuantityContext.getTotalQuantity(fsn, warehouse);
             if (onHandQuantity <= ropQuantity) {
                 //reorder point has been reached
                 Double rocDays = warehouseToRocMap.get(warehouse);
-                if (rocDays == null) {
+                if (!isValidRopRoc(rocDays)) {
                     //roc policy not found
-                    requirement.setState(Constants.ERROR_STATE);
-                    requirement.setEnabled(false);
-                    requirement.setCurrent(false);
-                    requirement.setOverrideComment(String.format(Constants.POLICY_NOT_FOUND, PolicyType.ROC));
+                    markAsError(requirement, String.format(Constants.VALID_POLICY_NOT_FOUND, PolicyType.ROC));
                     return;
                 }
                 addToSnapshot(requirement, PolicyType.ROC, rocDays);
-                double demand = convertDaysToQuantity(rocDays, forecast);
+                double demand = 0;
+                demand = convertDaysToQuantity(rocDays, forecast);
                 requirement.setQuantity(demand - onHandQuantity);
             }
         });
@@ -68,5 +64,15 @@ public class RopRocApplicator extends PolicyApplicator {
             }
         }
         return policyMap;
+    }
+
+    public boolean isValidRopRoc(Double value) {
+        if (value == null) {
+            return false;
+        } else if (value < 0 || value > Constants.WEEKS_OF_FORECAST * Constants.DAYS_IN_WEEK) {
+            return false;
+        } else {
+            return true;
+        }
     }
 }

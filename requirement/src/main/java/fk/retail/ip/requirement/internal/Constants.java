@@ -15,7 +15,7 @@ public class Constants {
     public static final String INVALID_POLICY_TYPE = "Did not find matching policy type for: {}";
     public static final String GROUP_NOT_FOUND = "Group for this fsn is not present";
     public static final String FORECAST_NOT_FOUND = "Forecast for this fsn is not present";
-    public static final String POLICY_NOT_FOUND = "Policy: %s for this fsn is not present";
+    public static final String VALID_POLICY_NOT_FOUND = "Valid %s policy for this fsn is not present";
     public static final String UNABLE_TO_PARSE = "Unable to parse: {}";
     public static final String NOT_APPLICABLE = "N/A";
 

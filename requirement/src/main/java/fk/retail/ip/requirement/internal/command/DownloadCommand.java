@@ -127,7 +127,7 @@ public abstract class DownloadCommand {
         List<Warehouse> warehouses = warehouseRepository.fetchWarehouseNameByCode(requirementWhs);
         HashMap<String,String> whCodeNameMap= new HashMap();
         warehouses.forEach(w -> {
-         whCodeNameMap.put(w.getWarehouseCode(),w.getWarehouseName());
+         whCodeNameMap.put(w.getCode(),w.getName());
         });
 
         requirementDownloadLineItems.forEach(reqItem -> {

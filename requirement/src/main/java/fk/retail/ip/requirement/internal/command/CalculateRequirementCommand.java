@@ -169,7 +169,7 @@ public class CalculateRequirementCommand {
 
     public Map<String, String> getWarehouseCodeMap() {
         List<Warehouse> warehouses = warehouseRepository.findAll();
-        return warehouses.stream().collect(Collectors.toMap(Warehouse::getWarehouseName, Warehouse::getWarehouseCode, (k1, k2) -> k1));
+        return warehouses.stream().collect(Collectors.toMap(Warehouse::getName, Warehouse::getCode));
     }
 
     private Map<String, Group> getFsnToGroupMap(Set<String> fsns) {

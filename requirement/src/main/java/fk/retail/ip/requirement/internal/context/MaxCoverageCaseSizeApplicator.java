@@ -19,12 +19,12 @@ public class MaxCoverageCaseSizeApplicator extends PolicyApplicator {
 
     @Override
     public void applyPolicies(String fsn, List<Requirement> requirements, Map<PolicyType, String> policyTypeMap, ForecastContext forecastContext, OnHandQuantityContext onHandQuantityContext) {
-        if (policyTypeMap.containsKey(PolicyType.MAX_COVERAGE) && policyTypeMap.get(PolicyType.MAX_COVERAGE) != null) {
-            double maxCoverageDays = parsePolicy(policyTypeMap.get(PolicyType.MAX_COVERAGE), PolicyType.MAX_COVERAGE);
+        Double maxCoverageDays = parsePolicy(policyTypeMap.get(PolicyType.MAX_COVERAGE), PolicyType.MAX_COVERAGE);
+        if (isValidMaxCoverage(maxCoverageDays)) {
             double maxCoverageQuantity = convertDaysToQuantity(maxCoverageDays, forecastContext.geAllIndiaForecast(fsn));
             double totalOnHandQuantity = onHandQuantityContext.getTotalQuantity(fsn);
             double totalProjectedQuantity = requirements.stream().mapToDouble(Requirement::getQuantity).sum();
-            if (maxCoverageQuantity > totalProjectedQuantity) {
+            if (maxCoverageQuantity < totalProjectedQuantity) {
                 double reductionRatio = (maxCoverageQuantity - totalOnHandQuantity) / totalProjectedQuantity;
                 requirements.forEach(requirement -> {
                     addToSnapshot(requirement, PolicyType.MAX_COVERAGE, maxCoverageDays);
@@ -33,29 +33,31 @@ public class MaxCoverageCaseSizeApplicator extends PolicyApplicator {
                 });
             }
         }
-        if (policyTypeMap.containsKey(PolicyType.CASE_SIZE) && policyTypeMap.get(PolicyType.CASE_SIZE) != null) {
-            int caseSize = (int) parsePolicy(policyTypeMap.get(PolicyType.CASE_SIZE), PolicyType.CASE_SIZE);
-            if (caseSize > 0) {
-                if (policyTypeMap.containsKey(PolicyType.MAX_COVERAGE) && policyTypeMap.get(PolicyType.MAX_COVERAGE) != null) {
-                    //max coverage is present, round everything down
-                    requirements.forEach(requirement -> {
-                        addToSnapshot(requirement, PolicyType.CASE_SIZE, caseSize);
-                        double roundedQuantity = Math.floor(requirement.getQuantity()/caseSize) * caseSize;
-                        requirement.setQuantity(roundedQuantity);
-                    });
-                } else {
-                    //round to nearest multiple of case size
-                    requirements.forEach(requirement -> {
-                        addToSnapshot(requirement, PolicyType.CASE_SIZE, caseSize);
-                        double roundedQuantity = Math.round(requirement.getQuantity()/caseSize) * caseSize;
-                        requirement.setQuantity(roundedQuantity);
-                    });
-                }
+        Double caseSize = parsePolicy(policyTypeMap.get(PolicyType.CASE_SIZE), PolicyType.CASE_SIZE);
+        if (isValidCaseSize(caseSize)) {
+            if (isValidMaxCoverage(maxCoverageDays)) {
+                //max coverage is present, round everything down
+                requirements.forEach(requirement -> {
+                    addToSnapshot(requirement, PolicyType.CASE_SIZE, caseSize);
+                    double roundedQuantity = Math.floor(requirement.getQuantity() / caseSize) * caseSize;
+                    requirement.setQuantity(roundedQuantity);
+                });
+            } else {
+                //round to nearest multiple of case size
+                requirements.forEach(requirement -> {
+                    addToSnapshot(requirement, PolicyType.CASE_SIZE, caseSize);
+                    double roundedQuantity = Math.round(requirement.getQuantity() / caseSize) * caseSize;
+                    requirement.setQuantity(roundedQuantity);
+                });
             }
+
         }
     }
 
-    private double parsePolicy(String value, PolicyType type) {
+    private Double parsePolicy(String value, PolicyType type) {
+        if (value == null) {
+            return null;
+        }
         TypeReference<Map<String, Double>> typeReference = new TypeReference<Map<String, Double>>() {
         };
         String key = "";
@@ -72,5 +74,25 @@ public class MaxCoverageCaseSizeApplicator extends PolicyApplicator {
             log.warn(Constants.UNABLE_TO_PARSE, value);
         }
         return 0.0;
+    }
+
+    public boolean isValidMaxCoverage(Double value) {
+        if (value == null) {
+            return false;
+        } else if (value <= 0 || value > Constants.WEEKS_OF_FORECAST * Constants.DAYS_IN_WEEK) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public boolean isValidCaseSize(Double value) {
+        if (value == null) {
+            return false;
+        } else if (value <= 0) {
+            return false;
+        } else {
+            return true;
+        }
     }
 }

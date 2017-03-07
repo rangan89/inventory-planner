@@ -78,7 +78,7 @@ public class TestHelper {
         return fsnBand;
     }
 
-    public static LastAppSupplier getLastAppSupplier(String fsn, String wh,String supplier, int app ) {
+    public static LastAppSupplier getLastAppSupplier(String fsn, String wh, String supplier, int app) {
         LastAppSupplier lastAppSupplier = new LastAppSupplier();
         lastAppSupplier.setFsn(fsn);
         lastAppSupplier.setWarehouse(wh);
@@ -117,7 +117,7 @@ public class TestHelper {
         return requirement;
     }
 
-    public static RequirementSnapshot getRequirementSnapshot(String forecast, int inventory, int qoh, int po , int req, int intransit) {
+    public static RequirementSnapshot getRequirementSnapshot(String forecast, int inventory, int qoh, int po, int req, int intransit) {
         RequirementSnapshot snapshot = new RequirementSnapshot();
         snapshot.setForecast(forecast);
         snapshot.setInventoryQty(inventory);
@@ -130,14 +130,14 @@ public class TestHelper {
 
     public static Warehouse getWarehouse(String whCode, String whName) {
         Warehouse warehouse = new Warehouse();
-        warehouse.setWarehouseCode(whCode);
-        warehouse.setWarehouseName(whName);
+        warehouse.setCode(whCode);
+        warehouse.setName(whName);
         return warehouse;
     }
 
-     /*
-    * Initialise mocked zulu response
-    * */
+    /*
+   * Initialise mocked zulu response
+   * */
     public static RetailProductAttributeResponse getZuluData() {
         RetailProductAttributeResponse retailProductAttributeResponse = new RetailProductAttributeResponse();
         EntityView entityView = new EntityView();
