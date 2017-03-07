@@ -1,9 +1,11 @@
 package fk.retail.ip.requirement.internal.command;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.common.collect.Table;
 import com.google.inject.Inject;
 import fk.retail.ip.requirement.internal.Constants;
 import fk.retail.ip.requirement.internal.context.ForecastContext;
@@ -30,11 +32,16 @@ import fk.retail.ip.requirement.internal.repository.ProjectionRepository;
 import fk.retail.ip.requirement.internal.repository.RequirementRepository;
 import fk.retail.ip.requirement.internal.repository.WarehouseInventoryRepository;
 import fk.retail.ip.requirement.internal.repository.WarehouseRepository;
+import fk.retail.ip.ssl.client.SslClient;
+import fk.retail.ip.ssl.model.SupplierSelectionRequest;
+import fk.retail.ip.ssl.model.SupplierSelectionResponse;
+import fk.retail.ip.ssl.model.SupplierView;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.joda.time.DateTime;
 
 public class CalculateRequirementCommand {
 
@@ -46,6 +53,7 @@ public class CalculateRequirementCommand {
     private final IwtRequestItemRepository iwtRequestItemRepository;
     private final OpenRequirementAndPurchaseOrderRepository openRequirementAndPurchaseOrderRepository;
     private final RequirementRepository requirementRepository;
+    private final SslClient sslClient;
     //TODO: remove
     private final ProjectionRepository projectionRepository;
     private final ObjectMapper objectMapper;
@@ -58,7 +66,7 @@ public class CalculateRequirementCommand {
     private OnHandQuantityContext onHandQuantityContext;
 
     @Inject
-    public CalculateRequirementCommand(WarehouseRepository warehouseRepository, GroupFsnRepository groupFsnRepository, PolicyRepository policyRepository, ForecastRepository forecastRepository, WarehouseInventoryRepository warehouseInventoryRepository, IwtRequestItemRepository iwtRequestItemRepository, OpenRequirementAndPurchaseOrderRepository openRequirementAndPurchaseOrderRepository, RequirementRepository requirementRepository, ProjectionRepository projectionRepository, ObjectMapper objectMapper) {
+    public CalculateRequirementCommand(WarehouseRepository warehouseRepository, GroupFsnRepository groupFsnRepository, PolicyRepository policyRepository, ForecastRepository forecastRepository, WarehouseInventoryRepository warehouseInventoryRepository, IwtRequestItemRepository iwtRequestItemRepository, OpenRequirementAndPurchaseOrderRepository openRequirementAndPurchaseOrderRepository, RequirementRepository requirementRepository, SslClient sslClient, ProjectionRepository projectionRepository, ObjectMapper objectMapper) {
         this.warehouseRepository = warehouseRepository;
         this.groupFsnRepository = groupFsnRepository;
         this.policyRepository = policyRepository;
@@ -67,6 +75,7 @@ public class CalculateRequirementCommand {
         this.iwtRequestItemRepository = iwtRequestItemRepository;
         this.openRequirementAndPurchaseOrderRepository = openRequirementAndPurchaseOrderRepository;
         this.requirementRepository = requirementRepository;
+        this.sslClient = sslClient;
         this.projectionRepository = projectionRepository;
         this.objectMapper = objectMapper;
     }
@@ -163,8 +172,48 @@ public class CalculateRequirementCommand {
         return requirement;
     }
 
-    private void populateSupplier(List<Requirement> validRequirements) {
+    private void populateSupplier(List<Requirement> requirements) {
+        List<SupplierSelectionRequest> requests = createSupplierSelectionRequest(requirements);
+        List<SupplierSelectionResponse> responses = sslClient.getSupplierSelectionResponse(requests);
+        if (requests.size() != responses.size()) {
+            return;
+        }
+        Table<String, String, SupplierSelectionResponse> fsnWhSupplierTable = HashBasedTable.create();
+        responses.stream().filter(response -> response.getSuppliers().size() > 0).forEach(response -> {
+            fsnWhSupplierTable.put(response.getFsn(), response.getWarehouseId(), response);
+        });
+        requirements.forEach(requirement -> {
+            SupplierSelectionResponse supplierResponse = fsnWhSupplierTable.get(requirement.getFsn(), requirement.getWarehouse());
+            if (supplierResponse != null) {
+                SupplierView supplier = supplierResponse.getSuppliers().get(0);
+                requirement.setSupplier(supplier.getSource_id());
+                requirement.setApp(supplier.getApp());
+                requirement.setMrp(supplier.getMrp());
+                requirement.setSla(supplier.getSla());
+                requirement.setCurrency(supplier.getVendor_preferred_currency());
+                requirement.setMrpCurrency(supplier.getVendor_preferred_currency());
+                requirement.setInternational(!supplier.isLocal());
+                requirement.setSslId(supplierResponse.getEntityId());
+            }
+        });
+    }
 
+    public List<SupplierSelectionRequest> createSupplierSelectionRequest(List<Requirement> requirements) {
+        List<SupplierSelectionRequest> requests = Lists.newArrayList();
+        requirements.forEach(req -> {
+            SupplierSelectionRequest request = new SupplierSelectionRequest();
+            request.setFsn(req.getFsn());
+            request.setSku("SKU0000000000000");
+            request.setOrderType(req.getProcType());
+            request.setQuantity((int) req.getQuantity());
+            request.setEntityType("Requirement");
+            request.setWarehouseId(req.getWarehouse());
+            request.setTenantId("FKI");
+            DateTime date = DateTime.now();
+            request.setRequiredByDate(date.toString());
+            requests.add(request);
+        });
+        return requests;
     }
 
     public Map<String, String> getWarehouseCodeMap() {
@@ -189,7 +238,6 @@ public class CalculateRequirementCommand {
         requirement.setProcType(group.getProcurementType());
         RequirementSnapshot requirementSnapshot = new RequirementSnapshot();
         requirementSnapshot.setGroup(group);
-//        requirementSnapshot.setPolicy(policyContext.getPolicyAsString(fsn));
         requirementSnapshot.setForecast(forecastContext.getForecastAsString(fsn, warehouse));
         requirementSnapshot.setOpenReqQty((int) onHandQuantityContext.getOpenRequirementQuantity(fsn, warehouse));
         requirementSnapshot.setPendingPoQty((int) onHandQuantityContext.getPendingPurchaseOrderQuantity(fsn, warehouse));
