@@ -97,6 +97,13 @@ public class CalculateRequirementCommand {
     }
 
     public void execute() {
+        //mark existing requirements ad disabled
+        List<Requirement> existingRequirements = requirementRepository.find(fsns, true);
+        existingRequirements.forEach(requirement -> requirement.setEnabled(false));
+        //TODO: remove
+        List<Projection> existingProjections = projectionRepository.find(fsns, true);
+        existingProjections.forEach(projection -> projection.setEnabled(0));
+
         Set<String> validFsns = initContexts();
 
         //create requirement entities
@@ -230,7 +237,7 @@ public class CalculateRequirementCommand {
         Requirement requirement = new Requirement();
         requirement.setFsn(fsn);
         requirement.setWarehouse(warehouse);
-        requirement.setState(RequirementApprovalStates.PROPOSED.toString());
+        requirement.setState(RequirementApprovalStates.PRE_PROPOSED.toString());
         requirement.setEnabled(true);
         requirement.setCurrent(true);
 //        requirement.setQuantity(0);

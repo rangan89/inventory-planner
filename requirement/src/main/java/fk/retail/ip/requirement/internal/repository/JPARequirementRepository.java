@@ -59,6 +59,15 @@ public class JPARequirementRepository extends SimpleJpaGenericRepository<Require
     }
 
     @Override
+    public List<Requirement> find(Collection<String> fsns, boolean enabled) {
+        TypedQuery<Requirement> query = getEntityManager().createNamedQuery("Requirement.fetchEnabledByFsns", Requirement.class);
+        query.setParameter("fsns", fsns);
+        query.setParameter("enabled", enabled);
+        List<Requirement> requirements = query.getResultList();
+        return requirements;
+    }
+
+    @Override
     public List<Requirement> findRequirements(List<Long> projectionIds, String requirementState, Map<String, Object> filters, int pageNumber) {
         EntityManager entityManager = getEntityManager();
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();

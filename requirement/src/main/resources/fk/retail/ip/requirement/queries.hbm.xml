@@ -71,7 +71,19 @@
             WHERE
                 r.enabled = 1 and
                 r.state = :state and
-                r.fsn in :fsn
+                r.fsn in :fsns
+                ]]>
+        </query>
+    </named-query>
+
+    <named-query name="Requirement.fetchEnabledByFsns">
+        <query>
+            <![CDATA[
+            SELECT r
+            FROM Requirement r
+            WHERE
+                r.enabled = :enabled and
+                r.fsn in :fsns
                 ]]>
         </query>
     </named-query>
