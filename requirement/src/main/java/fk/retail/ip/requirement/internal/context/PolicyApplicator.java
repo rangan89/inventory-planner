@@ -20,7 +20,7 @@ public abstract class PolicyApplicator {
     protected double convertDaysToQuantity(Double days, List<Double> forecast) {
         int i = 0;
         double quantity = 0;
-        for (double remainingDays = days; remainingDays > 0; remainingDays -= Constants.DAYS_IN_WEEK) {
+        for (double remainingDays = days; remainingDays > 0; remainingDays -= Constants.DAYS_IN_WEEK, i++) {
             if (remainingDays >= Constants.DAYS_IN_WEEK) {
                 quantity += forecast.get(i);
             } else {
