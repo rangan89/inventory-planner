@@ -1,15 +1,19 @@
 package fk.retail.ip.requirement.service;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import com.google.common.io.CharStreams;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import fk.retail.ip.requirement.internal.entities.AbstractEntity;
 import fk.retail.ip.requirement.internal.entities.Requirement;
+import fk.retail.ip.requirement.internal.enums.RequirementApprovalStates;
 import fk.retail.ip.requirement.internal.repository.RequirementRepository;
 import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.json.JSONObject;
@@ -80,12 +84,17 @@ public class ApprovalService<E extends AbstractEntity> {
         public void execute(String userId, String fromState, String toState, boolean forward, List<Requirement> entities) {
             Map<String, List<Requirement>> fsnToRequirements = entities.stream().collect(Collectors.groupingBy(Requirement::getFsn));
             List<Requirement> toEntities = repository.findEnabledRequirementsByStateFsn(toState, fsnToRequirements.keySet());
+            Table<String, String, Requirement> cdoStateEntityMap = getCDOEntityMap(toState,  fsnToRequirements.keySet());
+            boolean isIPCReviewState = RequirementApprovalStates.IPC_REVIEW.toString().equals(toState);
             fsnToRequirements.keySet().stream().forEach((fsn) -> {
                 fsnToRequirements.get(fsn).stream().forEach((entity) -> {
                     Optional<Requirement> toStateEntity = toEntities.stream().filter(e -> e.getWarehouse().equals(entity.getWarehouse()) && e.getFsn().equals(entity.getFsn())).findFirst();
                     if (forward) {
                         if (toStateEntity.isPresent()) {
                             toStateEntity.get().setQuantity(entity.getQuantity());
+                            if(isIPCReviewState) {
+                                toStateEntity.get().setQuantity(cdoStateEntityMap.get(entity.getFsn(), entity.getWarehouse()).getQuantity());
+                            }
                             toStateEntity.get().setSupplier(entity.getSupplier());
                             toStateEntity.get().setApp(entity.getApp());
                             toStateEntity.get().setSla(entity.getSla());
@@ -95,6 +104,9 @@ public class ApprovalService<E extends AbstractEntity> {
                             entity.setCurrent(false);
                         } else {
                             Requirement newEntity = new Requirement(entity);
+                            if(isIPCReviewState) {
+                                newEntity.setQuantity(cdoStateEntityMap.get(entity.getFsn(), entity.getWarehouse()).getQuantity());
+                            }
                             newEntity.setState(toState);
                             newEntity.setCreatedBy(userId);
                             newEntity.setPreviousStateId(entity.getId());
@@ -110,6 +122,29 @@ public class ApprovalService<E extends AbstractEntity> {
                     }
                 });
             });
+        }
+
+        private Table<String,String,Requirement> getCDOEntityMap(String toState, Set<String> fsns) {
+            Table<String, String, Requirement> cdoStateRequirementMap = HashBasedTable.create();
+            boolean isIPCReviewState = RequirementApprovalStates.IPC_REVIEW.toString().equals(toState);
+            if (isIPCReviewState) {
+                String cdoState = RequirementApprovalStates.CDO_REVIEW.toString();
+                List<Requirement> cdoReviewEntities = repository.findEnabledRequirementsByStateFsn(cdoState, fsns);
+                cdoReviewEntities.forEach((entity) -> {
+                    cdoStateRequirementMap.put(entity.getFsn(), entity.getWarehouse(), entity);
+                });
+            }
+            return cdoStateRequirementMap ;
+        }
+
+        private Table<String,String,Requirement> getToStateEntity(String toState, Set<String> fsns) {
+            Table<String, String, Requirement> toStateRequirementMap = HashBasedTable.create();
+            List<Requirement> toStateEntities = repository.findEnabledRequirementsByStateFsn(toState, fsns);
+            toStateEntities.forEach((entity) -> {
+                toStateRequirementMap.put(entity.getFsn(), entity.getWarehouse(), entity);
+            });
+
+            return toStateRequirementMap ;
         }
     }
 }
