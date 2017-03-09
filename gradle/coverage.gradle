@@ -1,9 +1,10 @@
 allprojects {
+    apply plugin: 'java'
     apply plugin: 'jacoco'
 }
 
 subprojects {
-
+    apply plugin: 'jacoco'
     jacocoTestReport {
         group = "Reporting"
         description = "Generate Jacoco coverage reports after running tests."
@@ -28,5 +29,20 @@ task jacocoRootReport(type: JacocoReport, group: 'Coverage reports', dependsOn: 
     reports {
         html.enabled = true
         xml.enabled = true
+    }
+}
+
+task testReport(type: TestReport) {
+    destinationDir = file("$buildDir/reports/tests")
+    // Include the results from the `test` task in all subprojects
+    reportOn subprojects*.test
+}
+
+task aggregateTestReports(type: Copy, dependsOn: subprojects*.test) {
+    copy {
+        into "$buildDir/test-results"
+        subprojects {
+            from "$buildDir/test-results"
+        }
     }
 }
