@@ -23,7 +23,7 @@ public class MaxCoverageApplicator extends PolicyApplicator {
             double maxCoverageQuantity = convertDaysToQuantity(maxCoverageDays, forecastContext.getForecast(fsn));
             double totalOnHandQuantity = onHandQuantityContext.getTotalQuantity(fsn);
             double totalProjectedQuantity = requirements.stream().filter(requirement -> !Constants.ERROR_STATE.equals(requirement.getState()) && fsn.equals(requirement.getFsn())).mapToDouble(Requirement::getQuantity).sum();
-            if (maxCoverageQuantity < totalProjectedQuantity) {
+            if (maxCoverageQuantity < totalProjectedQuantity + totalOnHandQuantity) {
                 double reductionRatio = (maxCoverageQuantity - totalOnHandQuantity) / totalProjectedQuantity;
                 requirements.forEach(requirement -> {
                     addToSnapshot(requirement, PolicyType.MAX_COVERAGE, maxCoverageDays);
