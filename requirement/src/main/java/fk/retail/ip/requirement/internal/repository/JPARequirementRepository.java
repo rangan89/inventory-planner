@@ -68,7 +68,7 @@ public class JPARequirementRepository extends SimpleJpaGenericRepository<Require
     }
 
     @Override
-    public List<Requirement> findRequirements(List<Long> projectionIds, String requirementState, Map<String, Object> filters, int pageNumber) {
+    public List<Requirement> findRequirements(List<Long> projectionIds, String requirementState, Map<String, Object> filters) {
         EntityManager entityManager = getEntityManager();
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Requirement> criteriaQuery = criteriaBuilder.createQuery(Requirement.class);

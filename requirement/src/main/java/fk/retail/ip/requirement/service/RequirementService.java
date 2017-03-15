@@ -70,20 +70,11 @@ public class RequirementService {
         List<Long> ids = (List<Long>) request.getFilters().get("id");
         String state = (String) request.getFilters().get("state");
 
-        int count = 0;
-        int pageNumber = 1;
         Set<Long> projectionIds = new HashSet<>();
-        do {
-            requirements = requirementRepository.findRequirements(ids, state, request.getFilters(), pageNumber++);
-            count += requirements.size();
-            if (requirements.isEmpty()) {
-                break;
-            }
-            log.info("Loaded {} records from page {}", requirements.size(), pageNumber - 1);
-            requirements.stream().forEach(e -> projectionIds.add(e.getProjectionId()));
-            approvalService.changeState(requirements, "dummyUser", action, getter, new ApprovalService.CopyOnStateChangeAction(requirementRepository));
-        } while (requirements.size() == RequirementRepository.PAGE_SIZE);
 
+        requirements = requirementRepository.findRequirements(ids, state, request.getFilters());
+        requirements.stream().forEach(e -> projectionIds.add(e.getProjectionId()));
+        approvalService.changeState(requirements, "dummyUser", action, getter, new ApprovalService.CopyOnStateChangeAction(requirementRepository));
         requirementRepository.updateProjection(projectionIds, approvalService.getTargetState(action));
         return "{\"msg\":\"Moved " + projectionIds.size() + " projections to new state.\"}";
     }
