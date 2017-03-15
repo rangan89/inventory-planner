@@ -176,6 +176,7 @@ public class CalculateRequirementCommand {
         requirement.setWarehouse(Constants.NOT_APPLICABLE);
         requirement.setOverrideComment(errorMessage);
         requirement.setEnabled(false);
+        requirement.setCurrent(false);
         return requirement;
     }
 
@@ -193,12 +194,12 @@ public class CalculateRequirementCommand {
             SupplierSelectionResponse supplierResponse = fsnWhSupplierTable.get(requirement.getFsn(), requirement.getWarehouse());
             if (supplierResponse != null) {
                 SupplierView supplier = supplierResponse.getSuppliers().get(0);
-                requirement.setSupplier(supplier.getSource_id());
+                requirement.setSupplier(supplier.getSourceId());
                 requirement.setApp(supplier.getApp());
                 requirement.setMrp(supplier.getMrp());
                 requirement.setSla(supplier.getSla());
-                requirement.setCurrency(supplier.getVendor_preferred_currency());
-                requirement.setMrpCurrency(supplier.getVendor_preferred_currency());
+                requirement.setCurrency(supplier.getVendorPreferredCurrency());
+                requirement.setMrpCurrency(supplier.getVendorPreferredCurrency());
                 requirement.setInternational(!supplier.isLocal());
                 requirement.setSslId(supplierResponse.getEntityId());
             }

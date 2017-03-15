@@ -1,14 +1,18 @@
 package fk.retail.ip.requirement.internal.context;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import fk.retail.ip.requirement.internal.Constants;
 import fk.retail.ip.requirement.internal.entities.Requirement;
 import fk.retail.ip.requirement.internal.enums.PolicyType;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public abstract class PolicyApplicator {
 
     protected final ObjectMapper objectMapper;
@@ -24,13 +28,25 @@ public abstract class PolicyApplicator {
             if (remainingDays >= Constants.DAYS_IN_WEEK) {
                 quantity += forecast.get(i);
             } else {
-                quantity += forecast.get(i)*remainingDays/Constants.DAYS_IN_WEEK;
+                quantity += forecast.get(i) * remainingDays / Constants.DAYS_IN_WEEK;
             }
         }
         return quantity;
     }
 
     abstract void applyPolicies(String fsn, List<Requirement> requirements, Map<PolicyType, String> policyTypeMap, ForecastContext forecastContext, OnHandQuantityContext onHandQuantityContext);
+
+    public <T> T parsePolicy(String value, TypeReference<T> typeReference) {
+        if (value != null) {
+            try {
+                T policy = objectMapper.readValue(value, typeReference);
+                return policy;
+            } catch (IOException e) {
+                log.warn(Constants.UNABLE_TO_PARSE, value);
+            }
+        }
+        return null;
+    }
 
     public void addToSnapshot(Requirement requirement, PolicyType type, double value) {
         String appliedPoliciesString = requirement.getRequirementSnapshot().getPolicy();

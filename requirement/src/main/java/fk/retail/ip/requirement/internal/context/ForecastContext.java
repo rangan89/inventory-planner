@@ -49,7 +49,7 @@ public class ForecastContext {
         return value;
     }
 
-    public List<Double> geAllIndiaForecast(String fsn) {
+    public List<Double> getForecast(String fsn) {
         List<Double> allIndiaForecast = Stream.generate(() -> Constants.DEFAULT_FORECAST).limit(Constants.WEEKS_OF_FORECAST).collect(Collectors.toList());
         Map<String, List<Double>> forecasts = fsnWarehouseForecastTable.row(fsn);
         forecasts.keySet().forEach(warehouse -> {

@@ -24,7 +24,7 @@ public class PolicyContext {
         this.objectMapper = objectMapper;
         this.warehouseCodeMap = warehouseCodeMap;
         //DO NOT CHANGE THE ORDERING UNLESS YOU KNOW WHAT YOU ARE DOING
-        orderedPolicyApplicators = Lists.newArrayList(new RopRocApplicator(objectMapper), new MaxCoverageCaseSizeApplicator(objectMapper));
+        orderedPolicyApplicators = Lists.newArrayList(new RopRocApplicator(objectMapper), new MaxCoverageApplicator(objectMapper), new CaseSizeApplicator(objectMapper));
     }
 
     public Set<String> getFsns() {

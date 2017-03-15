@@ -1,10 +1,8 @@
 
 package fk.retail.ip.requirement.config;
 
-import com.google.common.collect.Lists;
 import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
-import fk.sp.common.extensions.jpa.JpaWithTestDbModule;
 
 @Singleton
 public class TestModule extends AbstractModule {
@@ -13,7 +11,6 @@ public class TestModule extends AbstractModule {
   protected void configure() {
 
     install(new RequirementModule());
-    install(new JpaWithTestDbModule("default", Lists.newArrayList("fk.retail.ip")));
   }
 
 }

@@ -8,6 +8,9 @@ public interface Constants {
     double DEFAULT_FORECAST = 0.0;
     int DAYS_IN_WEEK = 7;
     int WEEKS_OF_FORECAST = 15;
+    double MIN_CASE_SIZE = 1D;
+    String MAX_COVERAGE_KEY = "max_coverage";
+    String CASE_SIZE_KEY = "case_size";
     Set<String> INTRANSIT_REQUEST_STATUSES = Sets.newHashSet("in-process", "dispatched", "requested");
     String POLICY_DISPLAY_FORMAT = "{\"%s\":%.2f}";
 

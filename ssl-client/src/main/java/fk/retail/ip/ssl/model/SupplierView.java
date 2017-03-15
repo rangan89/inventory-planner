@@ -35,4 +35,12 @@ public class SupplierView {
     Integer logistics_cost;
     Integer mov;
     Integer moq;
+
+    public String getSourceId() {
+        return source_id;
+    }
+
+    public String getVendorPreferredCurrency() {
+        return vendor_preferred_currency;
+    }
 }

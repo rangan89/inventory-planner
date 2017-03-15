@@ -2,7 +2,7 @@ package fk.retail.ip.requirement.internal.repository;
 
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
-import fk.retail.ip.requirement.config.TestModule;
+import fk.retail.ip.requirement.config.TestDbModule;
 import fk.retail.ip.requirement.internal.entities.ProductInfo;
 import fk.sp.common.extensions.jpa.TransactionalJpaRepositoryTest;
 import java.util.List;
@@ -16,7 +16,7 @@ import org.junit.runner.RunWith;
  * Created by agarwal.vaibhav on 16/02/17.
  */
 @RunWith(JukitoRunner.class)
-@UseModules(TestModule.class)
+@UseModules(TestDbModule.class)
 public class ProductInfoRepositoryTest extends TransactionalJpaRepositoryTest {
 
     @Inject
