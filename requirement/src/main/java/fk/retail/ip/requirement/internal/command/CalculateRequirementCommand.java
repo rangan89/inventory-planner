@@ -151,14 +151,14 @@ public class CalculateRequirementCommand {
             Projection projection = new Projection();
             Requirement requirement = requirements.get(0);
             projection.setFsn(requirement.getFsn());
-            projection.setCurrentState(requirement.getState());
-            projection.setEnabled(requirement.isEnabled() ? 1 : 0);
-            projection.setError(requirement.getOverrideComment());
+            projection.setCurrentState(RequirementApprovalStates.PRE_PROPOSED.toString());
+            projection.setEnabled(1);
+            projection.setError("YOLO");
             projection.setProcType(requirement.getProcType());
             projection.setForecastId(0L);
             projection.setIntransit(0);
             projection.setInventory(0);
-            projection.setPolicyId(requirement.getRequirementSnapshot().getPolicy());
+            projection.setPolicyId("SWAG");
             projection.setGroupId(requirement.getRequirementSnapshot().getGroup().getId());
             projectionRepository.persist(projection);
             requirements.forEach(requirement1 -> {

@@ -28,6 +28,7 @@ public class MaxCoverageApplicator extends PolicyApplicator {
                 requirements.forEach(requirement -> {
                     addToSnapshot(requirement, PolicyType.MAX_COVERAGE, maxCoverageDays);
                     double reducedQuantity = requirement.getQuantity() * reductionRatio;
+                    reducedQuantity = reducedQuantity > 0 ? reducedQuantity : 0;
                     requirement.setQuantity(reducedQuantity);
                 });
             }
