@@ -148,11 +148,18 @@ public class CalculateRequirementCommand {
         //TODO: remove backward compatibility changes to add entry in projections table
         for (String fsn : fsnToRequirementMap.keySet()) {
             List<Requirement> requirements = fsnToRequirementMap.get(fsn);
+            String state = Constants.ERROR_STATE;
+            for (Requirement requirement : requirements) {
+                if (RequirementApprovalStates.PRE_PROPOSED == RequirementApprovalStates.fromString(requirement.getState())) {
+                    state = RequirementApprovalStates.PRE_PROPOSED.toString();
+                    break;
+                }
+            }
             Projection projection = new Projection();
             Requirement requirement = requirements.get(0);
             projection.setFsn(requirement.getFsn());
-            projection.setCurrentState(RequirementApprovalStates.PRE_PROPOSED.toString());
-            projection.setEnabled(1);
+            projection.setCurrentState(state);
+            projection.setEnabled(Constants.ERROR_STATE.equals(state) ? 0 : 1);
             projection.setError("YOLO");
             projection.setProcType(requirement.getProcType());
             projection.setForecastId(0L);
