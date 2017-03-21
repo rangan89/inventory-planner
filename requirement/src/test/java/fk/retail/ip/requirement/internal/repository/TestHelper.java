@@ -14,6 +14,7 @@ import fk.retail.ip.requirement.internal.entities.ProductInfo;
 import fk.retail.ip.requirement.internal.entities.Requirement;
 import fk.retail.ip.requirement.internal.entities.RequirementSnapshot;
 import fk.retail.ip.requirement.internal.entities.Warehouse;
+import fk.retail.ip.requirement.internal.entities.WarehouseSupplierSla;
 import fk.retail.ip.requirement.internal.entities.WeeklySale;
 import fk.retail.ip.zulu.internal.entities.EntityView;
 import fk.retail.ip.zulu.internal.entities.RetailProductAttributeResponse;
@@ -186,5 +187,14 @@ public class TestHelper {
         forecast.setWarehouse(warehouse);
         forecast.setForecast(forecastString);
         return forecast;
+    }
+
+    public static WarehouseSupplierSla getWarehouseSupplierSla(String vertical, String warehouse, String supplier, int sla) {
+        WarehouseSupplierSla warehouseSupplierSla = new WarehouseSupplierSla();
+        warehouseSupplierSla.setVertical(vertical);
+        warehouseSupplierSla.setWarehouseId(warehouse);
+        warehouseSupplierSla.setSupplierId(supplier);
+        warehouseSupplierSla.setSla(sla);
+        return warehouseSupplierSla;
     }
 }

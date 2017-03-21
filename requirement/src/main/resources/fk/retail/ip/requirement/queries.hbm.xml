@@ -294,4 +294,51 @@
         </query>
     </named-query>
 
+    <named-query name="ProcPurchaseOrder.fetchVerticalByFsn">
+        <query>
+            <![CDATA[
+            SELECT po.vertical
+            FROM ProcPurchaseOrder po
+            WHERE
+                po.fsn = :fsn
+            ]]>
+        </query>
+    </named-query>
+
+    <named-query name="WarehouseSupplierSla.fetchSlaByVerticalWhSupplier">
+        <query>
+            <![CDATA[
+            SELECT s.sla
+            FROM WarehouseSupplierSla s
+            WHERE
+                s.vertical = :vertical AND
+                s.warehouseId = :warehouse AND
+                s.supplierId = :supplier
+            ]]>
+        </query>
+    </named-query>
+
+    <named-query name="WarehouseSupplierSla.fetchAvgSlaByVerticalWh">
+        <query>
+            <![CDATA[
+            SELECT avg(s.sla)
+            FROM WarehouseSupplierSla s
+            WHERE
+                s.vertical = :vertical AND
+                s.warehouseId = :warehouse
+            ]]>
+        </query>
+    </named-query>
+
+    <named-query name="WarehouseSupplierSla.fetchAvgSlaByVertical">
+        <query>
+            <![CDATA[
+            SELECT avg(s.sla)
+            FROM WarehouseSupplierSla s
+            WHERE
+                s.vertical = :vertical
+            ]]>
+        </query>
+    </named-query>
+
 </entity-mappings>

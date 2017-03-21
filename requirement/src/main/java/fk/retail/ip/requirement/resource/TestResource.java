@@ -18,6 +18,7 @@ import fk.retail.ip.requirement.internal.repository.JPAGroupFsnRepository;
 import fk.retail.ip.requirement.internal.repository.OpenRequirementAndPurchaseOrderRepository;
 import fk.retail.ip.requirement.internal.repository.PolicyRepository;
 import fk.retail.ip.requirement.internal.repository.RequirementRepository;
+import fk.retail.ip.requirement.internal.repository.WarehouseSupplierSlaRepository;
 import fk.retail.ip.ssl.client.HystrixSslClient;
 import fk.retail.ip.ssl.model.SupplierSelectionRequest;
 import fk.retail.ip.ssl.model.SupplierSelectionResponse;
@@ -39,15 +40,17 @@ public class TestResource {
     private final GroupFsnRepository groupFsnRepository;
     private final RequirementRepository requirementRepository;
     private final HystrixSslClient hystrixSslClient;
+    private final WarehouseSupplierSlaRepository warehouseSupplierSlaRepository;
 
     @Inject
-    public TestResource(HystrixSslClient hystrixSslClient, IwtRequestItemRepository iwtRequestItemRepository, OpenRequirementAndPurchaseOrderRepository openRequirementAndPurchaseOrderRepository, PolicyRepository policyRepository, JPAGroupFsnRepository jpaGroupFsnRepository, RequirementRepository requirementRepository) {
+    public TestResource(HystrixSslClient hystrixSslClient, IwtRequestItemRepository iwtRequestItemRepository, OpenRequirementAndPurchaseOrderRepository openRequirementAndPurchaseOrderRepository, PolicyRepository policyRepository, JPAGroupFsnRepository jpaGroupFsnRepository, RequirementRepository requirementRepository, WarehouseSupplierSlaRepository warehouseSupplierSlaRepository) {
         this.iwtRequestItemRepository = iwtRequestItemRepository;
         this.openRequirementAndPurchaseOrderRepository = openRequirementAndPurchaseOrderRepository;
         this.policyRepository = policyRepository;
         this.groupFsnRepository = jpaGroupFsnRepository;
         this.hystrixSslClient = hystrixSslClient;
         this.requirementRepository = requirementRepository;
+        this.warehouseSupplierSlaRepository = warehouseSupplierSlaRepository;
     }
 
     @GET
@@ -142,6 +145,13 @@ public class TestResource {
         List<SupplierSelectionResponse> responses = hystrixSslClient.getSupplierSelectionResponse(requests);
         return responses;
 
+    }
+
+    @GET
+    @Path("/sla")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Integer getSupplier(@QueryParam("vertical") String vertical, @QueryParam("warehouse") String warehouse, @QueryParam("supplier") String supplier) {
+        return warehouseSupplierSlaRepository.getSla(vertical, warehouse, supplier).get();
     }
 
     public List<SupplierSelectionRequest> getSupplierSelectionRequest(List<Requirement> requirements) {

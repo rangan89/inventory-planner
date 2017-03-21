@@ -28,10 +28,12 @@ import fk.retail.ip.requirement.internal.repository.GroupFsnRepository;
 import fk.retail.ip.requirement.internal.repository.IwtRequestItemRepository;
 import fk.retail.ip.requirement.internal.repository.OpenRequirementAndPurchaseOrderRepository;
 import fk.retail.ip.requirement.internal.repository.PolicyRepository;
+import fk.retail.ip.requirement.internal.repository.ProcPurchaseOrderRepository;
 import fk.retail.ip.requirement.internal.repository.ProjectionRepository;
 import fk.retail.ip.requirement.internal.repository.RequirementRepository;
 import fk.retail.ip.requirement.internal.repository.WarehouseInventoryRepository;
 import fk.retail.ip.requirement.internal.repository.WarehouseRepository;
+import fk.retail.ip.requirement.internal.repository.WarehouseSupplierSlaRepository;
 import fk.retail.ip.ssl.client.SslClient;
 import fk.retail.ip.ssl.model.SupplierSelectionRequest;
 import fk.retail.ip.ssl.model.SupplierSelectionResponse;
@@ -39,10 +41,13 @@ import fk.retail.ip.ssl.model.SupplierView;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 
+@Slf4j
 public class CalculateRequirementCommand {
 
     private final WarehouseRepository warehouseRepository;
@@ -53,6 +58,8 @@ public class CalculateRequirementCommand {
     private final IwtRequestItemRepository iwtRequestItemRepository;
     private final OpenRequirementAndPurchaseOrderRepository openRequirementAndPurchaseOrderRepository;
     private final RequirementRepository requirementRepository;
+    private final ProcPurchaseOrderRepository procPurchaseOrderRepository;
+    private final WarehouseSupplierSlaRepository warehouseSupplierSlaRepository;
     private final SslClient sslClient;
     //TODO: remove
     private final ProjectionRepository projectionRepository;
@@ -66,7 +73,7 @@ public class CalculateRequirementCommand {
     private OnHandQuantityContext onHandQuantityContext;
 
     @Inject
-    public CalculateRequirementCommand(WarehouseRepository warehouseRepository, GroupFsnRepository groupFsnRepository, PolicyRepository policyRepository, ForecastRepository forecastRepository, WarehouseInventoryRepository warehouseInventoryRepository, IwtRequestItemRepository iwtRequestItemRepository, OpenRequirementAndPurchaseOrderRepository openRequirementAndPurchaseOrderRepository, RequirementRepository requirementRepository, SslClient sslClient, ProjectionRepository projectionRepository, ObjectMapper objectMapper) {
+    public CalculateRequirementCommand(WarehouseRepository warehouseRepository, GroupFsnRepository groupFsnRepository, PolicyRepository policyRepository, ForecastRepository forecastRepository, WarehouseInventoryRepository warehouseInventoryRepository, IwtRequestItemRepository iwtRequestItemRepository, OpenRequirementAndPurchaseOrderRepository openRequirementAndPurchaseOrderRepository, RequirementRepository requirementRepository, ProcPurchaseOrderRepository procPurchaseOrderRepository, WarehouseSupplierSlaRepository warehouseSupplierSlaRepository, SslClient sslClient, ProjectionRepository projectionRepository, ObjectMapper objectMapper) {
         this.warehouseRepository = warehouseRepository;
         this.groupFsnRepository = groupFsnRepository;
         this.policyRepository = policyRepository;
@@ -75,6 +82,8 @@ public class CalculateRequirementCommand {
         this.iwtRequestItemRepository = iwtRequestItemRepository;
         this.openRequirementAndPurchaseOrderRepository = openRequirementAndPurchaseOrderRepository;
         this.requirementRepository = requirementRepository;
+        this.procPurchaseOrderRepository = procPurchaseOrderRepository;
+        this.warehouseSupplierSlaRepository = warehouseSupplierSlaRepository;
         this.sslClient = sslClient;
         this.projectionRepository = projectionRepository;
         this.objectMapper = objectMapper;
@@ -204,13 +213,33 @@ public class CalculateRequirementCommand {
                 requirement.setSupplier(supplier.getSourceId());
                 requirement.setApp(supplier.getApp());
                 requirement.setMrp(supplier.getMrp());
-                requirement.setSla(supplier.getSla());
+                int sla = getSla(requirement.getFsn(), requirement.getWarehouse(), supplier.getSourceId(), supplier.getSla());
+                requirement.setSla(sla);
                 requirement.setCurrency(supplier.getVendorPreferredCurrency());
                 requirement.setMrpCurrency(supplier.getVendorPreferredCurrency());
                 requirement.setInternational(!supplier.isLocal());
                 requirement.setSslId(supplierResponse.getEntityId());
             }
         });
+    }
+
+    //TODO: optimize this
+    private int getSla(String fsn, String warehouse, String supplier, int apiSla) {
+        if (apiSla > 0) {
+            return apiSla;
+        }
+        try {
+            String vertical = procPurchaseOrderRepository.find(fsn);
+            Optional<Integer> sla = warehouseSupplierSlaRepository.getSla(vertical, warehouse, supplier);
+            if (sla.isPresent()) {
+                return sla.get();
+            } else {
+                return apiSla;
+            }
+        } catch (Exception e) {
+            log.warn(e.getMessage(), e);
+            return apiSla;
+        }
     }
 
     public List<SupplierSelectionRequest> createSupplierSelectionRequest(List<Requirement> requirements) {
