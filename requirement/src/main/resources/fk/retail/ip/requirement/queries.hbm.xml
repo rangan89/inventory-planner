@@ -15,7 +15,7 @@
             ]]>
         </query>
     </named-query>
-    
+
     <named-query name="findRequirementByProjectionIds.count">
         <query>
             <![CDATA[

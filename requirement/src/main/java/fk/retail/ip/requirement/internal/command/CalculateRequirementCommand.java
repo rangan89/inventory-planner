@@ -22,7 +22,7 @@ import fk.retail.ip.requirement.internal.entities.Requirement;
 import fk.retail.ip.requirement.internal.entities.RequirementSnapshot;
 import fk.retail.ip.requirement.internal.entities.Warehouse;
 import fk.retail.ip.requirement.internal.entities.WarehouseInventory;
-import fk.retail.ip.requirement.internal.enums.RequirementApprovalStates;
+import fk.retail.ip.requirement.internal.enums.RequirementApprovalState;
 import fk.retail.ip.requirement.internal.repository.ForecastRepository;
 import fk.retail.ip.requirement.internal.repository.GroupFsnRepository;
 import fk.retail.ip.requirement.internal.repository.IwtRequestItemRepository;
@@ -150,8 +150,8 @@ public class CalculateRequirementCommand {
             List<Requirement> requirements = fsnToRequirementMap.get(fsn);
             String state = Constants.ERROR_STATE;
             for (Requirement requirement : requirements) {
-                if (RequirementApprovalStates.PRE_PROPOSED == RequirementApprovalStates.fromString(requirement.getState())) {
-                    state = RequirementApprovalStates.PRE_PROPOSED.toString();
+                if (RequirementApprovalState.PRE_PROPOSED == RequirementApprovalState.fromString(requirement.getState())) {
+                    state = RequirementApprovalState.PRE_PROPOSED.toString();
                     break;
                 }
             }
@@ -245,7 +245,7 @@ public class CalculateRequirementCommand {
         Requirement requirement = new Requirement();
         requirement.setFsn(fsn);
         requirement.setWarehouse(warehouse);
-        requirement.setState(RequirementApprovalStates.PRE_PROPOSED.toString());
+        requirement.setState(RequirementApprovalState.PRE_PROPOSED.toString());
         requirement.setEnabled(true);
         requirement.setCurrent(true);
 //        requirement.setQuantity(0);

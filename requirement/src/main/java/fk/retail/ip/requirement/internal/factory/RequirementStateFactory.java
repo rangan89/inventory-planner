@@ -1,8 +1,8 @@
 package fk.retail.ip.requirement.internal.factory;
 
 import com.google.inject.Inject;
+import fk.retail.ip.requirement.internal.enums.RequirementApprovalState;
 import fk.retail.ip.requirement.internal.exception.InvalidRequirementStateException;
-import fk.retail.ip.requirement.internal.enums.RequirementApprovalStates;
 import fk.retail.ip.requirement.internal.states.*;
 
 /**
@@ -31,7 +31,7 @@ public class RequirementStateFactory {
 
     public RequirementState getRequirementState(String requirementState) throws InvalidRequirementStateException {
 
-        RequirementApprovalStates requirementApprovalState = RequirementApprovalStates.fromString(requirementState);
+        RequirementApprovalState requirementApprovalState = RequirementApprovalState.fromString(requirementState);
         if (requirementApprovalState == null) {
             throw new InvalidRequirementStateException(requirementState + " is not a valid requirement state");
 

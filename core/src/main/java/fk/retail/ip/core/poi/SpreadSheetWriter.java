@@ -34,9 +34,7 @@ public class SpreadSheetWriter {
         try (OPCPackage pkg = OPCPackage.open(tempFile.toFile())) {
             XSSFWorkbook wb = new XSSFWorkbook(pkg);
             Sheet sheet = wb.getSheetAt(0);
-            CellStyle editableStyle = wb.createCellStyle();
-            editableStyle.setLocked(false);
-
+            sheet.protectSheet("uneditable");
             List<String> headers = new ArrayList<>();
             Row headerRow = sheet.getRow(0);
             for (int c = 0; c < headerRow.getLastCellNum(); c++) {
@@ -58,13 +56,13 @@ public class SpreadSheetWriter {
                     Object value = record.get(headers.get(c));
                     Cell cell = row.getCell(c, Row.CREATE_NULL_AS_BLANK);
                     setCellValue(value, cell);
-
-                    cell.setCellStyle(editableStyle);
+                    applyCellStyle(wb, cell, headers.get(c));
                 }
             }
             wb.write(out);
         }
     }
+
 
     private void setCellValue(Object value, Cell cell) {
         if (value == null) {
@@ -75,5 +73,11 @@ public class SpreadSheetWriter {
         } else {
             cell.setCellValue(value.toString());
         }
+    }
+
+    protected void applyCellStyle(XSSFWorkbook wb, Cell cell, String columnName) {
+        CellStyle editableStyle = wb.createCellStyle();
+        editableStyle.setLocked(false);
+        cell.setCellStyle(editableStyle);
     }
 }

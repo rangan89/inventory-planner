@@ -3,6 +3,7 @@ package fk.retail.ip.requirement.resource;
 import com.codahale.metrics.annotation.Timed;
 import com.google.inject.Inject;
 import com.google.inject.persist.Transactional;
+
 import fk.retail.ip.requirement.internal.exception.InvalidRequirementStateException;
 import fk.retail.ip.requirement.model.CalculateRequirementRequest;
 import fk.retail.ip.requirement.internal.exception.NoRequirementsSelectedException;
@@ -21,6 +22,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -31,6 +33,7 @@ import org.json.JSONException;
  */
 @Transactional
 @Path("/v1/requirement")
+@Slf4j
 public class RequirementResource {
 
     private final RequirementService requirementService;
@@ -49,17 +52,13 @@ public class RequirementResource {
     @Path("/download")
     @Timed
     public Response download(DownloadRequirementRequest downloadRequirementRequest) {
-        try {
-            StreamingOutput stream = requirementService.downloadRequirement(downloadRequirementRequest);
-            return Response.ok(stream)
+        log.info("Download Requirement request received " + downloadRequirementRequest);
+        StreamingOutput stream = requirementService.downloadRequirement(downloadRequirementRequest);
+        return Response.ok(stream)
                     .header(HttpHeaders.CONTENT_TYPE, "application/octet-stream")
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename = projection.xlsx")
                     .build();
-        } catch (InvalidRequirementStateException ise) {
-            return Response.status(400).entity(ise.getMessage()).build();
-        } catch (NoRequirementsSelectedException noreq) {
-            return Response.status(400).entity(noreq.getMessage()).build();
-        }
+
     }
 
     @POST

@@ -3,7 +3,7 @@ package fk.retail.ip.requirement.service;
 import com.google.inject.Inject;
 import fk.retail.ip.requirement.config.TestDbModule;
 import fk.retail.ip.requirement.internal.entities.Requirement;
-import fk.retail.ip.requirement.internal.enums.RequirementApprovalStates;
+import fk.retail.ip.requirement.internal.enums.RequirementApprovalState;
 import fk.retail.ip.requirement.internal.repository.RequirementRepository;
 import fk.sp.common.extensions.jpa.TransactionalJpaRepositoryTest;
 import java.math.BigInteger;
@@ -80,7 +80,7 @@ public class ApprovalServiceTest extends TransactionalJpaRepositoryTest {
 
     private void testForwardFlow(String fromState, String toState, String action) {
         Requirement requirement = createRequirement(fromState);
-        Requirement cdoRequirement = createRequirement(RequirementApprovalStates.CDO_REVIEW.toString());
+        Requirement cdoRequirement = createRequirement(RequirementApprovalState.CDO_REVIEW.toString());
         ApprovalService service = new ApprovalService("/requirement-state-actions.json");
         Function<Requirement, String> getter = Requirement::getState;
         service.changeState(Arrays.asList(requirement), "userId", action, getter, new ApprovalService.CopyOnStateChangeAction(requirementRepository));
@@ -92,7 +92,7 @@ public class ApprovalServiceTest extends TransactionalJpaRepositoryTest {
         Assert.assertTrue(actual.isEnabled());
         Assert.assertEquals(actual.getPreviousStateId(), requirement.getId());
 
-        Assert.assertEquals(actual.getQuantity(), cdoRequirement.getQuantity(), 0.01);
+        Assert.assertEquals(actual.getQuantity(), cdoRequirement.getQuantity(),0.01);
 
         Assert.assertEquals(actual.getSla(), requirement.getSla());
         Assert.assertEquals(actual.getSupplier(), requirement.getSupplier());
@@ -139,7 +139,6 @@ public class ApprovalServiceTest extends TransactionalJpaRepositoryTest {
         requirementRepository.persist(requirement);
         return requirement;
     }
-
     private Requirement createCdoRequirement(String state) {
         Requirement requirement = new Requirement();
         requirement.setFsn("fsn1");
@@ -155,7 +154,6 @@ public class ApprovalServiceTest extends TransactionalJpaRepositoryTest {
         requirementRepository.persist(requirement);
         return requirement;
     }
-
     //TODO: legacy code
     private BigInteger insertProjection(String fsn, String state) {
         EntityManager entityManager = entityManagerProvider.get();

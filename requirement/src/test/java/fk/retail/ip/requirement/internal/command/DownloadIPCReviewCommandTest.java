@@ -3,7 +3,7 @@ package fk.retail.ip.requirement.internal.command;
 import com.google.common.collect.Lists;
 import fk.retail.ip.requirement.config.TestModule;
 import fk.retail.ip.requirement.internal.entities.*;
-import fk.retail.ip.requirement.internal.enums.RequirementApprovalStates;
+import fk.retail.ip.requirement.internal.enums.RequirementApprovalState;
 import fk.retail.ip.requirement.internal.repository.*;
 import fk.retail.ip.requirement.model.RequirementDownloadLineItem;
 import java.io.IOException;
@@ -76,9 +76,9 @@ public class DownloadIPCReviewCommandTest {
         Mockito.when(warehouseRepository.fetchWarehouseNameByCode(Mockito.anySetOf(String.class))).thenReturn(getWarehouse());
         Mockito.when(productInfoRepository.getProductInfo(Mockito.anyList())).thenReturn(TestHelper.getProductInfo());
         Mockito.doReturn(TestHelper.getZuluData()).when(zuluClient).getRetailProductAttributes(Mockito.anyList());
-        Mockito.when(requirementRepository.findEnabledRequirementsByStateFsn(Mockito.matches(RequirementApprovalStates.BIZFIN_REVIEW.toString()),Mockito.anySetOf(String.class))).thenReturn(getBizFinData());
-        Mockito.when(requirementRepository.findEnabledRequirementsByStateFsn(Mockito.matches(RequirementApprovalStates.CDO_REVIEW.toString()),Mockito.anySetOf(String.class))).thenReturn(getCdoData());
-        Mockito.when(requirementRepository.findEnabledRequirementsByStateFsn(Mockito.matches(RequirementApprovalStates.PROPOSED.toString()),Mockito.anySetOf(String.class))).thenReturn(getIpcQuantity());
+        Mockito.when(requirementRepository.findEnabledRequirementsByStateFsn(Mockito.matches(RequirementApprovalState.BIZFIN_REVIEW.toString()),Mockito.anySetOf(String.class))).thenReturn(getBizFinData());
+        Mockito.when(requirementRepository.findEnabledRequirementsByStateFsn(Mockito.matches(RequirementApprovalState.CDO_REVIEW.toString()),Mockito.anySetOf(String.class))).thenReturn(getCdoData());
+        Mockito.when(requirementRepository.findEnabledRequirementsByStateFsn(Mockito.matches(RequirementApprovalState.PROPOSED.toString()),Mockito.anySetOf(String.class))).thenReturn(getIpcQuantity());
 
         downloadIPCReviewCommand.execute(requirements,false);
         Mockito.verify(generateExcelCommand).generateExcel(captor.capture(), Mockito.eq("/templates/IPCReview.xlsx"));
@@ -107,12 +107,12 @@ public class DownloadIPCReviewCommandTest {
         RequirementSnapshot snapshot1 = TestHelper.getRequirementSnapshot("[3,4]", 7,8,9,10,11);
 
         List<Requirement> requirements = Lists.newArrayList();
-        Requirement requirement = TestHelper.getRequirement("fsn", "dummy_warehouse1", RequirementApprovalStates.BIZFIN_REVIEW.toString(), true, snapshot, 30,
+        Requirement requirement = TestHelper.getRequirement("fsn", "dummy_warehouse1", RequirementApprovalState.BIZFIN_REVIEW.toString(), true, snapshot, 30,
                 "ABC",100,101,"INR", 3, "bizfin_comment", "Daily planning" );
 
         requirements.add(requirement);
 
-        requirement = TestHelper.getRequirement("fsn", "dummy_warehouse2", RequirementApprovalStates.BIZFIN_REVIEW.toString(), true, snapshot1, 22,
+        requirement = TestHelper.getRequirement("fsn", "dummy_warehouse2", RequirementApprovalState.BIZFIN_REVIEW.toString(), true, snapshot1, 22,
                 "DEF",10,9,"USD", 4, "", "Daily planning" );
 
         requirements.add(requirement);
@@ -149,12 +149,12 @@ public class DownloadIPCReviewCommandTest {
         RequirementSnapshot snapshot = TestHelper.getRequirementSnapshot("[1,2]", 2,3,4,5,6);
 
         List<Requirement> requirements = Lists.newArrayList();
-        Requirement requirement = TestHelper.getRequirement("fsn", "dummy_warehouse1", RequirementApprovalStates.BIZFIN_REVIEW.toString(), true, snapshot, 30,
+        Requirement requirement = TestHelper.getRequirement("fsn", "dummy_warehouse1", RequirementApprovalState.BIZFIN_REVIEW.toString(), true, snapshot, 30,
                 "ABC",100,101,"INR", 3, "bizfin_comment", "Daily planning" );
 
         requirements.add(requirement);
 
-        requirement = TestHelper.getRequirement("fsn", "dummy_warehouse2", RequirementApprovalStates.BIZFIN_REVIEW.toString(), true, snapshot, 22,
+        requirement = TestHelper.getRequirement("fsn", "dummy_warehouse2", RequirementApprovalState.BIZFIN_REVIEW.toString(), true, snapshot, 22,
                 "DEF",10,9,"USD", 4, "", "Daily planning" );
 
 
@@ -169,12 +169,12 @@ public class DownloadIPCReviewCommandTest {
         RequirementSnapshot snapshot1 = TestHelper.getRequirementSnapshot("[3,4]", 7,8,9,10,11);
 
         List<Requirement> requirements = Lists.newArrayList();
-        Requirement requirement = TestHelper.getRequirement("fsn", "dummy_warehouse1", RequirementApprovalStates.CDO_REVIEW.toString(), true, snapshot, 21,
+        Requirement requirement = TestHelper.getRequirement("fsn", "dummy_warehouse1", RequirementApprovalState.CDO_REVIEW.toString(), true, snapshot, 21,
                 "ABC",100,101,"INR", 3, "cdo_comment", "Daily planning" );
 
         requirements.add(requirement);
 
-        requirement = TestHelper.getRequirement("fsn", "dummy_warehouse2", RequirementApprovalStates.CDO_REVIEW.toString(), true, snapshot1, 22,
+        requirement = TestHelper.getRequirement("fsn", "dummy_warehouse2", RequirementApprovalState.CDO_REVIEW.toString(), true, snapshot1, 22,
                 "DEF",10,9,"USD", 4, "", "Daily planning" );
 
         requirements.add(requirement);
@@ -187,12 +187,12 @@ public class DownloadIPCReviewCommandTest {
         RequirementSnapshot snapshot1 = TestHelper.getRequirementSnapshot("[3,4]", 7,8,9,10,11);
 
         List<Requirement> requirements = Lists.newArrayList();
-        Requirement requirement = TestHelper.getRequirement("fsn", "dummy_warehouse1", RequirementApprovalStates.PROPOSED.toString(), true, snapshot, 15,
+        Requirement requirement = TestHelper.getRequirement("fsn", "dummy_warehouse1", RequirementApprovalState.PROPOSED.toString(), true, snapshot, 15,
                 "ABC",100,101,"INR", 3, "", "Daily planning" );
 
         requirements.add(requirement);
 
-        requirement = TestHelper.getRequirement("fsn", "dummy_warehouse2", RequirementApprovalStates.PROPOSED.toString(), true, snapshot1, 22,
+        requirement = TestHelper.getRequirement("fsn", "dummy_warehouse2", RequirementApprovalState.PROPOSED.toString(), true, snapshot1, 22,
                 "DEF",10,9,"USD", 4, "", "Daily planning" );
 
         requirements.add(requirement);

@@ -6,7 +6,7 @@ import fk.retail.ip.requirement.internal.entities.Requirement;
 import fk.retail.ip.requirement.internal.entities.RequirementSnapshot;
 import fk.retail.ip.requirement.internal.entities.Warehouse;
 import fk.retail.ip.requirement.internal.entities.WeeklySale;
-import fk.retail.ip.requirement.internal.enums.RequirementApprovalStates;
+import fk.retail.ip.requirement.internal.enums.RequirementApprovalState;
 import fk.retail.ip.requirement.internal.repository.JPAFsnBandRepository;
 import fk.retail.ip.requirement.internal.repository.ProductInfoRepository;
 import fk.retail.ip.requirement.internal.repository.TestHelper;
@@ -156,16 +156,16 @@ public class DownloadPreProposedCommandTest {
 
         List<Requirement> requirements = Lists.newArrayList();
 
-        Requirement requirement = TestHelper.getRequirement("fsn", "dummy_warehouse1", RequirementApprovalStates.PROPOSED.toString(), true, snapshot , 21, "ABC",
+        Requirement requirement = TestHelper.getRequirement("fsn", "dummy_warehouse1", RequirementApprovalState.PROPOSED.toString(), true, snapshot , 21, "ABC",
                 100, 101, "INR", 3, "", "Daily planning");
         requirements.add(requirement);
 
-        requirement = TestHelper.getRequirement("fsn", "dummy_warehouse2",RequirementApprovalStates.PROPOSED.toString(), true, snapshot1 , 22, "DEF",
+        requirement = TestHelper.getRequirement("fsn", "dummy_warehouse2", RequirementApprovalState.PROPOSED.toString(), true, snapshot1 , 22, "DEF",
                 10, 9, "USD", 4, "", "Daily planning");
 
         requirements.add(requirement);
 
-//        requirement = TestHelper.getRequirement("zulufsn", "dummy_warehouse2",RequirementApprovalStates.PROPOSED.toString(), true, snapshot1 , 22, "DEF",
+//        requirement = TestHelper.getRequirement("zulufsn", "dummy_warehouse2",RequirementApprovalState.PROPOSED.toString(), true, snapshot1 , 22, "DEF",
 //                10, 9, "USD", 4, "", "Daily planning");
 //
 //        requirements.add(requirement);

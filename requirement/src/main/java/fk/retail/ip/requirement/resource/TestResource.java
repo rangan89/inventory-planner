@@ -11,7 +11,7 @@ import fk.retail.ip.requirement.internal.entities.OpenRequirementAndPurchaseOrde
 import fk.retail.ip.requirement.internal.entities.Policy;
 import fk.retail.ip.requirement.internal.entities.Requirement;
 import fk.retail.ip.requirement.internal.entities.RequirementSnapshot;
-import fk.retail.ip.requirement.internal.enums.RequirementApprovalStates;
+import fk.retail.ip.requirement.internal.enums.RequirementApprovalState;
 import fk.retail.ip.requirement.internal.repository.GroupFsnRepository;
 import fk.retail.ip.requirement.internal.repository.IwtRequestItemRepository;
 import fk.retail.ip.requirement.internal.repository.JPAGroupFsnRepository;
@@ -89,7 +89,7 @@ public class TestResource {
         Requirement requirement = new Requirement();
         requirement.setFsn(fsn);
         requirement.setWarehouse("dummy");
-        requirement.setState(RequirementApprovalStates.PROPOSED.toString());
+        requirement.setState(RequirementApprovalState.PROPOSED.toString());
         requirement.setEnabled(true);
         requirement.setCurrent(true);
         requirement.setQuantity(0.123);

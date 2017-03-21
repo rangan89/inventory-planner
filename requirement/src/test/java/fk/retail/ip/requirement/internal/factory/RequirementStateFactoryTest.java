@@ -2,7 +2,7 @@ package fk.retail.ip.requirement.internal.factory;
 
 import com.google.inject.Inject;
 import fk.retail.ip.requirement.config.TestModule;
-import fk.retail.ip.requirement.internal.enums.RequirementApprovalStates;
+import fk.retail.ip.requirement.internal.enums.RequirementApprovalState;
 import fk.retail.ip.requirement.internal.exception.InvalidRequirementStateException;
 import fk.retail.ip.requirement.internal.states.BizFinRequirementState;
 import fk.retail.ip.requirement.internal.states.CDOReviewRequirementState;
@@ -33,32 +33,32 @@ public class RequirementStateFactoryTest {
 
     @Test
     public void testGetPreProposedRequirementState() {
-        Assert.assertEquals(requirementStateFactory.getRequirementState(RequirementApprovalStates.PRE_PROPOSED.toString()).getClass().getName(),(PreProposedRequirementState.class.getName()));
+        Assert.assertEquals(requirementStateFactory.getRequirementState(RequirementApprovalState.PRE_PROPOSED.toString()).getClass().getName(),(PreProposedRequirementState.class.getName()));
     }
 
     @Test
     public void testGetProposedRequirementState() {
-        Assert.assertEquals(requirementStateFactory.getRequirementState(RequirementApprovalStates.PROPOSED.toString()).getClass().getName(),(ProposedRequirementState.class.getName()));
+        Assert.assertEquals(requirementStateFactory.getRequirementState(RequirementApprovalState.PROPOSED.toString()).getClass().getName(),(ProposedRequirementState.class.getName()));
     }
 
     @Test
     public void testGetCdoReviewRequirementState() {
-        Assert.assertEquals(requirementStateFactory.getRequirementState(RequirementApprovalStates.CDO_REVIEW.toString()).getClass().getName(),(CDOReviewRequirementState.class.getName()));
+        Assert.assertEquals(requirementStateFactory.getRequirementState(RequirementApprovalState.CDO_REVIEW.toString()).getClass().getName(),(CDOReviewRequirementState.class.getName()));
     }
 
     @Test
     public void testGetBizFinReviewRequirementState() {
-        Assert.assertEquals(requirementStateFactory.getRequirementState(RequirementApprovalStates.BIZFIN_REVIEW.toString()).getClass().getName(),(BizFinRequirementState.class.getName()));
+        Assert.assertEquals(requirementStateFactory.getRequirementState(RequirementApprovalState.BIZFIN_REVIEW.toString()).getClass().getName(),(BizFinRequirementState.class.getName()));
     }
 
     @Test
     public void testGetIPCReviewRequirementState() {
-        Assert.assertEquals(requirementStateFactory.getRequirementState(RequirementApprovalStates.IPC_REVIEW.toString()).getClass().getName(),(IPCReviewRequirementState.class.getName()));
+        Assert.assertEquals(requirementStateFactory.getRequirementState(RequirementApprovalState.IPC_REVIEW.toString()).getClass().getName(),(IPCReviewRequirementState.class.getName()));
     }
 
     @Test
     public void testGetIpcFinalisedRequirementState() {
-        Assert.assertEquals(requirementStateFactory.getRequirementState(RequirementApprovalStates.IPC_FINALISED.toString()).getClass().getName(),(IPCFinalisedRequirementState.class.getName()));
+        Assert.assertEquals(requirementStateFactory.getRequirementState(RequirementApprovalState.IPC_FINALISED.toString()).getClass().getName(),(IPCFinalisedRequirementState.class.getName()));
     }
 
 

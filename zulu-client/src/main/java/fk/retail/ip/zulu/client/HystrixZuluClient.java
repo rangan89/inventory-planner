@@ -1,12 +1,11 @@
 package fk.retail.ip.zulu.client;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import fk.retail.ip.zulu.config.ZuluConfiguration;
 import fk.retail.ip.zulu.internal.command.GetRetailProductAttributesCommand;
 import fk.retail.ip.zulu.internal.entities.RetailProductAttributeResponse;
-import java.util.List;
+import java.util.Collection;
 import javax.inject.Provider;
 
 /**
@@ -25,9 +24,9 @@ public class HystrixZuluClient implements ZuluClient {
 
 
     @Override
-    public RetailProductAttributeResponse getRetailProductAttributes(List<String> fsns) {
+    public RetailProductAttributeResponse getRetailProductAttributes(Collection<String> fsns) {
         RetailProductAttributeResponse response = new RetailProductAttributeResponse();
-        Lists.partition(fsns, zuluConfiguration.getMaxBatchSize()).forEach(partition -> {
+        Lists.partition(Lists.newArrayList(fsns), zuluConfiguration.getMaxBatchSize()).forEach(partition -> {
             RetailProductAttributeResponse zuluResponse = getRetailProductAttributesCommand.get().withFsns(partition).execute();
             response.getEntityViews().addAll(zuluResponse.getEntityViews());
         });

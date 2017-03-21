@@ -7,7 +7,7 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import fk.retail.ip.requirement.internal.entities.AbstractEntity;
 import fk.retail.ip.requirement.internal.entities.Requirement;
-import fk.retail.ip.requirement.internal.enums.RequirementApprovalStates;
+import fk.retail.ip.requirement.internal.enums.RequirementApprovalState;
 import fk.retail.ip.requirement.internal.repository.RequirementRepository;
 import java.io.InputStreamReader;
 import java.util.List;
@@ -85,7 +85,7 @@ public class ApprovalService<E extends AbstractEntity> {
             Map<String, List<Requirement>> fsnToRequirements = entities.stream().collect(Collectors.groupingBy(Requirement::getFsn));
             List<Requirement> toEntities = repository.findEnabledRequirementsByStateFsn(toState, fsnToRequirements.keySet());
             Table<String, String, Requirement> cdoStateEntityMap = getCDOEntityMap(toState,  fsnToRequirements.keySet());
-            boolean isIPCReviewState = RequirementApprovalStates.IPC_REVIEW.toString().equals(toState);
+            boolean isIPCReviewState = RequirementApprovalState.IPC_REVIEW.toString().equals(toState);
             fsnToRequirements.keySet().stream().forEach((fsn) -> {
                 fsnToRequirements.get(fsn).stream().forEach((entity) -> {
                     Optional<Requirement> toStateEntity = toEntities.stream().filter(e -> e.getWarehouse().equals(entity.getWarehouse()) && e.getFsn().equals(entity.getFsn())).findFirst();
@@ -126,9 +126,9 @@ public class ApprovalService<E extends AbstractEntity> {
 
         private Table<String,String,Requirement> getCDOEntityMap(String toState, Set<String> fsns) {
             Table<String, String, Requirement> cdoStateRequirementMap = HashBasedTable.create();
-            boolean isIPCReviewState = RequirementApprovalStates.IPC_REVIEW.toString().equals(toState);
+            boolean isIPCReviewState = RequirementApprovalState.IPC_REVIEW.toString().equals(toState);
             if (isIPCReviewState) {
-                String cdoState = RequirementApprovalStates.CDO_REVIEW.toString();
+                String cdoState = RequirementApprovalState.CDO_REVIEW.toString();
                 List<Requirement> cdoReviewEntities = repository.findEnabledRequirementsByStateFsn(cdoState, fsns);
                 cdoReviewEntities.forEach((entity) -> {
                     cdoStateRequirementMap.put(entity.getFsn(), entity.getWarehouse(), entity);
