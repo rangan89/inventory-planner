@@ -17,11 +17,11 @@ public class SupplierView {
     String fullName;
     String name;
     String vendorSiteId;
-    Integer mrp;
+    int mrp;
     boolean local;
-    Integer supplierQuantity;
-    Integer app;
-    Integer sla;
+    int supplierQuantity;
+    int app;
+    int sla;
     boolean isPositiveSupplierQuantity;
     boolean isPublisherAndDistributor;
     boolean isPublisher;
@@ -30,11 +30,11 @@ public class SupplierView {
     String source_id;
     String proc_type;
     boolean is_sor;
-    Integer fulfill_quantity;
+    int fulfill_quantity;
     String payment_term;
-    Integer logistics_cost;
-    Integer mov;
-    Integer moq;
+    int logistics_cost;
+    int mov;
+    int moq;
 
     public String getSourceId() {
         return source_id;

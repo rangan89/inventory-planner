@@ -34,6 +34,12 @@ public class WarehouseSupplierSlaRepositoryTest extends TransactionalJpaReposito
         //supplier not present
         sla = warehouseSupplierSlaRepository.getSla("vertical1", "wh1", "supp3");
         Assert.assertEquals(17, (int)sla.get());
+        //supplier is null
+        sla = warehouseSupplierSlaRepository.getSla("vertical1", "wh1", null);
+        Assert.assertEquals(17, (int)sla.get());
+        //supplier is empty
+        sla = warehouseSupplierSlaRepository.getSla("vertical1", "wh1", "");
+        Assert.assertEquals(17, (int)sla.get());
         //warehouse not present
         sla = warehouseSupplierSlaRepository.getSla("vertical1", "wh3", "supp1");
         Assert.assertEquals(15, (int)sla.get());

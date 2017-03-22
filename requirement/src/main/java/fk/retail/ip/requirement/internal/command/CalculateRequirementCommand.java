@@ -225,9 +225,6 @@ public class CalculateRequirementCommand {
 
     //TODO: optimize this
     private int getSla(String fsn, String warehouse, String supplier, int apiSla) {
-        if (apiSla > 0) {
-            return apiSla;
-        }
         try {
             String vertical = procPurchaseOrderRepository.find(fsn);
             Optional<Integer> sla = warehouseSupplierSlaRepository.getSla(vertical, warehouse, supplier);
