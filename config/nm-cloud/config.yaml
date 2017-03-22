@@ -2,11 +2,11 @@ dataSource:
   # the name of your JDBC driver
   driverClass: com.mysql.jdbc.Driver
   # the username
-  user: fk_sp_mapipre_rw
+  user: ip_sys_rw
   # the password
-  password: K3nzG9ll
+  password: caiP5yaa
   # the JDBC URL
-  url: jdbc:mysql://seller-mapi-master.nm.flipkart.com/sp_mapi_preprod
+  url: jdbc:mysql://10.32.173.190/erp_inv_db
   # any properties specific to your JDBC driver:
   properties:
     charSet: UTF-8
@@ -34,37 +34,49 @@ rotationManagementConfig:
 
 logging:
   level: INFO
+  loggers:
+    "org.hibernate.ejb.HibernatePersistence": ERROR
+    "org.hibernate.SQL": ERROR
+    "org.hibernate.type": ERROR
+    "com.flipkart.mmq.Dispatcher": ERROR
   appenders:
-  - type: file
-    threshold: ERROR
-    timeZone: IST
+  - type: file-size-rolled
+    threshold: ALL
+    timeZone: Asia/Calcutta
     logFormat: "%-5p [%d{ISO8601}] [%X{reqId} %X{txnId}] %replace(%c: %m){'\n', '\n '}%n%replace(%ex){'(?m)^(.)',' $1'}%nopex"
-    currentLogFilename: /var/log/flipkart/sp/fk-sp-inventory-planner/app.log
-    archivedLogFilenamePattern: /var/log/flipkart/sp/fk-sp-inventory-planner/app-%d.log.gz
-    archivedFileCount: 30
+    currentLogFilename: /var/log/flipkart/rp/fk-ip-inventory-planner/production.log
+    archive: true
+    archivedLogFilenamePattern: /var/log/flipkart/rp/fk-ip-inventory-planner/production.%i.log.gz
+    archivedFileCount: 4
+    maxFileSize: 500MB
+
 
 server:
   applicationConnectors:
   - type: http
-    port: 9999
+    port: 32000
     acceptQueueSize: 0
   adminConnectors:
   - type: http
-    port: 9991
+    port: 32001
   minThreads: 150
   maxThreads: 150
   gzip:
     enabled: true
+    minimumEntitySize: 256 bytes
+    bufferSize: 8KiB
+    excludedUserAgents: []
+    compressedMimeTypes: []
   requestLog:
     timeZone: IST
     appenders:
-    - type: file
+    - type: file-size-rolled
       logFormat: "%-5p [%d{ISO8601}] [%X{reqId} %X{txnId}] %replace(%c: %m){'\n', '\n '}%n%replace(%ex){'(?m)^(.)',' $1'}%nopex"
-      currentLogFilename: /var/log/flipkart/sp/fk-sp-inventory-planner/requests.log
+      currentLogFilename: /var/log/flipkart/rp/fk-ip-inventory-planner/requests.log
       archive: true
-      archivedLogFilenamePattern: /var/log/flipkart/sp/fk-sp-inventory-planner/requests-%d.log.gz
-      archivedFileCount: 30
-
+      archivedLogFilenamePattern: /var/log/flipkart/rp/fk-ip-inventory-planner/requests.%i.log.gz
+      archivedFileCount: 2
+      maxFileSize: 500MB
 
 clientConfiguration:
   timeout: 80000ms

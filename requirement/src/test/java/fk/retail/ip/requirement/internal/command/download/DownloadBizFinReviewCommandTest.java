@@ -1,4 +1,4 @@
-package fk.retail.ip.requirement.internal.command;
+package fk.retail.ip.requirement.internal.command.download;
 
 import com.google.common.collect.Lists;
 import fk.retail.ip.requirement.config.TestModule;

@@ -68,7 +68,6 @@ public class Requirement extends AbstractEntity {
 
     //todo: cleanup
     @Column(name = "comment")
-    @Size(max = 100)
     private String overrideComment;
 
     private String createdBy;

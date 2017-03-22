@@ -1,43 +1,43 @@
-package fk.retail.ip.requirement.internal.command;
+package fk.retail.ip.requirement.internal.command.download;
 
 import com.google.inject.Inject;
-
 import fk.retail.ip.requirement.internal.repository.*;
-import fk.retail.ip.zulu.client.ZuluClient;
+
 import fk.retail.ip.requirement.model.RequirementDownloadLineItem;
+import fk.retail.ip.zulu.client.ZuluClient;
+
 
 import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
-
 
 /**
  * Created by nidhigupta.m on 26/01/17.
  */
-public class DownloadCDOReviewCommand extends DownloadCommand {
-
+public class DownloadIPCReviewCommand extends DownloadCommand {
 
    @Inject
-    public DownloadCDOReviewCommand(FsnBandRepository fsnBandRepository, WeeklySaleRepository weeklySaleRepository, GenerateExcelCommand generateExcelCommand, LastAppSupplierRepository lastAppSupplierRepository,
+    public DownloadIPCReviewCommand(FsnBandRepository fsnBandRepository, WeeklySaleRepository weeklySaleRepository, GenerateExcelCommand generateExcelCommand, LastAppSupplierRepository lastAppSupplierRepository,
                                     ProductInfoRepository productInfoRepository, ZuluClient zuluClient, RequirementRepository requirementRepository, WarehouseRepository warehouseRepository) {
         super(fsnBandRepository, weeklySaleRepository, generateExcelCommand, lastAppSupplierRepository, productInfoRepository, zuluClient, requirementRepository, warehouseRepository);
-}
 
+    }
 
     @Override
-    protected String getTemplateName(boolean isLastAPPSupplierRequired) {
-        if(isLastAPPSupplierRequired)
-            return "/templates/CDOReviewWithLastAppSupplier.xlsx";
-        else
-            return "/templates/CDOReview.xlsx";
+    protected String getTemplateName(boolean isLastAppSupplierRequired) {
+        return "/templates/IPCReview.xlsx";
     }
 
     @Override
     void fetchRequirementStateData(boolean isLastAppSupplierRequired, Set<String> requirementFsns, List<RequirementDownloadLineItem> requirementDownloadLineItems) {
-        if (isLastAppSupplierRequired) {
-            fetchLastAppSupplierDataFromProc(requirementFsns,requirementDownloadLineItems);
-        }
+
+        populateCdoData(requirementFsns,requirementDownloadLineItems);
+        populateIpcQuantity(requirementFsns,requirementDownloadLineItems);
         populateBizFinData(requirementFsns,requirementDownloadLineItems);
     }
+
+
+
+
+
 
 }

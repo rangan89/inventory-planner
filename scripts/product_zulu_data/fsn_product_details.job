@@ -1,0 +1,3 @@
+type=command
+command=python fsn_product_details.py
+failure.emails=rp-dev

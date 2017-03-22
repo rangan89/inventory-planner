@@ -1,6 +1,8 @@
 package fk.retail.ip.requirement.internal.states;
 
 import fk.retail.ip.requirement.internal.entities.Requirement;
+import fk.retail.ip.requirement.model.RequirementDownloadLineItem;
+import fk.retail.ip.requirement.model.UploadOverrideFailureLineItem;
 import java.util.List;
 import javax.ws.rs.core.StreamingOutput;
 
@@ -11,5 +13,6 @@ import javax.ws.rs.core.StreamingOutput;
 public interface RequirementState {
 
     StreamingOutput download(List<Requirement> requirements, boolean isLastAppSupplierRequired);
+    List<UploadOverrideFailureLineItem> upload(List<Requirement> requirements, List<RequirementDownloadLineItem> requirementDownloadLineItems);
 
 }

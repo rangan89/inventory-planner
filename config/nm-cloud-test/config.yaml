@@ -34,9 +34,21 @@ rotationManagementConfig:
 
 logging:
   level: INFO
+  loggers:
+    "org.hibernate.ejb.HibernatePersistence": ERROR
+    "org.hibernate.SQL": ERROR
+    "org.hibernate.type": ERROR
+    "com.flipkart.mmq.Dispatcher": ERROR
   appenders:
-  - type: console
-    threshold: INFO
+  - type: file-size-rolled
+    threshold: ALL
+    timeZone: Asia/Calcutta
+    logFormat: "%-5p [%d{ISO8601}] [%X{reqId} %X{txnId}] %replace(%c: %m){'\n', '\n '}%n%replace(%ex){'(?m)^(.)',' $1'}%nopex"
+    currentLogFilename: /var/log/flipkart/rp/fk-ip-inventory-planner/production.log
+    archive: true
+    archivedLogFilenamePattern: /var/log/flipkart/rp/fk-ip-inventory-planner/production.%i.log.gz
+    archivedFileCount: 3
+    maxFileSize: 10KB
 
 server:
   applicationConnectors:
@@ -57,8 +69,13 @@ server:
   requestLog:
     timeZone: IST
     appenders:
-    - type: console
-      threshold: INFO
+    - type: file
+      logFormat: "%-5p [%d{ISO8601}] [%X{reqId} %X{txnId}] %replace(%c: %m){'\n', '\n '}%n%replace(%ex){'(?m)^(.)',' $1'}%nopex"
+      currentLogFilename: /var/log/flipkart/rp/fk-ip-inventory-planner/requests.log
+      archive: true
+      archivedLogFilenamePattern: /var/log/flipkart/rp/fk-ip-inventory-planner/requests.%i.log.gz
+      archivedFileCount: 2
+      maxFileSize: 10KB
 
 
 zuluConfiguration:
@@ -85,3 +102,4 @@ clientConfiguration:
   gzipEnabled: false
   gzipEnabledForRequests: false
   chunkedEncodingEnabled: false
+

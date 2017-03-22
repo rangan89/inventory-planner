@@ -66,3 +66,6 @@ server:
       archive: true
       archivedLogFilenamePattern: /var/log/flipkart/sp/fk-sp-inventory-planner/requests-%d.log.gz
       archivedFileCount: 30
+sslClientConfiguration:
+  url: http://10.85.52.106
+  viewPath: "/supplier_selection"

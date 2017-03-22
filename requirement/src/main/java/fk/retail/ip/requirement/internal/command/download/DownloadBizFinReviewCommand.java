@@ -1,4 +1,4 @@
-package fk.retail.ip.requirement.internal.command;
+package fk.retail.ip.requirement.internal.command.download;
 
 import com.google.inject.Inject;
 

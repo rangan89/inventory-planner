@@ -34,7 +34,7 @@ public class SpreadSheetWriter {
         try (OPCPackage pkg = OPCPackage.open(tempFile.toFile())) {
             XSSFWorkbook wb = new XSSFWorkbook(pkg);
             Sheet sheet = wb.getSheetAt(0);
-            sheet.protectSheet("uneditable");
+            //sheet.protectSheet("uneditable");
             List<String> headers = new ArrayList<>();
             Row headerRow = sheet.getRow(0);
             for (int c = 0; c < headerRow.getLastCellNum(); c++) {

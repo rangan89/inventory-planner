@@ -1,5 +1,6 @@
-package fk.retail.ip.requirement.internal.command;
+package fk.retail.ip.requirement.internal.command.download;
 
+import fk.retail.ip.requirement.internal.command.RequirementDataAggregator;
 import fk.retail.ip.requirement.internal.entities.Requirement;
 import fk.retail.ip.requirement.internal.repository.FsnBandRepository;
 import fk.retail.ip.requirement.internal.repository.LastAppSupplierRepository;
@@ -30,7 +31,7 @@ public abstract class DownloadCommand extends RequirementDataAggregator {
 
     public DownloadCommand(FsnBandRepository fsnBandRepository, WeeklySaleRepository weeklySaleRepository, GenerateExcelCommand generateExcelCommand, LastAppSupplierRepository lastAppSupplierRepository,
                            ProductInfoRepository productInfoRepository, ZuluClient zuluClient, RequirementRepository requirementRepository, WarehouseRepository warehouseRepository) {
-        super(fsnBandRepository, weeklySaleRepository,lastAppSupplierRepository, productInfoRepository, zuluClient, requirementRepository, warehouseRepository);
+        super(fsnBandRepository, weeklySaleRepository, lastAppSupplierRepository, productInfoRepository, zuluClient, requirementRepository, warehouseRepository);
         this.generateExcelCommand = generateExcelCommand;
     }
 
@@ -44,12 +45,12 @@ public abstract class DownloadCommand extends RequirementDataAggregator {
         Map<String, List<RequirementDownloadLineItem>> fsnToRequirement = requirementDownloadLineItems.stream().collect(Collectors.groupingBy(RequirementDownloadLineItem::getFsn));
         Map<String, List<RequirementDownloadLineItem>> WhToRequirement = requirementDownloadLineItems.stream().collect(Collectors.groupingBy(RequirementDownloadLineItem::getWarehouse));
         Set<String> fsns = fsnToRequirement.keySet();
-        Set<String> requirementWhs =  WhToRequirement.keySet();
+        Set<String> requirementWhs = WhToRequirement.keySet();
         fetchProductData(fsnToRequirement);
         fetchFsnBandData(fsnToRequirement);
         fetchSalesBucketData(fsns, requirementDownloadLineItems);
-        fetchWarehouseName(requirementWhs,requirementDownloadLineItems);
-        fetchRequirementStateData(isLastAppSupplierRequired, fsns,requirementDownloadLineItems);
+        fetchWarehouseName(requirementWhs, requirementDownloadLineItems);
+        fetchRequirementStateData(isLastAppSupplierRequired, fsns, requirementDownloadLineItems);
         return generateExcelCommand.generateExcel(requirementDownloadLineItems, getTemplateName(isLastAppSupplierRequired));
     }
 

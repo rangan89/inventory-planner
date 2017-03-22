@@ -109,7 +109,10 @@ public class CalculateRequirementCommand {
     public void execute() {
         //mark existing requirements ad disabled
         List<Requirement> existingRequirements = requirementRepository.find(fsns, true);
-        existingRequirements.forEach(requirement -> requirement.setEnabled(false));
+        existingRequirements.forEach(requirement -> {
+            requirement.setEnabled(false);
+            requirement.setCurrent(false);
+        });
         //TODO: remove
         List<Projection> existingProjections = projectionRepository.find(fsns, true);
         existingProjections.forEach(projection -> projection.setEnabled(0));

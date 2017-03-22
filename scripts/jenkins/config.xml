@@ -94,7 +94,6 @@
     <builders>
         <hudson.tasks.Shell>
             <command>cd inventory-planner
-                ./gradlew clean test jacocoTestReport
                 ./gradlew generateRestApiDocs generateMetricsDocs --rerun-tasks
                 ./gradlew genDebianProject
                 ./gradlew clean shadowJar buildDeb

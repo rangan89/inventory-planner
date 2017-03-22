@@ -15,6 +15,7 @@ public enum RequirementApprovalState {
     IPC_FINALISED("ipc_finalized"), ;
 
 
+
     private String state;
 
     RequirementApprovalState(String state) {

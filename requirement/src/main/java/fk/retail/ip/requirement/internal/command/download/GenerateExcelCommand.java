@@ -1,4 +1,4 @@
-package fk.retail.ip.requirement.internal.command;
+package fk.retail.ip.requirement.internal.command.download;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,7 +23,7 @@ public class GenerateExcelCommand {
 
     public StreamingOutput generateExcel(List<RequirementDownloadLineItem> requirementDownloadLineItems, String templateName) {
         log.info("Generating excel for {} number of requirements",requirementDownloadLineItems.size());
-        SpreadSheetWriter spreadsheet = new RequirementSpreadSheetWriter();
+        SpreadSheetWriter spreadsheet = new SpreadSheetWriter();
         ObjectMapper mapper = new ObjectMapper();
         InputStream template = getClass().getResourceAsStream(templateName);
         StreamingOutput output = (OutputStream out) -> {

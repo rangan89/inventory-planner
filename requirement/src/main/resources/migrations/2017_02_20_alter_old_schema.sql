@@ -36,6 +36,7 @@ CREATE TABLE `warehouse` (
 
 
 alter table projection_states add column fsn varchar(20);
+update projection_states as ps set fsn = (select fsn from projections where id = ps.projection_id ) where fsn = null;
 
 //populating existing fsn from projections to projection_states
 update projection_states as ps set fsn = (select fsn from projections where id = ps.projection_id ) where fsn is NULL

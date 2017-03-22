@@ -1,4 +1,4 @@
-package fk.retail.ip.requirement.internal.command;
+package fk.retail.ip.requirement.internal.command.download;
 
 import com.google.inject.Inject;
 import fk.retail.ip.requirement.internal.repository.*;
@@ -9,25 +9,22 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created by nidhigupta.m on 26/01/17.
+ * Created by yogeshwari.k on 23/02/17.
  */
-public class DownloadProposedCommand extends DownloadCommand {
+public class DownloadPreProposedCommand extends DownloadCommand {
 
     @Inject
-    public DownloadProposedCommand(FsnBandRepository fsnBandRepository, WeeklySaleRepository weeklySaleRepository, GenerateExcelCommand generateExcelCommand, LastAppSupplierRepository lastAppSupplierRepository,
-                                   ProductInfoRepository productInfoRepository, ZuluClient zuluClient, RequirementRepository requirementRepository, WarehouseRepository warehouseRepository) {
+    public DownloadPreProposedCommand(FsnBandRepository fsnBandRepository, WeeklySaleRepository weeklySaleRepository, GenerateExcelCommand generateExcelCommand, LastAppSupplierRepository lastAppSupplierRepository, ProductInfoRepository productInfoRepository, ZuluClient zuluClient, RequirementRepository requirementRepository, WarehouseRepository warehouseRepository) {
         super(fsnBandRepository, weeklySaleRepository, generateExcelCommand, lastAppSupplierRepository, productInfoRepository, zuluClient, requirementRepository, warehouseRepository);
-
     }
 
     @Override
     protected String getTemplateName(boolean isLastAppSupplierRequired) {
-        return "/templates/proposed.xlsx";
+        return "/templates/pre_proposed.xlsx";
     }
 
     @Override
     void fetchRequirementStateData(boolean isLastAppSupplierRequired, Set<String> requirementFsns, List<RequirementDownloadLineItem> requirementDownloadLineItems) {
 
     }
-
 }

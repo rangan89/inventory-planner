@@ -20,7 +20,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 public class SpreadSheetReader {
 
     //    private final DecimalFormat formatter = new DecimalFormat("#.###");
-    public List<Map<String, Object>> writeToCsv(InputStream xlsxFile) throws InvalidFormatException, IOException {
+    public List<Map<String, Object>> read(InputStream xlsxFile) throws InvalidFormatException, IOException {
         List<Map<String, Object>> rows = new ArrayList<>();
         try (OPCPackage pkg = OPCPackage.open(xlsxFile)) {
 
@@ -28,7 +28,7 @@ public class SpreadSheetReader {
             Sheet sheet = wb.getSheetAt(0);
 //            FormulaEvaluator evaluator = wb.getCreationHelper().createFormulaEvaluator();
 
-            int maxRows = sheet.getLastRowNum();
+            int maxRows = sheet.getLastRowNum() + 1;
             List<String> headers = new ArrayList<>();
             Row headerRow = sheet.getRow(0);
             for (int c = 0; c < headerRow.getLastCellNum(); c++) {
