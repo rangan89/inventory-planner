@@ -17,6 +17,7 @@ import fk.retail.ip.requirement.internal.entities.GroupFsn;
 import fk.retail.ip.requirement.internal.entities.IwtRequestItem;
 import fk.retail.ip.requirement.internal.entities.OpenRequirementAndPurchaseOrder;
 import fk.retail.ip.requirement.internal.entities.Policy;
+import fk.retail.ip.requirement.internal.entities.ProductInfo;
 import fk.retail.ip.requirement.internal.entities.Projection;
 import fk.retail.ip.requirement.internal.entities.Requirement;
 import fk.retail.ip.requirement.internal.entities.RequirementSnapshot;
@@ -28,7 +29,7 @@ import fk.retail.ip.requirement.internal.repository.GroupFsnRepository;
 import fk.retail.ip.requirement.internal.repository.IwtRequestItemRepository;
 import fk.retail.ip.requirement.internal.repository.OpenRequirementAndPurchaseOrderRepository;
 import fk.retail.ip.requirement.internal.repository.PolicyRepository;
-import fk.retail.ip.requirement.internal.repository.ProcPurchaseOrderRepository;
+import fk.retail.ip.requirement.internal.repository.ProductInfoRepository;
 import fk.retail.ip.requirement.internal.repository.ProjectionRepository;
 import fk.retail.ip.requirement.internal.repository.RequirementRepository;
 import fk.retail.ip.requirement.internal.repository.WarehouseInventoryRepository;
@@ -58,7 +59,7 @@ public class CalculateRequirementCommand {
     private final IwtRequestItemRepository iwtRequestItemRepository;
     private final OpenRequirementAndPurchaseOrderRepository openRequirementAndPurchaseOrderRepository;
     private final RequirementRepository requirementRepository;
-    private final ProcPurchaseOrderRepository procPurchaseOrderRepository;
+    private final ProductInfoRepository productInfoRepository;
     private final WarehouseSupplierSlaRepository warehouseSupplierSlaRepository;
     private final SslClient sslClient;
     //TODO: remove
@@ -73,7 +74,7 @@ public class CalculateRequirementCommand {
     private OnHandQuantityContext onHandQuantityContext;
 
     @Inject
-    public CalculateRequirementCommand(WarehouseRepository warehouseRepository, GroupFsnRepository groupFsnRepository, PolicyRepository policyRepository, ForecastRepository forecastRepository, WarehouseInventoryRepository warehouseInventoryRepository, IwtRequestItemRepository iwtRequestItemRepository, OpenRequirementAndPurchaseOrderRepository openRequirementAndPurchaseOrderRepository, RequirementRepository requirementRepository, ProcPurchaseOrderRepository procPurchaseOrderRepository, WarehouseSupplierSlaRepository warehouseSupplierSlaRepository, SslClient sslClient, ProjectionRepository projectionRepository, ObjectMapper objectMapper) {
+    public CalculateRequirementCommand(WarehouseRepository warehouseRepository, GroupFsnRepository groupFsnRepository, PolicyRepository policyRepository, ForecastRepository forecastRepository, WarehouseInventoryRepository warehouseInventoryRepository, IwtRequestItemRepository iwtRequestItemRepository, OpenRequirementAndPurchaseOrderRepository openRequirementAndPurchaseOrderRepository, RequirementRepository requirementRepository, ProductInfoRepository productInfoRepository, WarehouseSupplierSlaRepository warehouseSupplierSlaRepository, SslClient sslClient, ProjectionRepository projectionRepository, ObjectMapper objectMapper) {
         this.warehouseRepository = warehouseRepository;
         this.groupFsnRepository = groupFsnRepository;
         this.policyRepository = policyRepository;
@@ -82,7 +83,7 @@ public class CalculateRequirementCommand {
         this.iwtRequestItemRepository = iwtRequestItemRepository;
         this.openRequirementAndPurchaseOrderRepository = openRequirementAndPurchaseOrderRepository;
         this.requirementRepository = requirementRepository;
-        this.procPurchaseOrderRepository = procPurchaseOrderRepository;
+        this.productInfoRepository = productInfoRepository;
         this.warehouseSupplierSlaRepository = warehouseSupplierSlaRepository;
         this.sslClient = sslClient;
         this.projectionRepository = projectionRepository;
@@ -206,6 +207,8 @@ public class CalculateRequirementCommand {
         responses.stream().filter(response -> response.getSuppliers().size() > 0).forEach(response -> {
             fsnWhSupplierTable.put(response.getFsn(), response.getWarehouseId(), response);
         });
+        List<ProductInfo> productInfos = productInfoRepository.getProductInfo(forecastContext.getFsns());
+        Map<String, String> fsnToVerticalMap = productInfos.stream().collect(Collectors.toMap(ProductInfo::getFsn, ProductInfo::getVertical, (k1, k2) -> k1));
         requirements.forEach(requirement -> {
             SupplierSelectionResponse supplierResponse = fsnWhSupplierTable.get(requirement.getFsn(), requirement.getWarehouse());
             if (supplierResponse != null) {
@@ -213,7 +216,7 @@ public class CalculateRequirementCommand {
                 requirement.setSupplier(supplier.getSourceId());
                 requirement.setApp(supplier.getApp());
                 requirement.setMrp(supplier.getMrp());
-                int sla = getSla(requirement.getFsn(), requirement.getWarehouse(), supplier.getSourceId(), supplier.getSla());
+                int sla = getSla(fsnToVerticalMap.get(requirement.getFsn()), requirement.getWarehouse(), supplier.getSourceId(), supplier.getSla());
                 requirement.setSla(sla);
                 requirement.setCurrency(supplier.getVendorPreferredCurrency());
                 requirement.setMrpCurrency(supplier.getVendorPreferredCurrency());
@@ -224,9 +227,11 @@ public class CalculateRequirementCommand {
     }
 
     //TODO: optimize this
-    private int getSla(String fsn, String warehouse, String supplier, int apiSla) {
+    private int getSla(String vertical, String warehouse, String supplier, int apiSla) {
+        if (vertical == null || warehouse == null) {
+            return apiSla;
+        }
         try {
-            String vertical = procPurchaseOrderRepository.find(fsn);
             Optional<Integer> sla = warehouseSupplierSlaRepository.getSla(vertical, warehouse, supplier);
             if (sla.isPresent()) {
                 return sla.get();

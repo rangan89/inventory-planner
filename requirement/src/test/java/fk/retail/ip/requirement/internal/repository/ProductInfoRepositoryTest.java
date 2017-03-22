@@ -1,6 +1,6 @@
 package fk.retail.ip.requirement.internal.repository;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import fk.retail.ip.requirement.config.TestDbModule;
 import fk.retail.ip.requirement.internal.entities.ProductInfo;
@@ -33,7 +33,7 @@ public class ProductInfoRepositoryTest extends TransactionalJpaRepositoryTest {
     public void testGetProductInfo() {
         ProductInfo productInfo = getProductInfo(1);
         productInfoRepository.persist(productInfo);
-        List<ProductInfo> productInfoList = productInfoRepository.getProductInfo(Lists.newArrayList(String.valueOf(1)));
+        List<ProductInfo> productInfoList = productInfoRepository.getProductInfo(Sets.newHashSet(String.valueOf(1)));
         Assert.assertEquals(1, productInfoList.size());
         Assert.assertEquals(productInfo, productInfoList.get(0));
     }

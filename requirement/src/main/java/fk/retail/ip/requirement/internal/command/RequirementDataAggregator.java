@@ -212,7 +212,7 @@ public class RequirementDataAggregator {
     private Set<String> fetchDataFromProductInfo(Map<String, List<RequirementDownloadLineItem>> fsnToRequirement ) {
         log.info("Fetching product info data from db for downloading requirements");
         Set<String> fsns = fsnToRequirement.keySet();
-        List<ProductInfo> productInfo = productInfoRepository.getProductInfo(Lists.newArrayList(fsns));
+        List<ProductInfo> productInfo = productInfoRepository.getProductInfo(fsns);
         Set<String> cachedFsns = Sets.newHashSet();
         productInfo.stream().forEach(pi -> {
             cachedFsns.add(pi.getFsn());
