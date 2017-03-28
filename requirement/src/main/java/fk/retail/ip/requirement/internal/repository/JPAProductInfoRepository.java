@@ -2,6 +2,9 @@ package fk.retail.ip.requirement.internal.repository;
 
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
+
+import org.apache.commons.collections4.CollectionUtils;
+
 import fk.retail.ip.requirement.internal.entities.ProductInfo;
 import fk.retail.ip.requirement.internal.entities.Requirement;
 import fk.sp.common.extensions.jpa.SimpleJpaGenericRepository;
@@ -28,6 +31,9 @@ public class JPAProductInfoRepository extends SimpleJpaGenericRepository<Product
 
     @Override
     public List<ProductInfo> getProductInfo(Set<String> fsns) {
+        if (CollectionUtils.isEmpty(fsns)) {
+            return Lists.newArrayList();
+        }
         TypedQuery<ProductInfo> query = getEntityManager().createNamedQuery("getProductInfo", ProductInfo.class);
         query.setParameter("fsns", fsns);
         return query.getResultList();
