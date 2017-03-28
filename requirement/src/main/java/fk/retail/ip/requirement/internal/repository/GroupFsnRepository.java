@@ -7,4 +7,8 @@ import java.util.Set;
 
 public interface GroupFsnRepository extends JpaGenericRepository<GroupFsn, Long> {
     List<GroupFsn> findByFsns(Set<String> fsns);
+
+    List<String> getFsns(String group);
+
+    List<String> getAllFsns();
 }

@@ -1,5 +1,7 @@
 package fk.retail.ip.requirement.resource;
 
+import com.codahale.metrics.annotation.ExceptionMetered;
+import com.codahale.metrics.annotation.Metered;
 import com.codahale.metrics.annotation.Timed;
 import com.google.inject.Inject;
 import com.google.inject.persist.Transactional;
@@ -39,7 +41,9 @@ public class RequirementResource {
     public RequirementResource(RequirementService requirementService) {
         this.requirementService = requirementService;
     }
-
+    @Timed(name="calcReqTimer")
+    @Metered(name="calcReqMeter")
+    @ExceptionMetered(name="calcReqExceptionMeter")
     @POST
     public void calculateRequirement(@Valid CalculateRequirementRequest calculateRequirementRequest) {
         requirementService.calculateRequirement(calculateRequirementRequest);
@@ -47,7 +51,9 @@ public class RequirementResource {
 
     @POST
     @Path("/download")
-    @Timed
+    @Timed(name="downloadTimer")
+    @Metered(name="downloadMeter")
+    @ExceptionMetered(name="downloadExceptionMeter")
     public Response download(DownloadRequirementRequest downloadRequirementRequest) {
         log.info("Download Requirement request received " + downloadRequirementRequest);
         StreamingOutput stream = requirementService.downloadRequirement(downloadRequirementRequest);
@@ -57,10 +63,11 @@ public class RequirementResource {
                     .build();
 
     }
-
+    @Timed(name="uploadTimer")
+    @Metered(name="uploadMeter")
+    @ExceptionMetered(name="uploadExceptionMeter")
     @POST
     @Path("/upload")
-    @Timed
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response uploadProjectionOverride(
@@ -85,7 +92,9 @@ public class RequirementResource {
     @PUT
     @Path("/state")
     @Produces(MediaType.APPLICATION_JSON)
-    @Timed
+    @Timed(name="changeStateTimer")
+    @Metered(name="changeStateMeter")
+    @ExceptionMetered(name="changeStateExceptionMeter")
     public String changeState(RequirementApprovalRequest request) throws JSONException {
         return requirementService.changeState(request);
     }

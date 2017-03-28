@@ -272,6 +272,29 @@
         </query>
     </named-query>
 
+    <named-query name="GroupFsn.getFsnsForGroup">
+        <query>
+            <![CDATA[
+            SELECT fsn
+            FROM GroupFsn gf
+            WHERE
+                gf.group.name = :groupName
+                ]]>
+        </query>
+    </named-query>
+
+
+    <named-query name="GroupFsn.getDistinctFsns">
+        <query>
+            <![CDATA[
+            SELECT fsn
+            FROM GroupFsn gf
+            WHERE
+                gf.group.enabled = true
+                ]]>
+        </query>
+    </named-query>
+
     <named-query name="Forecast.fetchByFsns">
         <query>
             <![CDATA[

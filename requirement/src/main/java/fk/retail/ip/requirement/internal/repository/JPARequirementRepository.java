@@ -61,14 +61,14 @@ public class JPARequirementRepository extends SimpleJpaGenericRepository<Require
 
 
 
-    public List<Requirement> findRequirements(List<Long> projectionIds, String requirementState, Map<String, Object> filters, int pageNumber, int pageSize) {
-        TypedQuery<Requirement> query = getCriteriaQuery(projectionIds, requirementState, filters);
+    public List<Requirement> findRequirements(List<Long> projectionIds, String requirementState, List<String> fsns , int pageNumber, int pageSize) {
+        TypedQuery<Requirement> query = getCriteriaQuery(projectionIds, requirementState, fsns);
         query.setFirstResult((pageNumber - 1) * pageSize).setMaxResults(pageSize);
         return query.getResultList();
     }
 
-    public List<Requirement> findRequirements(List<Long> projectionIds, String requirementState, Map<String, Object> filters) {
-        TypedQuery<Requirement> query = getCriteriaQuery(projectionIds, requirementState, filters);
+    public List<Requirement> findRequirements(List<Long> projectionIds, String requirementState, List<String> fsns) {
+        TypedQuery<Requirement> query = getCriteriaQuery(projectionIds, requirementState, fsns);
         return query.getResultList();
     }
 
@@ -81,13 +81,11 @@ public class JPARequirementRepository extends SimpleJpaGenericRepository<Require
         return requirements;
     }
 
-    private TypedQuery<Requirement> getCriteriaQuery(List<Long> projectionIds, String requirementState, Map<String, Object> filters) {
+    private TypedQuery<Requirement> getCriteriaQuery(List<Long> projectionIds, String requirementState, List<String> fsns) {
          EntityManager entityManager = getEntityManager();
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Requirement> criteriaQuery = criteriaBuilder.createQuery(Requirement.class);
         Root<Requirement> requirementRoot = criteriaQuery.from(Requirement.class);
-        Join<Requirement, RequirementSnapshot> requirementSnapshot = requirementRoot.join("requirementSnapshot");
-        requirementRoot.fetch("requirementSnapshot");
         CriteriaQuery<Requirement> select = criteriaQuery.select(requirementRoot);
         List<Predicate> predicates = Lists.newArrayList();
         Predicate predicate = criteriaBuilder.equal(requirementRoot.get("current"), 1);
@@ -98,30 +96,8 @@ public class JPARequirementRepository extends SimpleJpaGenericRepository<Require
             predicate = criteriaBuilder.isTrue(requirementRoot.get("projectionId").in(projectionIds));
             predicates.add(predicate);
         }
-        List<String> fsns = (List<String>) filters.get("fsns");
-
-        if (fsns != null && !fsns.isEmpty()) {
-            predicate = criteriaBuilder.isTrue(requirementRoot.get("fsn").in(fsns));
-            predicates.add(predicate);
-        }
-        if (filters.containsKey("international") && !filters.get("international").toString().isEmpty()) {
-            predicate = criteriaBuilder.equal(requirementRoot.get("international"), Integer.parseInt(filters.get("international").toString()));
-            predicates.add(predicate);
-        }
-        if (filters.containsKey("price_from") && !filters.get("price_from").toString().isEmpty()) {
-            predicate = criteriaBuilder.greaterThanOrEqualTo(requirementRoot.get("app"), Integer.parseInt(filters.get("price_from").toString()));
-            predicates.add(predicate);
-        }
-        if (filters.containsKey("price_to") && !filters.get("price_to").toString().isEmpty()) {
-            predicate = criteriaBuilder.lessThanOrEqualTo(requirementRoot.get("app"), Integer.parseInt(filters.get("price_to").toString()));
-            predicates.add(predicate);
-        }
-        List<String> group = (List<String>) filters.get("group");
-        if (group != null && !group.isEmpty()) {
-            predicate = criteriaBuilder.isTrue(requirementSnapshot.get("group").get("name").in(group));
-            predicates.add(predicate);
-        }
-
+        predicate = criteriaBuilder.isTrue(requirementRoot.get("fsn").in(fsns));
+        predicates.add(predicate);
         select.where(criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()])));
         TypedQuery<Requirement> query = entityManager.createQuery(select);
         return query;

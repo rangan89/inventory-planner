@@ -34,11 +34,13 @@ public interface Constants {
 
     String FSN_OR_WAREHOUSE_IS_MISSING = "FSN or Warehouse is missing";
     String QUANTITY_OVERRIDE_COMMENT_IS_MISSING = "Quantity override reason is missing";
+
     String SUGGESTED_QUANTITY_IS_NOT_GREATER_THAN_ZERO = "Suggested quantity shouldn't be negative";
     String APP_OVERRIDE_COMMENT_IS_MISSING = "Price override reason is missing";
     String SUPPLIER_OVERRIDE_COMMENT_IS_MISSING = "Supplier override reason is missing";
     String SLA_QUANTITY_IS_NOT_GREATER_THAN_ZERO = "Suggested SLA should be greater than zero";
     String APP_QUANTITY_IS_NOT_GREATER_THAN_ZERO = "Suggested price should be greater than zero";
+
     String REQUIREMENT_NOT_FOUND_FOR_GIVEN_REQUIREMENT_ID = "Requirement not found for given requirement Id";
     String INVALID_QUANTITY_WITHOUT_COMMENT = "Invalid quantity without reason";
     String INVALID_APP_WITHOUT_COMMENT = "Invalid Price without reason";

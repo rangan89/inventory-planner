@@ -28,4 +28,17 @@ public class JPAGroupFsnRepository extends SimpleJpaGenericRepository<GroupFsn, 
         query.setParameter("fsns", fsns);
         return query.getResultList();
     }
+
+    @Override
+    public List<String> getFsns(String group) {
+        TypedQuery<String> query = getEntityManager().createNamedQuery("GroupFsn.getFsnsForGroup",String.class);
+        query.setParameter("groupName", group);
+        return query.getResultList();
+    }
+
+    @Override
+    public List<String> getAllFsns() {
+        TypedQuery<String> query = getEntityManager().createNamedQuery("GroupFsn.getDistinctFsns",String.class);
+        return query.getResultList();
+    }
 }

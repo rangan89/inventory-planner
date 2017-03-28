@@ -2,12 +2,12 @@ package fk.retail.ip.requirement.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import fk.retail.ip.core.poi.SpreadSheetReader;
 import fk.retail.ip.requirement.internal.Constants;
 import fk.retail.ip.requirement.internal.command.CalculateRequirementCommand;
+import fk.retail.ip.requirement.internal.command.SearchFilterCommand;
 import fk.retail.ip.requirement.internal.entities.Requirement;
 import fk.retail.ip.requirement.internal.enums.OverrideStatus;
 import fk.retail.ip.requirement.internal.factory.RequirementStateFactory;
@@ -45,14 +45,17 @@ public class RequirementService {
     private final RequirementStateFactory requirementStateFactory;
     private final ApprovalService approvalService;
     private final Provider<CalculateRequirementCommand> calculateRequirementCommandProvider;
+    private final SearchFilterCommand searchFilterCommand;
 
     @Inject
     public RequirementService(RequirementRepository requirementRepository, RequirementStateFactory requirementStateFactory,
-                              ApprovalService approvalService, Provider<CalculateRequirementCommand> calculateRequirementCommandProvider) {
+                              ApprovalService approvalService, Provider<CalculateRequirementCommand> calculateRequirementCommandProvider,
+                              SearchFilterCommand searchFilterCommand) {
         this.requirementRepository = requirementRepository;
         this.requirementStateFactory = requirementStateFactory;
         this.approvalService = approvalService;
         this.calculateRequirementCommandProvider = calculateRequirementCommandProvider;
+        this.searchFilterCommand = searchFilterCommand;
     }
 
     public StreamingOutput downloadRequirement(DownloadRequirementRequest downloadRequirementRequest) {
@@ -60,7 +63,8 @@ public class RequirementService {
         String requirementState = downloadRequirementRequest.getState();
         Map<String, Object> filters = downloadRequirementRequest.getFilters();
         boolean isLastAppSupplierRequired = downloadRequirementRequest.isLastAppSupplierRequired();
-        List<Requirement> requirements = requirementRepository.findRequirements(requirementIds, requirementState, filters);
+        List<String> fsns = searchFilterCommand.getSearchFilterFsns(filters);
+        List<Requirement> requirements = requirementRepository.findRequirements(requirementIds, requirementState, fsns);
         requirements = requirements.stream().filter(requirement -> !requirement.getWarehouse().equals("all")).collect(Collectors.toList());
         RequirementState state = requirementStateFactory.getRequirementState(requirementState);
         return state.download(requirements, isLastAppSupplierRequired);
@@ -141,7 +145,8 @@ public class RequirementService {
         List<Long> ids = (List<Long>) request.getFilters().get("id");
         String state = (String) request.getFilters().get("state");
         Set<Long> projectionIds = new HashSet<>();
-        requirements = requirementRepository.findRequirements(ids, state, request.getFilters());
+        List<String> fsns = searchFilterCommand.getSearchFilterFsns(request.getFilters());
+        requirements = requirementRepository.findRequirements(ids, state, fsns);
         log.info("Change state Request for {} number of requirements", requirements.size());
         requirements.stream().forEach(e -> projectionIds.add(e.getProjectionId()));
         approvalService.changeState(requirements, "dummyUser", action, getter, new ApprovalService.CopyOnStateChangeAction(requirementRepository));

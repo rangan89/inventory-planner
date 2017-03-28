@@ -1,8 +1,6 @@
 package fk.retail.ip.requirement.internal.repository;
 
 import com.google.common.collect.Lists;
-
-import java.util.*;
 import fk.retail.ip.requirement.internal.entities.Forecast;
 import fk.retail.ip.requirement.internal.entities.FsnBand;
 import fk.retail.ip.requirement.internal.entities.Group;
@@ -18,15 +16,14 @@ import fk.retail.ip.requirement.internal.entities.RequirementSnapshot;
 import fk.retail.ip.requirement.internal.entities.Warehouse;
 import fk.retail.ip.requirement.internal.entities.WarehouseSupplierSla;
 import fk.retail.ip.requirement.internal.entities.WeeklySale;
-import fk.retail.ip.zulu.internal.entities.EntityView;
-import fk.retail.ip.zulu.internal.entities.RetailProductAttributeResponse;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
 import fk.retail.ip.requirement.model.RequirementDownloadLineItem;
 import fk.retail.ip.zulu.internal.entities.EntityView;
 import fk.retail.ip.zulu.internal.entities.RetailProductAttributeResponse;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class TestHelper {
 
@@ -54,12 +51,22 @@ public class TestHelper {
         return groupFsn;
     }
 
-    public static Group getGroup(String name) {
+    public static Group getEnabledGroup(String name) {
         Group group = new Group();
         group.setName(name);
+        group.setEnabled(true);
         group.setCreatedAt(new Date());
         return group;
     }
+
+    public static Group getDisabledGroup(String name) {
+        Group group = new Group();
+        group.setName(name);
+        group.setEnabled(false);
+        group.setCreatedAt(new Date());
+        return group;
+    }
+
 
     public static OpenRequirementAndPurchaseOrder getOpenRequirementAndPurchaseOrder() {
         OpenRequirementAndPurchaseOrder openRequirementAndPurchaseOrder = new OpenRequirementAndPurchaseOrder();

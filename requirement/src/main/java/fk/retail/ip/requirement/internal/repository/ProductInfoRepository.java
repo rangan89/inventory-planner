@@ -11,4 +11,6 @@ import java.util.Set;
 public interface ProductInfoRepository extends JpaGenericRepository<ProductInfo, Long> {
 
     List<ProductInfo> getProductInfo(Set<String> fsns);
+
+    List<String> getFsns(String vertical, String category, String superCategory, String businessUnit);
 }

@@ -22,7 +22,7 @@ public class PolicyRepositoryTest extends TransactionalJpaRepositoryTest {
 
     @Test
     public void testFetchByFsns() {
-        Group group = TestHelper.getGroup("Socks");
+        Group group = TestHelper.getEnabledGroup("Socks");
         Policy policy1 = TestHelper.getPolicy("fsn1", group);
         Policy policy2 = TestHelper.getPolicy(null, group);
         policyRepository.persist(policy1);
@@ -35,7 +35,7 @@ public class PolicyRepositoryTest extends TransactionalJpaRepositoryTest {
 
     @Test
     public void testFetchByGroup() {
-        Group group = TestHelper.getGroup("Socks");
+        Group group = TestHelper.getEnabledGroup("Socks");
         Policy policy1 = TestHelper.getPolicy("fsn1", group);
         Policy policy2 = TestHelper.getPolicy(null, group);
         policyRepository.persist(policy1);

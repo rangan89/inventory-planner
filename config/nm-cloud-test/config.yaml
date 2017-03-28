@@ -47,8 +47,8 @@ logging:
     currentLogFilename: /var/log/flipkart/rp/fk-ip-inventory-planner/production.log
     archive: true
     archivedLogFilenamePattern: /var/log/flipkart/rp/fk-ip-inventory-planner/production.%i.log.gz
-    archivedFileCount: 3
-    maxFileSize: 10KB
+    archivedFileCount: 4
+    maxFileSize: 500MB
 
 server:
   applicationConnectors:
@@ -75,8 +75,7 @@ server:
       archive: true
       archivedLogFilenamePattern: /var/log/flipkart/rp/fk-ip-inventory-planner/requests.%i.log.gz
       archivedFileCount: 2
-      maxFileSize: 10KB
-
+      maxFileSize: 500MB
 
 zuluConfiguration:
   url: http://10.47.1.8:31200
