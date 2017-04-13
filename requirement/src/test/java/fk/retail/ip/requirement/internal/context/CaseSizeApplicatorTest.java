@@ -6,12 +6,15 @@ import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import fk.retail.ip.requirement.config.TestModule;
 import fk.retail.ip.requirement.internal.Constants;
+import fk.retail.ip.requirement.internal.command.PayloadCreationHelper;
 import fk.retail.ip.requirement.internal.entities.Requirement;
 import fk.retail.ip.requirement.internal.entities.RequirementSnapshot;
 import fk.retail.ip.requirement.internal.enums.PolicyType;
 import fk.retail.ip.requirement.internal.repository.TestHelper;
 import java.util.List;
 import java.util.Map;
+
+import fk.retail.ip.requirement.model.RequirementChangeRequest;
 import org.jukito.JukitoRunner;
 import org.jukito.UseModules;
 import org.junit.Assert;
@@ -31,6 +34,7 @@ public class CaseSizeApplicatorTest {
 
     @Inject
     ObjectMapper objectMapper;
+
     @Mock
     ForecastContext forecastContext;
     @Mock
@@ -57,11 +61,12 @@ public class CaseSizeApplicatorTest {
         Requirement requirement4 = TestHelper.getRequirement("fsn1", "wh4", "error", true, new RequirementSnapshot(), 0, null, 0, 0, null, 0, null, null);
         Requirement requirement5 = TestHelper.getRequirement("fsn1", "wh4", "error", true, new RequirementSnapshot(), 50, null, 0, 0, null, 0, null, null);
         List<Requirement> requirements = Lists.newArrayList(requirement1, requirement2, requirement3, requirement4, requirement5);
+        List<RequirementChangeRequest> requirementChangeRequestList = Lists.newArrayList();
 
         Map<PolicyType, String> policyMap = Maps.newHashMap();
         String caseSize = String.format(policyFormat, 50);
         policyMap.put(PolicyType.CASE_SIZE, caseSize);
-        caseSizeApplicator.applyPolicies("fsn1", requirements, policyMap, forecastContext, onHandQuantityContext);
+        caseSizeApplicator.applyPolicies("fsn1", requirements, policyMap, forecastContext, onHandQuantityContext,requirementChangeRequestList);
         Assert.assertEquals(0, requirement1.getQuantity(), 0.01);
         Assert.assertEquals(50, requirement2.getQuantity(), 0.01);
         Assert.assertEquals(50, requirement3.getQuantity(), 0.01);
@@ -78,6 +83,7 @@ public class CaseSizeApplicatorTest {
         Requirement requirement4 = TestHelper.getRequirement("fsn1", "wh4", "error", true, new RequirementSnapshot(), 0, null, 0, 0, null, 0, null, null);
         Requirement requirement5 = TestHelper.getRequirement("fsn1", "wh4", "error", true, new RequirementSnapshot(), 50, null, 0, 0, null, 0, null, null);
         List<Requirement> requirements = Lists.newArrayList(requirement1, requirement2, requirement3, requirement4, requirement5);
+        List<RequirementChangeRequest> requirementChangeRequestList = Lists.newArrayList();
 
         Map<PolicyType, String> policyMap = Maps.newHashMap();
         String caseSize = String.format(policyFormat, 50);
@@ -85,7 +91,7 @@ public class CaseSizeApplicatorTest {
         String maxCoveragePolicyFormat = "{\""+Constants.MAX_COVERAGE_KEY+"\":%d}";
         String maxCoverage = String.format(maxCoveragePolicyFormat, 98);
         policyMap.put(PolicyType.MAX_COVERAGE, maxCoverage);
-        caseSizeApplicator.applyPolicies("fsn1", requirements, policyMap, forecastContext, onHandQuantityContext);
+        caseSizeApplicator.applyPolicies("fsn1", requirements, policyMap, forecastContext, onHandQuantityContext,requirementChangeRequestList);
         Assert.assertEquals(0, requirement1.getQuantity(), 0.01);
         Assert.assertEquals(0, requirement2.getQuantity(), 0.01);
         Assert.assertEquals(0, requirement3.getQuantity(), 0.01);
@@ -97,16 +103,17 @@ public class CaseSizeApplicatorTest {
     public void testInvalidCaseSize() {
         Requirement requirement1 = TestHelper.getRequirement("fsn1", "wh1", "proposed", true, new RequirementSnapshot(), 24, null, 0, 0, null, 0, null, null);
         List<Requirement> requirements = Lists.newArrayList(requirement1);
+        List<RequirementChangeRequest> requirementChangeRequestList = Lists.newArrayList();
 
         Map<PolicyType, String> policyMap = Maps.newHashMap();
         String caseSize = String.format(policyFormat, 0);
         policyMap.put(PolicyType.CASE_SIZE, caseSize);
-        caseSizeApplicator.applyPolicies("fsn1", requirements, policyMap, forecastContext, onHandQuantityContext);
+        caseSizeApplicator.applyPolicies("fsn1", requirements, policyMap, forecastContext, onHandQuantityContext, requirementChangeRequestList);
         Assert.assertEquals(24, requirement1.getQuantity(), 0.01);
 
         caseSize = String.format(policyFormat, -1);
         policyMap.put(PolicyType.CASE_SIZE, caseSize);
-        caseSizeApplicator.applyPolicies("fsn1", requirements, policyMap, forecastContext, onHandQuantityContext);
+        caseSizeApplicator.applyPolicies("fsn1", requirements, policyMap, forecastContext, onHandQuantityContext, requirementChangeRequestList);
         Assert.assertEquals(24, requirement1.getQuantity(), 0.01);
     }
 }

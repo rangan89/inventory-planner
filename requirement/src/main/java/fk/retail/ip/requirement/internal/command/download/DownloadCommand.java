@@ -2,21 +2,17 @@ package fk.retail.ip.requirement.internal.command.download;
 
 import fk.retail.ip.requirement.internal.command.RequirementDataAggregator;
 import fk.retail.ip.requirement.internal.entities.Requirement;
-import fk.retail.ip.requirement.internal.repository.FsnBandRepository;
-import fk.retail.ip.requirement.internal.repository.LastAppSupplierRepository;
-import fk.retail.ip.requirement.internal.repository.ProductInfoRepository;
-import fk.retail.ip.requirement.internal.repository.RequirementRepository;
-import fk.retail.ip.requirement.internal.repository.WarehouseRepository;
-import fk.retail.ip.requirement.internal.repository.WeeklySaleRepository;
+import fk.retail.ip.requirement.internal.repository.*;
 import fk.retail.ip.requirement.model.RequirementDownloadLineItem;
 import fk.retail.ip.zulu.client.ZuluClient;
+import lombok.extern.slf4j.Slf4j;
+
+import javax.ws.rs.core.StreamingOutput;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.ws.rs.core.StreamingOutput;
-import lombok.extern.slf4j.Slf4j;
 
 import static java.util.stream.Collectors.toList;
 

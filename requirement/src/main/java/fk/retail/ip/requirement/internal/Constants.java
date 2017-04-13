@@ -1,11 +1,6 @@
 package fk.retail.ip.requirement.internal;
 
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Optional;
-import java.util.Properties;
 import com.google.common.collect.Sets;
 import java.util.Set;
 
@@ -18,6 +13,7 @@ public interface Constants {
     int DAYS_IN_WEEK = 7;
     int WEEKS_OF_FORECAST = 15;
     double MIN_CASE_SIZE = 1D;
+    long DEFAULT_TRANSITION_GROUP = 1;
     String MAX_COVERAGE_KEY = "max_coverage";
     String CASE_SIZE_KEY = "case_size";
     Set<String> INTRANSIT_REQUEST_STATUSES = Sets.newHashSet("in-process", "dispatched", "requested");

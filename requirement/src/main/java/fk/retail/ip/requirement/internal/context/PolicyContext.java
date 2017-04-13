@@ -10,6 +10,8 @@ import fk.retail.ip.requirement.internal.enums.PolicyType;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import fk.retail.ip.requirement.model.RequirementChangeRequest;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -39,8 +41,8 @@ public class PolicyContext {
         return fsnPolicyTypeDataTable.put(fsn, PolicyType.fromString(policyType), value);
     }
 
-    public void applyPolicies(String fsn, List<Requirement> requirements, ForecastContext forecastContext, OnHandQuantityContext onHandQuantityContext) {
-        orderedPolicyApplicators.forEach(policyApplicator -> policyApplicator.applyPolicies(fsn, requirements, fsnPolicyTypeDataTable.row(fsn), forecastContext, onHandQuantityContext));
+    public void applyPolicies(String fsn, List<Requirement> requirements, ForecastContext forecastContext, OnHandQuantityContext onHandQuantityContext, List<RequirementChangeRequest> requirementChangeRequestList) {
+        orderedPolicyApplicators.forEach(policyApplicator -> policyApplicator.applyPolicies(fsn, requirements, fsnPolicyTypeDataTable.row(fsn), forecastContext, onHandQuantityContext, requirementChangeRequestList));
     }
 
     public String getPolicyAsString(String fsn) {

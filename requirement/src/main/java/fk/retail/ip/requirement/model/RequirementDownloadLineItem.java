@@ -2,9 +2,10 @@ package fk.retail.ip.requirement.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import fk.retail.ip.requirement.internal.entities.Requirement;
-import javax.xml.bind.annotation.XmlRootElement;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Created by nidhigupta.m on 26/01/17.

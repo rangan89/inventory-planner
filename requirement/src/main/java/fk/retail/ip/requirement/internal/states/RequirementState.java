@@ -13,6 +13,6 @@ import javax.ws.rs.core.StreamingOutput;
 public interface RequirementState {
 
     StreamingOutput download(List<Requirement> requirements, boolean isLastAppSupplierRequired);
-    List<UploadOverrideFailureLineItem> upload(List<Requirement> requirements, List<RequirementDownloadLineItem> requirementDownloadLineItems);
+    List<UploadOverrideFailureLineItem> upload(List<Requirement> requirements, List<RequirementDownloadLineItem> requirementDownloadLineItems, String userID);
 
 }

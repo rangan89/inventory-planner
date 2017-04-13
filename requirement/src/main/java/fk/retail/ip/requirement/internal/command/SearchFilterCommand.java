@@ -23,7 +23,6 @@ public class SearchFilterCommand {
     }
 
     public List<String> getSearchFilterFsns(Map<String, Object> filters) {
-
         List<String> allFsns = groupFsnRepository.getAllFsns();
         List<String> fsns = (List<String>) filters.get("fsns");
         getFsnsIntersection(allFsns,fsns);

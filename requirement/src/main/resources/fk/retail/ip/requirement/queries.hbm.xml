@@ -88,6 +88,21 @@
         </query>
     </named-query>
 
+    <named-query name="Requirement.getProjectionIds">
+        <query>
+            <![CDATA[
+            SELECT DISTINCT(r.projectionId)
+            FROM Requirement r
+            WHERE
+                r.state = :state AND
+                r.fsn in :fsns AND
+                r.current = true AND
+                r.enabled = true
+                ORDER BY r.projectionId
+                ]]>
+        </query>
+    </named-query>
+
     <named-query name="findCurrentRequirementsByState">
         <query>
             <![CDATA[
@@ -291,6 +306,7 @@
             FROM GroupFsn gf
             WHERE
                 gf.group.enabled = true
+            ORDER BY gf.id
                 ]]>
         </query>
     </named-query>
@@ -363,5 +379,20 @@
             ]]>
         </query>
     </named-query>
+
+    <named-query name="RequirementApprovalTransition.getApprovalStateTransition">
+        <query>
+            <![CDATA[
+            SELECT t
+            FROM RequirementApprovalTransition t
+            WHERE
+                t.fromState = :fromState and
+                t.forward = :forward
+                  ]]>
+        </query>
+    </named-query>
+
+
+
 
 </entity-mappings>

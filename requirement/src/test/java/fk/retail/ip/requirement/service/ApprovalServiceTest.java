@@ -1,25 +1,33 @@
 package fk.retail.ip.requirement.service;
 
-import com.google.inject.Inject;
 import fk.retail.ip.requirement.config.TestDbModule;
+import fk.retail.ip.requirement.internal.Constants;
+import fk.retail.ip.requirement.internal.command.FdpRequirementIngestorImpl;
+import fk.retail.ip.requirement.internal.entities.Group;
 import fk.retail.ip.requirement.internal.entities.Requirement;
+import fk.retail.ip.requirement.internal.entities.RequirementApprovalTransition;
+import fk.retail.ip.requirement.internal.entities.RequirementSnapshot;
 import fk.retail.ip.requirement.internal.enums.RequirementApprovalState;
+import fk.retail.ip.requirement.internal.repository.RequirementApprovalTransitionRepository;
 import fk.retail.ip.requirement.internal.repository.RequirementRepository;
+import fk.retail.ip.requirement.internal.repository.TestHelper;
 import fk.sp.common.extensions.jpa.TransactionalJpaRepositoryTest;
-import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Function;
-import javax.inject.Provider;
-import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import org.jukito.JukitoRunner;
 import org.jukito.UseModules;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 /**
  * @author Pragalathan M<pragalathan.m@flipkart.com>
@@ -28,162 +36,130 @@ import org.junit.runner.RunWith;
 @UseModules(TestDbModule.class)
 public class ApprovalServiceTest extends TransactionalJpaRepositoryTest {
 
-    @Inject
+    @Mock
     private RequirementRepository requirementRepository;
 
-    @Inject
-    private Provider<EntityManager> entityManagerProvider;
+    @Mock
+    private RequirementApprovalTransitionRepository requirementApprovalStateTransitionRepository;
 
-    @Test
-    public void testProposedStateForwardFlow() {
-        testForwardFlow("proposed", "verified", "verify");
-    }
+    @Mock
+    FdpRequirementIngestorImpl fdpRequirementIngestor;
 
-    @Test
-    public void testVerifiedStateForwardFlow() {
-        testForwardFlow("verified", "approved", "approve");
-    }
+    @InjectMocks
+    private ApprovalService approvalService;
 
-    @Test
-    public void testApprovedStateForwardFlow() {
-        testForwardFlow("approved", "bd_approved", "bd_approve");
-    }
 
-    @Test
-    public void testBdApprovedStateForwardFlow() {
-        testForwardFlow("bd_approved", "bizfin_approved", "bizfin_approve");
-    }
+    @Captor
+    private ArgumentCaptor<Requirement> captor;
 
-    @Test
-    public void testBizFinApprovedStateForwardFlow() {
-        testForwardFlow("bizfin_approved", "ipc_finalized", "ipc_finalize");
-    }
 
-    public void testVerifiedStateBackwardFlow() {
-        testBackwardFlow("verified", "proposed", "cancel_verify");
-    }
-
-    @Test
-    public void testApprovedStateBackwardFlow() {
-        testBackwardFlow("approved", "verified", "cancel_approve");
-    }
-
-    @Test
-    public void testBdApprovedStateBackwardFlow() {
-        testBackwardFlow("bd_approved", "approved", "cancel_bd_approve");
-    }
-
-    @Test
-    public void testBizFinApprovedStateBackwardFlow() {
-        testBackwardFlow("bizfin_approved", "bd_approved", "cancel_bizfin_approve");
-    }
-
-    private void testForwardFlow(String fromState, String toState, String action) {
-        Requirement requirement = createRequirement(fromState);
-        Requirement cdoRequirement = createRequirement(RequirementApprovalState.CDO_REVIEW.toString());
-        ApprovalService service = new ApprovalService("/requirement-state-actions.json");
+    @Test(expected = IllegalStateException.class)
+    public void testApprovalFlowWithInvalidState() {
+        String fromState = "proposed";
+        Requirement requirement = createRequirement("verified", true);
         Function<Requirement, String> getter = Requirement::getState;
-        service.changeState(Arrays.asList(requirement), "userId", action, getter, new ApprovalService.CopyOnStateChangeAction(requirementRepository));
+        approvalService.changeState(Arrays.asList(requirement), fromState, "userId", true, getter, new ApprovalService.CopyOnStateChangeAction(requirementRepository, requirementApprovalStateTransitionRepository, fdpRequirementIngestor));
 
-        List<Requirement> results = requirementRepository.findEnabledRequirementsByStateFsn(toState, Arrays.asList(requirement.getFsn()));
-        Requirement actual = results.get(0);
-        Assert.assertEquals(toState, actual.getState());
-        Assert.assertTrue(actual.isCurrent());
-        Assert.assertTrue(actual.isEnabled());
-        Assert.assertEquals(actual.getPreviousStateId(), requirement.getId());
-
-        Assert.assertEquals(actual.getQuantity(), cdoRequirement.getQuantity(),0.01);
-
-        Assert.assertEquals(actual.getSla(), requirement.getSla());
-        Assert.assertEquals(actual.getSupplier(), requirement.getSupplier());
-        Assert.assertEquals(actual.getApp(), requirement.getApp());
-
-        Assert.assertFalse(requirement.isCurrent());
-        Assert.assertTrue(requirement.isEnabled());
     }
 
-    private void testBackwardFlow(String fromState, String toState, String action) {
-        createRequirement(toState); // create the previous state first
-        Requirement requirement = createRequirement(fromState);
-        ApprovalService service = new ApprovalService("/requirement-state-actions.json");
+    @Test
+    public void testApprovalForwardFlow() {
+        String fromState = RequirementApprovalState.PRE_PROPOSED.toString();
+        String toState =  RequirementApprovalState.CDO_REVIEW.toString();
+        boolean forward = true;
+        Requirement requirement = createRequirement(fromState, true);
         Function<Requirement, String> getter = Requirement::getState;
-        service.changeState(Arrays.asList(requirement), "userId", action, getter, new ApprovalService.CopyOnStateChangeAction(requirementRepository));
-
-        List<Requirement> results = requirementRepository.findEnabledRequirementsByStateFsn(toState, Arrays.asList(requirement.getFsn()));
-        Requirement actual = results.get(0);
-        Assert.assertEquals(toState, actual.getState());
-        Assert.assertTrue(actual.isCurrent());
-        Assert.assertTrue(actual.isEnabled());
-//        Assert.assertEquals(actual.getPreviousStateId(), requirement.getId());
-        Assert.assertEquals(actual.getQuantity(), requirement.getQuantity(), 0.01);
-        Assert.assertEquals(actual.getSla(), requirement.getSla());
-        Assert.assertEquals(actual.getSupplier(), requirement.getSupplier());
-        Assert.assertEquals(actual.getApp(), requirement.getApp());
-
-        Assert.assertFalse(requirement.isCurrent());
-        Assert.assertTrue(requirement.isEnabled());
+        RequirementApprovalTransition requirementApprovalTransition = TestHelper.getRequirementApprovalTransition(256, fromState, toState, forward);
+        Mockito.when(requirementApprovalStateTransitionRepository.getApprovalTransition(Mockito.anyString(), Mockito.eq(true))).thenReturn(Arrays.asList(requirementApprovalTransition));
+        Mockito.when(requirementRepository.find(Arrays.asList("fsn1"), true)).thenReturn(Arrays.asList(requirement));
+        Mockito.doNothing().when(requirementRepository).updateProjections(Mockito.anyList(), Mockito.anyMap());
+        approvalService.changeState(Arrays.asList(requirement), fromState, "userId", true, getter, new ApprovalService.CopyOnStateChangeAction(requirementRepository, requirementApprovalStateTransitionRepository, fdpRequirementIngestor));
+        Mockito.verify(requirementRepository).persist(captor.capture());
+        Assert.assertEquals(toState,captor.getValue().getState());
+        Assert.assertEquals(requirement.getId(), captor.getValue().getPreviousStateId());
+        Assert.assertEquals(true, captor.getValue().isCurrent());
+        Assert.assertEquals(false, requirement.isCurrent());
     }
 
-    private Requirement createRequirement(String state) {
+
+    @Test
+    public void testApprovalForwardFlowWithDefaultGroupTransition() {
+        String fromState = RequirementApprovalState.PRE_PROPOSED.toString();
+        String toState =  RequirementApprovalState.PROPOSED.toString();
+        boolean forward = true;
+        Requirement requirement = createRequirement(fromState, true);
+        Function<Requirement, String> getter = Requirement::getState;
+        RequirementApprovalTransition requirementApprovalTransition = TestHelper.getRequirementApprovalTransition(Constants.DEFAULT_TRANSITION_GROUP, fromState, toState, forward);
+        Mockito.when(requirementApprovalStateTransitionRepository.getApprovalTransition(Mockito.anyString(), Mockito.eq(true))).thenReturn(Arrays.asList(requirementApprovalTransition));
+        Mockito.when(requirementRepository.find(Arrays.asList("fsn1"), true)).thenReturn(Arrays.asList(requirement));
+        Mockito.doNothing().when(requirementRepository).updateProjections(Mockito.anyList(), Mockito.anyMap());
+        approvalService.changeState(Arrays.asList(requirement), fromState, "userId", true, getter, new ApprovalService.CopyOnStateChangeAction(requirementRepository, requirementApprovalStateTransitionRepository, fdpRequirementIngestor));
+        Mockito.verify(requirementRepository).persist(captor.capture());
+        Assert.assertEquals(toState,captor.getValue().getState());
+        Assert.assertEquals(requirement.getId(), captor.getValue().getPreviousStateId());
+        Assert.assertEquals(true, captor.getValue().isCurrent());
+        Assert.assertEquals(false, requirement.isCurrent());
+    }
+
+
+    @Test
+    public void testBackwardFlow() {
+        String fromState = RequirementApprovalState.PROPOSED.toString();
+        String toState =  RequirementApprovalState.PRE_PROPOSED.toString();
+        boolean forward = false;
+        Requirement requirement = createRequirement(fromState, true);
+        Function<Requirement, String> getter = Requirement::getState;
+        RequirementApprovalTransition requirementApprovalTransition = TestHelper.getRequirementApprovalTransition(Constants.DEFAULT_TRANSITION_GROUP, fromState, toState, forward);
+        Mockito.when(requirementApprovalStateTransitionRepository.getApprovalTransition(Mockito.anyString(), Mockito.eq(true))).thenReturn(Arrays.asList(requirementApprovalTransition));
+        Mockito.doNothing().when(requirementRepository).updateProjections(Mockito.anyList(), Mockito.anyMap());
+        List<Requirement> allEnabledRequirements = Arrays.asList(createRequirement(toState, false));
+        Mockito.when(requirementRepository.find(Arrays.asList("fsn1"), true)).thenReturn(allEnabledRequirements);
+        approvalService.changeState(Arrays.asList(requirement), fromState, "userId", true, getter, new ApprovalService.CopyOnStateChangeAction(requirementRepository, requirementApprovalStateTransitionRepository, fdpRequirementIngestor));
+        Assert.assertEquals(false, requirement.isCurrent());
+    }
+
+
+    @Test
+    public void testForwardFlowWithToStateEntity() {
+        String fromState = RequirementApprovalState.PRE_PROPOSED.toString();
+        String toState =  RequirementApprovalState.PROPOSED.toString();
+        boolean forward = true;
+        Requirement requirement = createRequirement(fromState, true);
+        Function<Requirement, String> getter = Requirement::getState;
+        RequirementApprovalTransition requirementApprovalTransition = TestHelper.getRequirementApprovalTransition(Constants.DEFAULT_TRANSITION_GROUP, fromState, toState, forward);
+        Mockito.when(requirementApprovalStateTransitionRepository.getApprovalTransition(Mockito.anyString(), Mockito.eq(true))).thenReturn(Arrays.asList(requirementApprovalTransition));
+        List<Requirement> allEnabledRequirements = Arrays.asList(createRequirement(toState, false));
+        Mockito.doNothing().when(requirementRepository).updateProjections(Mockito.anyList(), Mockito.anyMap());
+        Mockito.when(requirementRepository.find(Arrays.asList("fsn1"), true)).thenReturn(allEnabledRequirements);
+        approvalService.changeState(Arrays.asList(requirement), fromState, "userId", true, getter, new ApprovalService.CopyOnStateChangeAction(requirementRepository, requirementApprovalStateTransitionRepository, fdpRequirementIngestor));
+        Assert.assertEquals(false, requirement.isCurrent());
+    }
+
+
+    private Requirement createRequirement(String state, boolean current) {
         Requirement requirement = new Requirement();
         requirement.setFsn("fsn1");
         requirement.setState(state);
         requirement.setEnabled(true);
-        requirement.setCurrent(true);
+        requirement.setCurrent(current);
         requirement.setWarehouse("dummy_warehouse");
         requirement.setCreatedAt(new Date());
         requirement.setUpdatedAt(new Date());
-
-        Long projectionId = insertProjection("fsn1", state).longValue();
-        requirement.setProjectionId(projectionId);
-        requirementRepository.persist(requirement);
+        Group group = TestHelper.getGroup("test_group");
+        group.setId(256l);
+        RequirementSnapshot requirementSnapshot = new RequirementSnapshot();
+        requirementSnapshot.setGroup(group);
+        requirement.setRequirementSnapshot(requirementSnapshot);
         return requirement;
-    }
-    private Requirement createCdoRequirement(String state) {
-        Requirement requirement = new Requirement();
-        requirement.setFsn("fsn1");
-        requirement.setState(state);
-        requirement.setEnabled(true);
-        requirement.setCurrent(false);
-        requirement.setWarehouse("dummy_warehouse");
-        requirement.setCreatedAt(new Date());
-        requirement.setUpdatedAt(new Date());
-
-        Long projectionId = insertProjection("fsn1", state).longValue();
-        requirement.setProjectionId(projectionId);
-        requirementRepository.persist(requirement);
-        return requirement;
-    }
-    //TODO: legacy code
-    private BigInteger insertProjection(String fsn, String state) {
-        EntityManager entityManager = entityManagerProvider.get();
-        try {
-            return (BigInteger) entityManager
-                    .createNativeQuery("SELECT id FROM projections WHERE fsn=:fsn")
-                    .setParameter("fsn", fsn)
-                    .getSingleResult();
-        } catch (NoResultException ex) {
-            entityManager
-                    .createNativeQuery("INSERT INTO projections(fsn, current_state, version) VALUES( :fsn, :state, 0)")
-                    .setParameter("fsn", fsn)
-                    .setParameter("state", state)
-                    .executeUpdate();
-            return (BigInteger) entityManager
-                    .createNativeQuery("SELECT id FROM projections WHERE fsn=:fsn")
-                    .setParameter("fsn", fsn)
-                    .getSingleResult();
-        }
     }
 
     //TODO: legacy code
+
     @Before
-    public void init() {
-        String sql = "CREATE TABLE IF NOT EXISTS projections"
-                + "  (ID BIGINT GENERATED BY DEFAULT AS IDENTITY (START WITH 1, INCREMENT BY 1) NOT NULL,"
-                + "  FSN VARCHAR(32),"
-                + "  current_state varchar(32) NOT NULL,"
-                + "  PRIMARY KEY (ID))";
-        EntityManager entityManager = entityManagerProvider.get();
-        entityManager.createNativeQuery(sql).executeUpdate();
+    public void setup() {
+        MockitoAnnotations.initMocks(this);
     }
+
+
+
 }

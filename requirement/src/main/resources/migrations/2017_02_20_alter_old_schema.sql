@@ -59,3 +59,16 @@ alter table ip_groups add column is_enabled TINYINT(1) NOT NULL DEFAULT 0;
 update ip_groups set is_enabled= 1 where tag = "rp_planning";
 
 alter table `INTRANSIT` add column `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP;
+
+
+
+CREATE TABLE `requirement_approval_state_transition` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `group_id` int(11) NOT NULL,
+  `from_state` varchar(20) NOT NULL DEFAULT '',
+  `to_state` varchar(20) NOT NULL DEFAULT '',
+  `action` varchar(20) NOT NULL DEFAULT '',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `group_fromstate_action` (`group_id`,`from_state`,`action`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

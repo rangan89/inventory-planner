@@ -27,7 +27,9 @@ public class IPCReviewRequirementState implements RequirementState {
     }
 
     @Override
-    public List<UploadOverrideFailureLineItem> upload(List<Requirement> requirements, List<RequirementDownloadLineItem> parsedJson) {
+    public List<UploadOverrideFailureLineItem> upload(List<Requirement> requirements,
+                                                      List<RequirementDownloadLineItem> parsedJson,
+                                                      String userId) {
         throw new UnsupportedOperationException("Invalid Operation");
     }
 }

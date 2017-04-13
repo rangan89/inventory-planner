@@ -9,7 +9,8 @@ public enum OverrideKey {
     QUANTITY("quantity"),
     APP("app"),
     SUPPLIER("supplier"),
-    OVERRIDE_COMMENT("override_comment");
+    OVERRIDE_COMMENT("override_comment"),
+    STATE("state");
 
     private String key;
 

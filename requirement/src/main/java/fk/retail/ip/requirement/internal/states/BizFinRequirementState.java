@@ -24,8 +24,10 @@ public class BizFinRequirementState implements RequirementState {
     }
 
     @Override
-    public List<UploadOverrideFailureLineItem> upload(List<Requirement> requirements,List<RequirementDownloadLineItem> parsedJson) {
-        return uploadBizFinReviewCommandProvider.get().execute(parsedJson, requirements);
+    public List<UploadOverrideFailureLineItem> upload(List<Requirement> requirements,
+                                                      List<RequirementDownloadLineItem> parsedJson,
+                                                      String userId) {
+        return uploadBizFinReviewCommandProvider.get().execute(parsedJson, requirements, userId);
     }
 
     @Override

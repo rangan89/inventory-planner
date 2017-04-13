@@ -12,6 +12,8 @@ import fk.retail.ip.requirement.internal.enums.PolicyType;
 import fk.retail.ip.requirement.internal.repository.TestHelper;
 import java.util.List;
 import java.util.Map;
+
+import fk.retail.ip.requirement.model.RequirementChangeRequest;
 import org.jukito.JukitoRunner;
 import org.jukito.UseModules;
 import org.junit.Assert;
@@ -31,6 +33,7 @@ public class MaxCoverageApplicatorTest {
 
     @Inject
     ObjectMapper objectMapper;
+
     @Mock
     ForecastContext forecastContext;
     @Mock
@@ -57,19 +60,20 @@ public class MaxCoverageApplicatorTest {
         Requirement requirement4 = TestHelper.getRequirement("fsn1", "wh4", "error", true, new RequirementSnapshot(), 10, null, 0, 0, null, 0, null, null);
         Requirement requirement5 = TestHelper.getRequirement("fsn2", "wh1", "proposed", true, new RequirementSnapshot(), 100, null, 0, 0, null, 0, null, null);
         List<Requirement> requirements = Lists.newArrayList(requirement1, requirement2, requirement3, requirement4, requirement5);
+        List<RequirementChangeRequest> requirementChangeRequestList = Lists.newArrayList();
 
         Map<PolicyType, String> policyMap = Maps.newHashMap();
         //max coverage not reached
         String maxCoverage = String.format(policyFormat, 98);
         policyMap.put(PolicyType.MAX_COVERAGE, maxCoverage);
-        maxCoverageApplicator.applyPolicies("fsn1", requirements, policyMap, forecastContext, onHandQuantityContext);
+        maxCoverageApplicator.applyPolicies("fsn1", requirements, policyMap, forecastContext, onHandQuantityContext, requirementChangeRequestList);
         Assert.assertEquals(50, requirement1.getQuantity(), 0.01);
         Assert.assertEquals(30, requirement2.getQuantity(), 0.01);
         Assert.assertEquals(20, requirement3.getQuantity(), 0.01);
         Assert.assertEquals(100, requirement5.getQuantity(), 0.01);
 
         requirement4.setState("proposed");
-        maxCoverageApplicator.applyPolicies("fsn1", requirements, policyMap, forecastContext, onHandQuantityContext);
+        maxCoverageApplicator.applyPolicies("fsn1", requirements, policyMap, forecastContext, onHandQuantityContext, requirementChangeRequestList);
         double totalQuantity = requirement1.getQuantity()+requirement2.getQuantity()+requirement3.getQuantity()+requirement4.getQuantity();
         Assert.assertEquals(105, totalQuantity, 0.01);
     }

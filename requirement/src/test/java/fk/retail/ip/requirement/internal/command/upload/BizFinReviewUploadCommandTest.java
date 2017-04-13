@@ -2,6 +2,7 @@ package fk.retail.ip.requirement.internal.command.upload;
 
 import com.google.common.collect.Lists;
 import fk.retail.ip.requirement.config.TestModule;
+import fk.retail.ip.requirement.internal.command.FdpRequirementIngestorImpl;
 import fk.retail.ip.requirement.internal.entities.Requirement;
 import fk.retail.ip.requirement.internal.entities.RequirementSnapshot;
 import fk.retail.ip.requirement.internal.enums.RequirementApprovalState;
@@ -33,6 +34,9 @@ public class BizFinReviewUploadCommandTest {
     @InjectMocks
     BizFinReviewUploadCommand bizFinReviewUploadCommand;
 
+    @Mock
+    FdpRequirementIngestorImpl fdpRequirementIngestor;
+
     @Before
     public void init() {
         MockitoAnnotations.initMocks(this);
@@ -42,7 +46,7 @@ public class BizFinReviewUploadCommandTest {
     public void uploadTest() throws IOException {
         List<RequirementDownloadLineItem> requirementDownloadLineItems = TestHelper.getBizfinReviewDownloadLineItem();
         List<Requirement> requirements = getRequirements();
-        List<UploadOverrideFailureLineItem> uploadOverrideFailureLineItems = bizFinReviewUploadCommand.execute(requirementDownloadLineItems, requirements);
+        List<UploadOverrideFailureLineItem> uploadOverrideFailureLineItems = bizFinReviewUploadCommand.execute(requirementDownloadLineItems, requirements, "");
 
         Map<Long, Requirement> requirementMap = requirements.stream().collect
                 (Collectors.toMap(Requirement::getId, Function.identity()));

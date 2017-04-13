@@ -29,6 +29,9 @@ subprojects {
 
         compile group: 'org.apache.poi', name: 'poi', version: '3.10-FINAL'
         compile group: 'org.apache.poi', name: 'poi-ooxml', version: '3.10-FINAL'
+        compile ('fk.sp.common:restbus-sender:' + commonExtentions){
+            exclude group: 'com.netflix.hystrix'
+        }
 
         testCompile "junit:junit:4.11"
         testCompile "org.jukito:jukito:1.3"

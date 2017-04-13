@@ -10,11 +10,13 @@ import fk.retail.ip.manager.config.ManagerModule;
 import fk.retail.ip.requirement.config.RequirementModule;
 import fk.retail.ip.ssl.config.SslClientModule;
 import fk.retail.ip.zulu.config.ZuluModule;
+import fk.retail.ip.fdp.config.FdpModule;
 import fk.sp.common.extensions.RequestContextFilter;
 import fk.sp.common.extensions.config.CustomEnumModule;
 import fk.sp.common.extensions.dropwizard.jersey.JerseyClientModule;
 import fk.sp.common.extensions.dropwizard.jersey.LoggingFilter;
 import fk.sp.common.extensions.guice.jpa.spring.JpaWithSpringModule;
+import fk.sp.common.restbus.sender.config.RestbusSenderModule;
 import flipkart.retail.server.admin.bundle.RotationManagementBundle;
 import flipkart.retail.server.admin.config.RotationManagementConfig;
 import io.dropwizard.Application;
@@ -40,6 +42,10 @@ public class ManagerApplication extends Application<ManagerConfiguration> {
         Properties jpaProperties = new Properties();
         jpaProperties.put(JpaWithSpringModule.HIBERNATE_EJB_NAMING_STRATEGY,
                 "fk.retail.ip.manager.config.AnnotationRespectfulNamingStrategy");
+        jpaProperties.put("hibernate.jdbc.batch_size",30);
+        jpaProperties.put("hibernate.order_inserts", "true");
+        jpaProperties.put("hibernate.order_updates", "true");
+        jpaProperties.put("hibernate.jdbc.batch_versioned_data", "true");
         this.guiceBundle = GuiceBundle.<ManagerConfiguration>newBuilder()
                 .setConfigClass(ManagerConfiguration.class)
                 .addModule(new ManagerModule())
@@ -47,9 +53,12 @@ public class ManagerApplication extends Application<ManagerConfiguration> {
                 .addModule(new RequirementModule())
                 .addModule(new ZuluModule())
                 .addModule(new SslClientModule())
+                .addModule(new FdpModule())
+                .addModule(new RestbusSenderModule())
                 .addModule(new JpaWithSpringModule(
                         Sets.newHashSet(
-                                "fk.retail.ip"
+                                "fk.retail.ip",
+                                "com.restbus.client.plugin.hibernate.entity"
                         ), jpaProperties))
                 .enableAutoConfig(
                         "fk.sp.common.extensions.exception",

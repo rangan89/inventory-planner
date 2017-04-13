@@ -12,6 +12,7 @@ import fk.retail.ip.requirement.internal.entities.OpenRequirementAndPurchaseOrde
 import fk.retail.ip.requirement.internal.entities.Policy;
 import fk.retail.ip.requirement.internal.entities.ProductInfo;
 import fk.retail.ip.requirement.internal.entities.Requirement;
+import fk.retail.ip.requirement.internal.entities.RequirementApprovalTransition;
 import fk.retail.ip.requirement.internal.entities.RequirementSnapshot;
 import fk.retail.ip.requirement.internal.entities.Warehouse;
 import fk.retail.ip.requirement.internal.entities.WarehouseSupplierSla;
@@ -49,6 +50,14 @@ public class TestHelper {
         groupFsn.setGroup(group);
         groupFsn.setCreatedAt(new Date());
         return groupFsn;
+    }
+
+    public static Group getGroup(String groupName) {
+        Group group = new Group();
+        group.setName(groupName);
+        group.setEnabled(true);
+        group.setCreatedAt(new Date());
+        return group;
     }
 
     public static Group getEnabledGroup(String name) {
@@ -89,6 +98,32 @@ public class TestHelper {
         fsnBand.setPvBand(3);
         fsnBand.setTimeFrame(timeFrame);
         return fsnBand;
+    }
+
+    public static RequirementApprovalTransition getRequirementApprovalTransition(long groupId, String fromState, String toState, boolean forward) {
+        RequirementApprovalTransition requirementApprovalTransition = new RequirementApprovalTransition();
+        requirementApprovalTransition.setGroupId(groupId);
+        requirementApprovalTransition.setFromState(fromState);
+        requirementApprovalTransition.setToState(toState);
+        requirementApprovalTransition.setForward(forward);
+        return requirementApprovalTransition;
+    }
+
+
+    public static List<RequirementApprovalTransition> getRequirementApprovalTransitionList(long groupId, String fromState, String toState, boolean forward) {
+        List<RequirementApprovalTransition> requirementApprovalTransitionList = Lists.newArrayList();
+        RequirementApprovalTransition requirementApprovalTransition = new RequirementApprovalTransition();
+        requirementApprovalTransition.setGroupId(groupId);
+        requirementApprovalTransition.setFromState(fromState);
+        requirementApprovalTransition.setToState(toState);
+        requirementApprovalTransition.setForward(forward);
+        requirementApprovalTransitionList.add(requirementApprovalTransition);
+        requirementApprovalTransition.setGroupId(1l);
+        requirementApprovalTransition.setFromState(fromState);
+        requirementApprovalTransition.setToState(toState);
+        requirementApprovalTransition.setForward(forward);
+        requirementApprovalTransitionList.add(requirementApprovalTransition);
+        return requirementApprovalTransitionList;
     }
 
     public static LastAppSupplier getLastAppSupplier(String fsn, String wh, String supplier, int app) {
