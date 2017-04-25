@@ -4,9 +4,11 @@ import com.google.common.collect.Sets;
 
 import java.util.Set;
 
+import io.dropwizard.jackson.JsonSnakeCase;
 import lombok.Data;
 
 @Data
+@JsonSnakeCase
 public class TriggerRequirementRequest {
 
     private Set<String> fsns = Sets.newHashSet();
