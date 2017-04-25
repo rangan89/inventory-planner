@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
+
 import javax.inject.Provider;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -21,7 +23,9 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import lombok.extern.slf4j.Slf4j;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by nidhigupta.m on 26/01/17.
@@ -39,6 +43,16 @@ public class JPARequirementRepository extends SimpleJpaGenericRepository<Require
         //todo: now we find requirements by projecion_id(at fsn level. need to think abt it)
         TypedQuery<Requirement> query = getEntityManager().createNamedQuery("findRequirementByIds", Requirement.class);
         query.setParameter("ids", requirementIds);
+        List<Requirement> requirements = query.getResultList();
+        return requirements;
+    }
+
+    @Override
+    public List<Requirement> findActiveRequirementForState(List<Long> requirementIds, String state) {
+        TypedQuery<Requirement> query = getEntityManager().
+                createNamedQuery("findActiveRequirementForState", Requirement.class);
+        query.setParameter("ids", requirementIds);
+        query.setParameter("state", state);
         List<Requirement> requirements = query.getResultList();
         return requirements;
     }

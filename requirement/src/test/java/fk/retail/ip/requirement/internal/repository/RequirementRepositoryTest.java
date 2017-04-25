@@ -108,6 +108,26 @@ public class RequirementRepositoryTest extends TransactionalJpaRepositoryTest {
         Assert.assertNotEquals(requirements.get(0), req2);
     }
 
+    @Test
+    public void getActiveRequirementsInGivenStateByIds() {
+
+        Requirement inactiveRequirement = getRequirement(1);
+        inactiveRequirement.setCurrent(false);
+
+        requirementRepository.persist(inactiveRequirement);
+        IntStream.rangeClosed(2, 30).forEach(i -> {
+
+            requirementRepository.persist(getRequirement(i));
+        });
+
+        long[] ids = LongStream.rangeClosed(1, 30).toArray();
+        Long[] idList = ArrayUtils.toObject(ids);
+        List<Long> idsAsList = Arrays.asList(idList);
+
+        List<Requirement> requirements = requirementRepository.findActiveRequirementForState(idsAsList, "proposed");
+        Assert.assertEquals(29, requirements.size());
+    }
+
     private Requirement getRequirement(int i) {
         String fsn = "fsn" + String.valueOf(i);
         Requirement requirement = TestHelper.getRequirement(fsn, "dummy_warehouse", "proposed", true, null, 10, "supplier",

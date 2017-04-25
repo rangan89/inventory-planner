@@ -84,6 +84,7 @@ public class ApprovalService<E extends AbstractEntity> {
             requirements.stream().forEach((requirement) -> {
                 String toState = requirementToTargetStateMap.get(requirement.getId());
                 boolean isIPCReviewState = RequirementApprovalState.IPC_REVIEW.toString().equals(toState);
+                boolean isBizFinReviewState = RequirementApprovalState.BIZFIN_REVIEW.toString().equals(toState);
                 String cdoState = RequirementApprovalState.CDO_REVIEW.toString();
                 Optional<Requirement> toStateEntity = allEnabledRequirements.stream().filter(e -> e.getFsn().equals(requirement.getFsn()) && e.getWarehouse().equals(requirement.getWarehouse()) && e.getState().equals(toState)).findFirst();
                 RequirementChangeRequest requirementChangeRequest = new RequirementChangeRequest();
@@ -93,7 +94,8 @@ public class ApprovalService<E extends AbstractEntity> {
                     log.info("Adding APPROVE events to fdp request");
                     requirementChangeMaps.add(PayloadCreationHelper.createChangeMap(OverrideKey.STATE.toString(), fromState, toState, FdpRequirementEventType.APPROVE.toString(), "Moved to next state", userId));
                     if (toStateEntity.isPresent()) {
-                        toStateEntity.get().setQuantity(requirement.getQuantity());
+                        if(!isBizFinReviewState)
+                            toStateEntity.get().setQuantity(requirement.getQuantity());
                         if (isIPCReviewState) {
                             Optional<Requirement> cdoStateEntity = allEnabledRequirements.stream().filter(e -> e.getFsn().equals(requirement.getFsn()) && e.getWarehouse().equals(requirement.getWarehouse()) && e.getState().equals(cdoState)).findFirst();
                             toStateEntity.get().setQuantity(cdoStateEntity.get().getQuantity());
@@ -112,6 +114,8 @@ public class ApprovalService<E extends AbstractEntity> {
                             Optional<Requirement> cdoStateEntity = allEnabledRequirements.stream().filter(e -> e.getFsn().equals(requirement.getFsn()) && e.getWarehouse().equals(requirement.getWarehouse()) && e.getState().equals(cdoState)).findFirst();
                             newEntity.setQuantity(cdoStateEntity.get().getQuantity());
                         }
+                        if (isBizFinReviewState)
+                            newEntity.setQuantity(-1);
                         newEntity.setState(toState);
                         newEntity.setCreatedBy(userId);
                         newEntity.setPreviousStateId(requirement.getId());

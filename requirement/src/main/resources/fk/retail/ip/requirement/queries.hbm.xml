@@ -39,6 +39,19 @@
         </query>
     </named-query>
 
+    <named-query name="findActiveRequirementForState">
+        <query>
+            <![CDATA[
+            SELECT r
+            FROM Requirement r
+            WHERE
+                r.id in :ids AND
+                r.current = true AND
+                r.state = :state
+                 ]]>
+        </query>
+    </named-query>
+
     <named-query name="findRequirementByIds.count">
         <query>
             <![CDATA[

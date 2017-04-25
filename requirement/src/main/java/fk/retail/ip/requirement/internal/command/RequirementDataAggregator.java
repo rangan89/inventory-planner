@@ -137,7 +137,7 @@ public class RequirementDataAggregator {
 
         requirementDownloadLineItems.forEach(reqItem
                 -> {
-            if (fsnWhBizFinRecommended.get(reqItem.getFsn(),reqItem.getWarehouse())!=null && !fsnWhBizFinRecommended.get(reqItem.getFsn(),reqItem.getWarehouse()).equals(reqItem.getQuantity()))
+            if (fsnWhBizFinRecommended.get(reqItem.getFsn(),reqItem.getWarehouse())!=null && !fsnWhBizFinRecommended.get(reqItem.getFsn(),reqItem.getWarehouse()).equals(-1))
                 reqItem.setBizFinRecommendedQuantity(fsnWhBizFinRecommended.get(reqItem.getFsn(), reqItem.getWarehouse()));
             reqItem.setBizFinComment(fsnWhBizFinComment.get(reqItem.getFsn(), reqItem.getWarehouse()));
         });

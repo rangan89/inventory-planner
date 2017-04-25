@@ -91,13 +91,14 @@ def get_fsn_product_data (fsn_list):
                 data = []
                 iterator = 0
                 entityViews = response['entityViews'];
-                entityId = ''
-                vertical = ''
-                category = ''
-                super_category = ''
-                title = ''
-                brand = ''
                 for entityView in entityViews:
+                    entityId = ''
+                    vertical = ''
+                    category = ''
+                    super_category = ''
+                    title = ''
+                    brand = ''
+                    fsp = -1
                     if 'entityId' in entityView:
                         entityId = entityView['entityId']
 

@@ -106,4 +106,6 @@ public class RequirementResource {
     public SearchResponse.GroupedResponse search(RequirementSearchRequest request) throws JSONException {
         return requirementService.search(request);
     }
+
+
 }
