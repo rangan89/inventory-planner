@@ -1,21 +1,26 @@
 package fk.retail.ip.manager.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.Multibinder;
-import fk.retail.ip.ssl.config.SslClientConfiguration;
-import fk.retail.ip.fdp.config.FdpConfiguration;
-import fk.retail.ip.zulu.config.ZuluConfiguration;
-import fk.sp.common.extensions.dropwizard.db.HasDataSourceFactory;
-import io.dropwizard.client.JerseyClientConfiguration;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.glassfish.jersey.filter.LoggingFilter;
 
 import java.text.SimpleDateFormat;
 import java.util.logging.Logger;
+
 import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.client.ClientResponseFilter;
-import org.glassfish.jersey.filter.LoggingFilter;
+
+import fk.retail.ip.fdp.config.FdpConfiguration;
+import fk.retail.ip.requirement.config.TriggerRequirementConfiguration;
+import fk.retail.ip.ssl.config.SslClientConfiguration;
+import fk.retail.ip.zulu.config.ZuluConfiguration;
+import fk.sp.common.extensions.dropwizard.db.HasDataSourceFactory;
+import io.dropwizard.client.JerseyClientConfiguration;
 
 import static com.google.inject.multibindings.Multibinder.newSetBinder;
 
@@ -54,6 +59,12 @@ public class ManagerModule extends AbstractModule {
     @Provides
     public FdpConfiguration getFdpConfiguration(ManagerConfiguration managerConfiguration) {
         return managerConfiguration.getFdpConfiguration();
+    }
+
+    @Provides
+    public TriggerRequirementConfiguration getTriggerRequirementConfiguration(
+            ManagerConfiguration managerConfiguration) {
+        return managerConfiguration.getTriggerRequirementConfigurationl();
     }
 
     @Provides

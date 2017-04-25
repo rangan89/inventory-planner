@@ -2,16 +2,19 @@ package fk.retail.ip.requirement.internal.repository;
 
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
-import fk.retail.ip.requirement.config.TestDbModule;
-import fk.retail.ip.requirement.internal.entities.Group;
-import fk.retail.ip.requirement.internal.entities.GroupFsn;
-import fk.sp.common.extensions.jpa.TransactionalJpaRepositoryTest;
-import java.util.List;
+
 import org.jukito.JukitoRunner;
 import org.jukito.UseModules;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.util.List;
+
+import fk.retail.ip.requirement.config.TestDbModule;
+import fk.retail.ip.requirement.internal.entities.Group;
+import fk.retail.ip.requirement.internal.entities.GroupFsn;
+import fk.sp.common.extensions.jpa.TransactionalJpaRepositoryTest;
 
 @RunWith(JukitoRunner.class)
 @UseModules(TestDbModule.class)

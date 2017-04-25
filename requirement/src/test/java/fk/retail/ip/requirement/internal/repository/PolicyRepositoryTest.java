@@ -27,7 +27,7 @@ public class PolicyRepositoryTest extends TransactionalJpaRepositoryTest {
         Policy policy2 = TestHelper.getPolicy(null, group);
         policyRepository.persist(policy1);
         policyRepository.persist(policy2);
-        List<Policy> policies = policyRepository.fetchByFsns(Sets.newHashSet("fsn1"));
+        List<Policy> policies = policyRepository.fetch(Sets.newHashSet("fsn1"));
         Assert.assertEquals(1, policies.size());
         Assert.assertEquals(policy1, policies.get(0));
         Assert.assertEquals(group, policies.get(0).getGroup());

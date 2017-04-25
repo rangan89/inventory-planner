@@ -1,14 +1,12 @@
 package fk.retail.ip.requirement.internal.enums;
 
-import com.google.common.collect.Lists;
 import fk.retail.ip.requirement.internal.Constants;
 import lombok.extern.slf4j.Slf4j;
-import java.util.List;
 
 @Slf4j
 public enum PolicyType {
 
-    PLANNING_CYCLE("PlanningCycle"), ROP("Rop"), ROC("Roc"), MAX_COVERAGE("MaxCoverage"), CASE_SIZE("CaseSize"), UNKNOWN("Unknown");
+    PLANNING_CYCLE("PlanningCycle"), SKIP_LIST("SkipList"), ROP("Rop"), ROC("Roc"), MAX_COVERAGE("MaxCoverage"), CASE_SIZE("CaseSize"), UNKNOWN("Unknown");
     String value;
 
     private PolicyType(String value) {

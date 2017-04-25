@@ -72,7 +72,7 @@ public class TestResource {
     @Produces(MediaType.APPLICATION_JSON)
     public List<Policy> getPolicy(@QueryParam("fsn") String fsn, @QueryParam("group_id") long id) {
         if (fsn != null) {
-            return policyRepository.fetchByFsns(Sets.newHashSet(fsn));
+            return policyRepository.fetch(Sets.newHashSet(fsn));
         } else {
             return policyRepository.fetchByGroup(Sets.newHashSet(id));
         }

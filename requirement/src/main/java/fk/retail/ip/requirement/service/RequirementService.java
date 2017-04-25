@@ -1,35 +1,50 @@
 package fk.retail.ip.requirement.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.json.JSONException;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import javax.ws.rs.core.StreamingOutput;
+
 import fk.retail.ip.core.poi.SpreadSheetReader;
 import fk.retail.ip.requirement.internal.Constants;
-import fk.retail.ip.requirement.internal.command.*;
-
+import fk.retail.ip.requirement.internal.command.CalculateRequirementCommand;
+import fk.retail.ip.requirement.internal.command.FdpRequirementIngestorImpl;
+import fk.retail.ip.requirement.internal.command.SearchCommand;
+import fk.retail.ip.requirement.internal.command.SearchFilterCommand;
+import fk.retail.ip.requirement.internal.command.TriggerRequirementCommand;
 import fk.retail.ip.requirement.internal.entities.Requirement;
 import fk.retail.ip.requirement.internal.enums.OverrideStatus;
 import fk.retail.ip.requirement.internal.enums.RequirementApprovalAction;
-import fk.retail.ip.requirement.internal.enums.RequirementApprovalState;
 import fk.retail.ip.requirement.internal.factory.RequirementStateFactory;
 import fk.retail.ip.requirement.internal.repository.RequirementApprovalTransitionRepository;
 import fk.retail.ip.requirement.internal.repository.RequirementRepository;
 import fk.retail.ip.requirement.internal.states.RequirementState;
-import fk.retail.ip.requirement.model.*;
+import fk.retail.ip.requirement.model.CalculateRequirementRequest;
+import fk.retail.ip.requirement.model.DownloadRequirementRequest;
+import fk.retail.ip.requirement.model.RequirementApprovalRequest;
+import fk.retail.ip.requirement.model.RequirementDownloadLineItem;
+import fk.retail.ip.requirement.model.RequirementSearchLineItem;
+import fk.retail.ip.requirement.model.RequirementSearchRequest;
+import fk.retail.ip.requirement.model.SearchResponse;
+import fk.retail.ip.requirement.model.TriggerRequirementRequest;
+import fk.retail.ip.requirement.model.UploadOverrideFailureLineItem;
+import fk.retail.ip.requirement.model.UploadResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.map.MultiKeyMap;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.json.JSONException;
-
-import javax.ws.rs.core.StreamingOutput;
-import java.io.IOException;
-import java.io.InputStream;
-
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * @author nidhigupta.m
@@ -43,6 +58,7 @@ public class RequirementService {
     private final RequirementApprovalTransitionRepository requirementApprovalStateTransitionRepository;
     private final RequirementStateFactory requirementStateFactory;
     private final ApprovalService approvalService;
+    private final Provider<TriggerRequirementCommand> triggerRequirementCommandProvider;
     private final Provider<CalculateRequirementCommand> calculateRequirementCommandProvider;
     private final SearchFilterCommand searchFilterCommand;
     private final Provider<SearchCommand> searchCommandProvider;
@@ -51,20 +67,24 @@ public class RequirementService {
 
 
     @Inject
-    public RequirementService(RequirementRepository requirementRepository, RequirementStateFactory requirementStateFactory,
-                              ApprovalService approvalService, Provider<CalculateRequirementCommand> calculateRequirementCommandProvider,
+    public RequirementService(RequirementRepository requirementRepository,
+                              RequirementStateFactory requirementStateFactory,
+                              ApprovalService approvalService,
+                              Provider<CalculateRequirementCommand> calculateRequirementCommandProvider,
                               RequirementApprovalTransitionRepository requirementApprovalStateTransitionRepository,
-                              SearchFilterCommand searchFilterCommand, Provider<SearchCommand> searchCommandProvider, FdpRequirementIngestorImpl fdpRequirementIngestor) {
-
+                              Provider<TriggerRequirementCommand> triggerRequirementCommandProvider,
+                              SearchFilterCommand searchFilterCommand,
+                              Provider<SearchCommand> searchCommandProvider,
+                              FdpRequirementIngestorImpl fdpRequirementIngestor) {
         this.requirementRepository = requirementRepository;
         this.requirementStateFactory = requirementStateFactory;
         this.approvalService = approvalService;
         this.calculateRequirementCommandProvider = calculateRequirementCommandProvider;
         this.requirementApprovalStateTransitionRepository = requirementApprovalStateTransitionRepository;
+        this.triggerRequirementCommandProvider = triggerRequirementCommandProvider;
         this.searchFilterCommand = searchFilterCommand;
         this.searchCommandProvider = searchCommandProvider;
         this.fdpRequirementIngestor = fdpRequirementIngestor;
-
     }
 
     public StreamingOutput downloadRequirement(DownloadRequirementRequest downloadRequirementRequest) {
@@ -192,6 +212,10 @@ public class RequirementService {
         }
         log.info("Got Search Response for Requirement");
         return groupedResponse;
+    }
+
+    public List<String> triggerRequirement(TriggerRequirementRequest triggerRequirementRequest) {
+        return triggerRequirementCommandProvider.get().withFsns(triggerRequirementRequest.getFsns()).withGroupIds(triggerRequirementRequest.getGroupIds()).execute();
     }
 
     public void calculateRequirement(CalculateRequirementRequest calculateRequirementRequest) {

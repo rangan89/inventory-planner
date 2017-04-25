@@ -24,7 +24,7 @@ public class JPAWarehouseInventoryRepository extends SimpleJpaGenericRepository<
             return Lists.newArrayList();
         }
         TypedQuery<WarehouseInventory> query =
-                getEntityManager().createNamedQuery("WarehouseInventory.fetchByFsns", WarehouseInventory.class);
+                getEntityManager().createNamedQuery("WarehouseInventory.fetch", WarehouseInventory.class);
         query.setParameter("fsns", fsns);
         return query.getResultList();
     }

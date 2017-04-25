@@ -41,4 +41,14 @@ public class JPAGroupFsnRepository extends SimpleJpaGenericRepository<GroupFsn, 
         TypedQuery<String> query = getEntityManager().createNamedQuery("GroupFsn.getDistinctFsns",String.class);
         return query.getResultList();
     }
+
+    @Override
+    public List<GroupFsn> findByGroupIds(Set<Long> groupIds) {
+        if (CollectionUtils.isEmpty(groupIds)) {
+            return Lists.newArrayList();
+        }
+        TypedQuery<GroupFsn> query = getEntityManager().createNamedQuery("GroupFsn.findByGroupIds",GroupFsn.class);
+        query.setParameter("ids", groupIds);
+        return query.getResultList();
+    }
 }

@@ -2,7 +2,7 @@ package fk.retail.ip.requirement.config;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
-import fk.retail.ip.requirement.internal.command.FdpRequirementIngestorImpl;
+
 import fk.retail.ip.requirement.internal.repository.ForecastRepository;
 import fk.retail.ip.requirement.internal.repository.FsnBandRepository;
 import fk.retail.ip.requirement.internal.repository.GroupFsnRepository;
@@ -35,7 +35,6 @@ import fk.retail.ip.requirement.internal.repository.WarehouseRepository;
 import fk.retail.ip.requirement.internal.repository.WarehouseSupplierSlaRepository;
 import fk.retail.ip.requirement.internal.repository.WarehouseSupplierSlaRepositoryImpl;
 import fk.retail.ip.requirement.internal.repository.WeeklySaleRepository;
-import fk.retail.ip.requirement.model.*;
 import fk.retail.ip.requirement.resource.RequirementResource;
 import fk.retail.ip.requirement.resource.TestResource;
 

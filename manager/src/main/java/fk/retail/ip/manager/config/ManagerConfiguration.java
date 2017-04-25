@@ -1,15 +1,17 @@
 package fk.retail.ip.manager.config;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
+import fk.retail.ip.fdp.config.FdpConfiguration;
+import fk.retail.ip.requirement.config.TriggerRequirementConfiguration;
 import fk.retail.ip.ssl.config.SslClientConfiguration;
 import fk.retail.ip.zulu.config.ZuluConfiguration;
-import fk.retail.ip.fdp.config.FdpConfiguration;
 import fk.sp.common.extensions.dropwizard.db.HasDataSourceFactory;
 import flipkart.retail.server.admin.config.RotationManagementConfig;
 import io.dropwizard.Configuration;
 import io.dropwizard.client.JerseyClientConfiguration;
 import io.dropwizard.db.DataSourceFactory;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -28,6 +30,9 @@ public class ManagerConfiguration extends Configuration implements HasDataSource
 
     @NotNull
     private SslClientConfiguration sslClientConfiguration;
+
+    @NotNull
+    private TriggerRequirementConfiguration triggerRequirementConfigurationl;
 
     @NotNull
     private FdpConfiguration fdpConfiguration;
