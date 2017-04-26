@@ -326,7 +326,7 @@
         </query>
     </named-query>
 
-    <named-query name="GroupFsn.getForGroup">
+    <named-query name="GroupFsn.getFsnsForGroup">
         <query>
             <![CDATA[
             SELECT fsn

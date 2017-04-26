@@ -1,6 +1,13 @@
 package fk.retail.ip.requirement.internal.repository;
 
 import com.google.common.collect.Lists;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import fk.retail.ip.requirement.internal.entities.Forecast;
 import fk.retail.ip.requirement.internal.entities.FsnBand;
 import fk.retail.ip.requirement.internal.entities.Group;
@@ -20,11 +27,6 @@ import fk.retail.ip.requirement.internal.entities.WeeklySale;
 import fk.retail.ip.requirement.model.RequirementDownloadLineItem;
 import fk.retail.ip.zulu.internal.entities.EntityView;
 import fk.retail.ip.zulu.internal.entities.RetailProductAttributeResponse;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class TestHelper {
 

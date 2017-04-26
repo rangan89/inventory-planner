@@ -34,10 +34,6 @@ import fk.sp.common.extensions.jpa.PageRequest;
 import fk.sp.common.restbus.sender.RestbusMessageSender;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * Created by nidhigupta.m on 04/11/16.
- */
-
 @Slf4j
 public class TriggerRequirementCommand {
 
@@ -197,11 +193,11 @@ public class TriggerRequirementCommand {
                 Date nextExecutionDate = cronValueMap.get(cronExpression);
                 if (nextExecutionDate == null) {
                     CronSequenceGenerator generator = new CronSequenceGenerator(cronExpression);
-                    nextExecutionDate = generator.next(new Date());
+                    nextExecutionDate = generator.next(getDate());
                     cronValueMap.put(cronExpression, nextExecutionDate);
                 }
-                SimpleDateFormat format = new SimpleDateFormat("ddMMddyyyy");
-                return format.format(nextExecutionDate).equals(format.format(new Date()));
+                SimpleDateFormat format = new SimpleDateFormat("ddMMyyyy");
+                return format.format(nextExecutionDate).equals(format.format(getDate()));
             } catch (Exception e) {
                 log.warn(e.getMessage(), e);
                 return false;
@@ -219,10 +215,14 @@ public class TriggerRequirementCommand {
                     mapper.readValue(policy.getValue(), new TypeReference<Map<String, String>>() {
                     });
             Date skipUpto = new SimpleDateFormat("d/M/yyyy").parse(policyValue.get("skip_upto"));
-            return new Date().before(skipUpto);
+            return getDate().before(skipUpto);
         } catch (Exception e) {
             log.warn(e.getMessage(), e);
             return false;
         }
+    }
+
+    public Date getDate() {
+        return new Date();
     }
 }
