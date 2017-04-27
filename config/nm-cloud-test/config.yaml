@@ -83,6 +83,12 @@ zuluConfiguration:
   clientId: "retail.rp"
   maxBatchSize: 30
 
+procClientConfiguration:
+  url: http://10.85.52.17
+  viewPath: "/requirements"
+  callbackUrl: http://10.85.110.102:32000/v1/requirement/callback/
+  requirementQueueName: proc_b2b_produciton
+
 fdpConfiguration:
   url: http://10.47.2.122:28223/ingestion/objects
   queueName: "fdp_requirement_ingestion"

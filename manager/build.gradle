@@ -9,6 +9,7 @@ dependencies {
     compile project(':zulu-client')
     compile project(':fdp-client')
     compile project(':ssl-client')
+    compile project(':proc-client')
     compile 'mysql:mysql-connector-java:5.1.37'
 
 }

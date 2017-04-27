@@ -29,7 +29,7 @@ public class RopRocApplicator extends PolicyApplicator {
     public void applyPolicies(String fsn, List<Requirement> requirements, Map<PolicyType, String> policyTypeMap, ForecastContext forecastContext, OnHandQuantityContext onHandQuantityContext, List<RequirementChangeRequest> requirementChangeRequestList) {
         Map<String, Double> warehouseToRopMap = parseRopRoc(policyTypeMap.get(PolicyType.ROP));
         Map<String, Double> warehouseToRocMap = parseRopRoc(policyTypeMap.get(PolicyType.ROC));
-        requirements.stream().filter(requirement -> !Constants.ERROR_STATE.equals(requirement.getState())).forEach(requirement -> {
+        requirements.stream().filter(requirement -> !RequirementApprovalState.ERROR.toString().equals(requirement.getState())).forEach(requirement -> {
             String warehouse = requirement.getWarehouse();
             Double ropDays = warehouseToRopMap.get(warehouse);
             if (!isValidRopRoc(ropDays)) {

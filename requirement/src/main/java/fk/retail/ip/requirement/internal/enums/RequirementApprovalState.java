@@ -12,8 +12,9 @@ public enum RequirementApprovalState {
     CDO_REVIEW("approved"),
     BIZFIN_REVIEW("bd_approved"),
     IPC_REVIEW("bizfin_approved"),
-    IPC_FINALISED("ipc_finalized"), ;
-
+    IPC_FINALISED("ipc_finalized"),
+    PUSHED_TO_PROC("closed"),
+    ERROR("error");
 
 
     private String state;

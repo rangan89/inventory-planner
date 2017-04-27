@@ -157,7 +157,7 @@ public class CalculateRequirementCommand {
         });
 
         //find supplier for non error fsns
-        List<Requirement> validRequirements = allRequirements.stream().filter(requirement -> !Constants.ERROR_STATE.equals(requirement.getState())).collect(Collectors.toList());
+        List<Requirement> validRequirements = allRequirements.stream().filter(requirement -> !RequirementApprovalState.ERROR.toString().equals(requirement.getState())).collect(Collectors.toList());
         populateSupplier(validRequirements,requirementChangeRequestList);
 
 
@@ -175,7 +175,7 @@ public class CalculateRequirementCommand {
         //TODO: remove backward compatibility changes to add entry in projections table
         for (String fsn : fsnToRequirementMap.keySet()) {
             List<Requirement> requirements = fsnToRequirementMap.get(fsn);
-            String state = Constants.ERROR_STATE;
+            String state = RequirementApprovalState.ERROR.toString();
             for (Requirement requirement : requirements) {
 
                 if (RequirementApprovalState.PRE_PROPOSED == RequirementApprovalState.fromString(requirement.getState())) {
@@ -187,7 +187,7 @@ public class CalculateRequirementCommand {
             Requirement requirement = requirements.get(0);
             projection.setFsn(requirement.getFsn());
             projection.setCurrentState(state);
-            projection.setEnabled(Constants.ERROR_STATE.equals(state) ? 0 : 1);
+            projection.setEnabled(RequirementApprovalState.ERROR.toString().equals(state) ? 0 : 1);
             projection.setError("YOLO");
             projection.setProcType(requirement.getProcType());
             projection.setForecastId(0L);
@@ -215,7 +215,7 @@ public class CalculateRequirementCommand {
     private void addProjectionCreatedRequest(List<Requirement> allRequirements, List<RequirementChangeRequest> requirementChangeRequestList) {
 
         allRequirements.forEach(requirement -> {
-            if(!requirement.getState().equals(Constants.ERROR_STATE)) {
+            if(!requirement.getState().equals(RequirementApprovalState.ERROR.toString())) {
                 RequirementChangeRequest requirementChangeRequest = new RequirementChangeRequest();
                 List<RequirementChangeMap> requirementChangeMaps = Lists.newArrayList();
                 requirementChangeMaps.add(PayloadCreationHelper.createChangeMap(OverrideKey.STATE.toString(), null, RequirementApprovalState.PRE_PROPOSED.toString(), FdpRequirementEventType.PROJECTION_CREATED.toString(), "Projection created", "system"));
@@ -229,7 +229,7 @@ public class CalculateRequirementCommand {
     private Requirement getErredRequirement(String fsn, String errorMessage) {
         Requirement requirement = new Requirement();
         requirement.setFsn(fsn);
-        requirement.setState(Constants.ERROR_STATE);
+        requirement.setState(RequirementApprovalState.ERROR.toString());
         requirement.setWarehouse(Constants.NOT_APPLICABLE);
         requirement.setOverrideComment(errorMessage);
         requirement.setEnabled(false);

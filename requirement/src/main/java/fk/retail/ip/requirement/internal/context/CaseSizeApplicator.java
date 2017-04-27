@@ -12,6 +12,7 @@ import fk.retail.ip.requirement.internal.enums.PolicyType;
 import java.util.List;
 import java.util.Map;
 
+import fk.retail.ip.requirement.internal.enums.RequirementApprovalState;
 import fk.retail.ip.requirement.model.RequirementChangeMap;
 import fk.retail.ip.requirement.model.RequirementChangeRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -56,7 +57,7 @@ public class CaseSizeApplicator extends PolicyApplicator {
     private void createRequirementChangeRequest(double oldQuantity, Requirement requirement, List<RequirementChangeRequest> requirementChangeRequestList) {
         RequirementChangeRequest requirementChangeRequest = new RequirementChangeRequest();
         List<RequirementChangeMap> requirementChangeMaps = Lists.newArrayList();
-        if(!Constants.ERROR_STATE.toString().equals(requirement.getState())) {
+        if(!RequirementApprovalState.ERROR.toString().equals(requirement.getState())) {
             requirementChangeMaps.add(PayloadCreationHelper.createChangeMap(OverrideKey.QUANTITY.toString(), String.valueOf(oldQuantity), String.valueOf(requirement.getQuantity()), FdpRequirementEventType.CONTROL_POLICY_QUANTITY_OVERRIDE.toString(), "CaseSize policy applied", "system"));
             requirementChangeRequest.setRequirement(requirement);
             requirementChangeRequest.setRequirementChangeMaps(requirementChangeMaps);

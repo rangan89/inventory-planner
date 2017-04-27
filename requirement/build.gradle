@@ -12,4 +12,5 @@ dependencies {
     compile project(':zulu-client')
     compile project(':ssl-client')
     compile project(':fdp-client')
+    compile project(':proc-client')
 }

@@ -65,6 +65,13 @@ zuluConfiguration:
   clientId: "retail.rp"
   maxBatchSize: 30
 
+procClientConfiguration:
+  url: http://stage-flo-proc-b2b.ch.flipkart.com
+  viewPath: "/requirements"
+  callbackUrl: http://localhost:32000/v1/requirement/callback/
+  requirementQueueName: proc_b2b_produciton
+
+
 sslClientConfiguration:
   url: http://10.85.52.106
   viewPath: "/supplier_selection"
@@ -103,4 +110,3 @@ triggerRequirementConfiguration:
   projectionQueueName: retail_rp_internal_projection
   fetchDataBatchSize: 10000
   createReqBatchSize: 10
-

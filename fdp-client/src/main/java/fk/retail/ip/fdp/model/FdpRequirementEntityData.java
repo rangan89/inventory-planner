@@ -1,5 +1,6 @@
 package fk.retail.ip.fdp.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -24,6 +25,7 @@ public class FdpRequirementEntityData {
     Integer app;
     Integer mrp;
     String currency;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     Date requiredByDate;
     Integer inventoryQty;
     Integer pendingPoQty;
@@ -32,7 +34,9 @@ public class FdpRequirementEntityData {
     String state;
     String poId;
     Boolean enabled;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     Date createdAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     Date updatedAt;
     List<PolicyValueMap> policies;
 }

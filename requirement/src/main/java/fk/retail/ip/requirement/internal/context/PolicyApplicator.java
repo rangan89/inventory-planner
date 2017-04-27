@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import fk.retail.ip.requirement.internal.enums.RequirementApprovalState;
 import fk.retail.ip.requirement.model.RequirementChangeRequest;
 import lombok.extern.slf4j.Slf4j;
 
@@ -62,7 +63,7 @@ public abstract class PolicyApplicator {
 
 
     public void markAsError(Requirement requirement, String errorMessage) {
-        requirement.setState(Constants.ERROR_STATE);
+        requirement.setState(RequirementApprovalState.ERROR.toString());
         requirement.setEnabled(false);
         requirement.setCurrent(false);
         requirement.setOverrideComment(errorMessage);

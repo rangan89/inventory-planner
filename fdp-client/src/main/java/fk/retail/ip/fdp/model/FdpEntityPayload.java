@@ -1,6 +1,8 @@
 package fk.retail.ip.fdp.model;
 
 import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 /**
@@ -9,6 +11,7 @@ import lombok.Data;
 @Data
 public class FdpEntityPayload<T> {
     Object entityId;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     Date updatedAt;
     String schemaVersion;
     T data;

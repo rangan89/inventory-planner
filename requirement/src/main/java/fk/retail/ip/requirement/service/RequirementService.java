@@ -13,6 +13,7 @@ import org.json.JSONException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -21,13 +22,18 @@ import java.util.stream.Collectors;
 import javax.ws.rs.core.StreamingOutput;
 
 import fk.retail.ip.core.poi.SpreadSheetReader;
+import fk.retail.ip.proc.model.PushToProcResponse;
 import fk.retail.ip.requirement.internal.Constants;
 import fk.retail.ip.requirement.internal.command.CalculateRequirementCommand;
 import fk.retail.ip.requirement.internal.command.FdpRequirementIngestorImpl;
+import fk.retail.ip.requirement.internal.command.PayloadCreationHelper;
+import fk.retail.ip.requirement.internal.command.PushToProcCommand;
 import fk.retail.ip.requirement.internal.command.SearchCommand;
 import fk.retail.ip.requirement.internal.command.SearchFilterCommand;
 import fk.retail.ip.requirement.internal.command.TriggerRequirementCommand;
 import fk.retail.ip.requirement.internal.entities.Requirement;
+import fk.retail.ip.requirement.internal.enums.FdpRequirementEventType;
+import fk.retail.ip.requirement.internal.enums.OverrideKey;
 import fk.retail.ip.requirement.internal.enums.OverrideStatus;
 import fk.retail.ip.requirement.internal.enums.RequirementApprovalAction;
 import fk.retail.ip.requirement.internal.factory.RequirementStateFactory;
@@ -36,7 +42,10 @@ import fk.retail.ip.requirement.internal.repository.RequirementRepository;
 import fk.retail.ip.requirement.internal.states.RequirementState;
 import fk.retail.ip.requirement.model.CalculateRequirementRequest;
 import fk.retail.ip.requirement.model.DownloadRequirementRequest;
+import fk.retail.ip.requirement.model.RaisePORequest;
 import fk.retail.ip.requirement.model.RequirementApprovalRequest;
+import fk.retail.ip.requirement.model.RequirementChangeMap;
+import fk.retail.ip.requirement.model.RequirementChangeRequest;
 import fk.retail.ip.requirement.model.RequirementDownloadLineItem;
 import fk.retail.ip.requirement.model.RequirementSearchLineItem;
 import fk.retail.ip.requirement.model.RequirementSearchRequest;
@@ -62,6 +71,7 @@ public class RequirementService {
     private final Provider<CalculateRequirementCommand> calculateRequirementCommandProvider;
     private final SearchFilterCommand searchFilterCommand;
     private final Provider<SearchCommand> searchCommandProvider;
+    private final PushToProcCommand pushToProcCommand;
     private final int PAGE_SIZE = 20;
     private final FdpRequirementIngestorImpl fdpRequirementIngestor;
 
@@ -75,7 +85,8 @@ public class RequirementService {
                               Provider<TriggerRequirementCommand> triggerRequirementCommandProvider,
                               SearchFilterCommand searchFilterCommand,
                               Provider<SearchCommand> searchCommandProvider,
-                              FdpRequirementIngestorImpl fdpRequirementIngestor) {
+                              FdpRequirementIngestorImpl fdpRequirementIngestor,
+                              PushToProcCommand pushToProcCommand) {
         this.requirementRepository = requirementRepository;
         this.requirementStateFactory = requirementStateFactory;
         this.approvalService = approvalService;
@@ -84,6 +95,7 @@ public class RequirementService {
         this.triggerRequirementCommandProvider = triggerRequirementCommandProvider;
         this.searchFilterCommand = searchFilterCommand;
         this.searchCommandProvider = searchCommandProvider;
+        this.pushToProcCommand = pushToProcCommand;
         this.fdpRequirementIngestor = fdpRequirementIngestor;
     }
 
@@ -182,6 +194,39 @@ public class RequirementService {
         approvalService.changeState(requirements, state, userId, forward, getter, new ApprovalService.CopyOnStateChangeAction(requirementRepository, requirementApprovalStateTransitionRepository, fdpRequirementIngestor));
         log.info("State changed for {} number of requirements", requirements.size());
         return "{\"msg\":\"Moved " + requirements.size() + " requirements to new state.\"}";
+    }
+
+    public String pushToProc(RaisePORequest request, String userId) throws JSONException {
+        log.info("Push to proc request received " + request);
+        List<Long> ids = (List<Long>) request.getFilters().get("id");
+        List<String> fsns = searchFilterCommand.getSearchFilterFsns(request.getFilters());
+        String state = (String) request.getFilters().get("state");
+        List<Requirement> requirements = requirementRepository.findRequirements(ids, state, fsns);
+        int pushedRequirements = pushToProcCommand.pushToProc(requirements,userId);
+        log.info("Moved {} number of requirements to Procurement", requirements.size());
+        return "{\"msg\":\"Moved " + pushedRequirements +" requirements to Procurement.\"}";
+    }
+
+    public String setPurchaseOrderId(Long reqId, PushToProcResponse callback) {
+        log.info("Proc response received for requirement_id: " + reqId);
+        List<Requirement> requirementList = requirementRepository.findRequirementByIds(Arrays.asList(reqId));
+        Requirement requirement = requirementList.get(0);
+        Map<String,Object> response = callback.getProcResponse().get(0); //since we get only one requirement response from proc
+        requirement.setPoId((Integer) response.get("id"));
+        String userId = requirement.getCreatedBy();
+        //Add PROC_CALLBACK_RECEIVED events to fdp request
+        List<RequirementChangeRequest> requirementChangeRequestList = Lists.newArrayList();
+        RequirementChangeRequest requirementChangeRequest = new RequirementChangeRequest();
+        List<RequirementChangeMap> requirementChangeMaps = Lists.newArrayList();
+        log.info("Adding PROC_CALLBACK_RECEIVED events to fdp request");
+        requirementChangeRequest.setRequirement(requirement);
+        requirementChangeMaps.add(PayloadCreationHelper.createChangeMap(OverrideKey.PO_ID.toString(), null, requirement.getPoId().toString(), FdpRequirementEventType.PROC_CALLBACK_RECEIVED.toString(), "Proc callback received", userId));
+        requirementChangeRequest.setRequirementChangeMaps(requirementChangeMaps);
+        requirementChangeRequestList.add(requirementChangeRequest);
+        //Push PROC_CALLBACK_RECEIVED events to fdp
+        log.info("Pushing PROC_CALLBACK_RECEIVED events to fdp");
+        fdpRequirementIngestor.pushToFdp(requirementChangeRequestList);
+        return "{\"msg\":\"Set po_id for requirement_id: " + reqId + " \"}";
     }
 
     public SearchResponse.GroupedResponse search(RequirementSearchRequest request) throws JSONException {

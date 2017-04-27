@@ -12,6 +12,7 @@ import fk.retail.ip.requirement.internal.enums.PolicyType;
 import java.util.List;
 import java.util.Map;
 
+import fk.retail.ip.requirement.internal.enums.RequirementApprovalState;
 import fk.retail.ip.requirement.model.RequirementChangeMap;
 import fk.retail.ip.requirement.model.RequirementChangeRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +30,7 @@ public class MaxCoverageApplicator extends PolicyApplicator {
         if (isValidMaxCoverage(maxCoverageDays)) {
             double maxCoverageQuantity = convertDaysToQuantity(maxCoverageDays, forecastContext.getForecast(fsn));
             double totalOnHandQuantity = onHandQuantityContext.getTotalQuantity(fsn);
-            double totalProjectedQuantity = requirements.stream().filter(requirement -> !Constants.ERROR_STATE.equals(requirement.getState()) && fsn.equals(requirement.getFsn())).mapToDouble(Requirement::getQuantity).sum();
+            double totalProjectedQuantity = requirements.stream().filter(requirement -> !RequirementApprovalState.ERROR.toString().equals(requirement.getState()) && fsn.equals(requirement.getFsn())).mapToDouble(Requirement::getQuantity).sum();
             if (maxCoverageQuantity < totalProjectedQuantity + totalOnHandQuantity) {
                 double reductionRatio = (maxCoverageQuantity - totalOnHandQuantity) / totalProjectedQuantity;
                 requirements.forEach(requirement -> {

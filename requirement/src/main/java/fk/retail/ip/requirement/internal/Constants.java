@@ -28,6 +28,7 @@ public interface Constants {
     String UNABLE_TO_PARSE = "Unable to parse: {}";
     String NOT_APPLICABLE = "N/A";
     String ERROR_STATE = "error";
+    String PUSHED_TO_PROC_FAILED = "Pushed to proc failed";
 
     String FSN_OR_WAREHOUSE_IS_MISSING = "FSN or Warehouse is missing";
     String QUANTITY_OVERRIDE_COMMENT_IS_MISSING = "Quantity override reason is missing";

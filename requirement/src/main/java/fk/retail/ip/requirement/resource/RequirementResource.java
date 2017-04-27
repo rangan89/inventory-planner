@@ -21,14 +21,17 @@ import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 
+import fk.retail.ip.proc.model.PushToProcResponse;
 import fk.retail.ip.requirement.model.CalculateRequirementRequest;
 import fk.retail.ip.requirement.model.DownloadRequirementRequest;
+import fk.retail.ip.requirement.model.RaisePORequest;
 import fk.retail.ip.requirement.model.RequirementApprovalRequest;
 import fk.retail.ip.requirement.model.RequirementSearchRequest;
 import fk.retail.ip.requirement.model.SearchResponse;
@@ -126,6 +129,20 @@ public class RequirementResource {
             userId = "dummyUser";
         }
         return requirementService.changeState(request, userId);
+    }
+
+    @POST
+    @Path("/push_to_proc")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String pushToProc(RaisePORequest request, @HeaderParam("X-Proxy-User") String userId) throws JSONException {
+        return requirementService.pushToProc(request, userId);
+    }
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/callback/{req_id}")
+    public String updateRequirements(@PathParam("req_id") Long reqId, PushToProcResponse callback) {
+        return requirementService.setPurchaseOrderId(reqId, callback);
     }
 
     @POST
