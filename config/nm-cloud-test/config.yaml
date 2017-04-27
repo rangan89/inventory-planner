@@ -111,7 +111,7 @@ clientConfiguration:
   gzipEnabledForRequests: false
   chunkedEncodingEnabled: false
 
-triggerRequirementConfigurationl:
+triggerRequirementConfiguration:
   url: http://10.85.53.212/v1/requirement
   projectionQueueName: retail_rp_internal_projection
   fetchDataBatchSize: 10000

@@ -32,7 +32,7 @@ public class ManagerConfiguration extends Configuration implements HasDataSource
     private SslClientConfiguration sslClientConfiguration;
 
     @NotNull
-    private TriggerRequirementConfiguration triggerRequirementConfigurationl;
+    private TriggerRequirementConfiguration triggerRequirementConfiguration;
 
     @NotNull
     private FdpConfiguration fdpConfiguration;

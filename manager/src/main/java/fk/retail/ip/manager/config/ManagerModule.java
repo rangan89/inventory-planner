@@ -64,7 +64,7 @@ public class ManagerModule extends AbstractModule {
     @Provides
     public TriggerRequirementConfiguration getTriggerRequirementConfiguration(
             ManagerConfiguration managerConfiguration) {
-        return managerConfiguration.getTriggerRequirementConfigurationl();
+        return managerConfiguration.getTriggerRequirementConfiguration();
     }
 
     @Provides
